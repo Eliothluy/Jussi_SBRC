@@ -1,0 +1,15 @@
+{
+    "simTime": [10.0],
+    "appStart": [0.5],
+    "scenario": ["normal"],
+    "seed": [1],
+    "periodMs": [10],
+    "embbUes": [5],
+    "urllcUes": [5],
+    "mtcUes": [10],
+    "weights": ["0.3333,0.4000,0.2667"],
+    "txPower": [43.0],
+    "tddPattern": ["D|D|D|D|D|D|D|D|D|D"],
+    "LogAllMacSlots": [false],
+    "MacLoggingPeriodMs": [100]
+}

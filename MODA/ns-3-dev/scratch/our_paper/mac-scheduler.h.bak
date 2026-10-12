@@ -1,0 +1,239 @@
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Slice-Aware Meta-Scheduler for 5G-LENA (ns-3)
+ *
+ * Slice-aware OFDMA MAC scheduler with dynamic intra-slice algorithm
+ * selection. Partitions PRBs (RBGs) across slices by configurable
+ * weights and applies per-slice Round Robin, Proportional Fair, or
+ * Best CQI (Maximum Rate) ordering.
+ */
+
+#pragma once
+
+#include "ns3/nr-mac-scheduler-ofdma-rr.h"
+
+#include <cstdint>
+#include <fstream>
+#include <string>
+#include <vector>
+
+namespace ns3
+{
+
+/**
+ * @ingroup scheduler
+ * @brief Slice-Aware Meta-Scheduler: slice-aware OFDMA with dynamic intra-slice policy
+ *
+ * The scheduler partitions the available RBGs among N configured slices
+ * according to a vector of proportional weights that sum to 1.0.
+ * Within each slice, UEs are sorted by a selectable intra-slice algorithm:
+ *
+ *   RR   - Round Robin (fewest assigned RBGs first)
+ *   PF   - Proportional Fair (potentialTput / avgTput)
+ *   BCQI - Best CQI / Maximum Rate (highest MCS first)
+ *
+ * Configuration is updated at run-time through SetSliceConfiguration(),
+ * typically called every 10 ms (one 5G frame) by the DRL agent callback.
+ */
+class MacScheduler : public NrMacSchedulerOfdmaRR
+{
+  public:
+    /**
+     * @brief Intra-slice scheduling algorithm identifier
+     */
+    enum class IntraSliceAlgorithm : uint8_t
+    {
+        RR = 0,   //!< Round Robin
+        PF = 1,   //!< Proportional Fair
+        BCQI = 2  //!< Best CQI (Maximum Rate)
+    };
+
+    static TypeId GetTypeId();
+
+    MacScheduler();
+    ~MacScheduler() override;
+
+    /**
+     * @brief Configure slice PRB weights and intra-slice algorithms
+     *
+     * @param prbWeights     Vector of N weights (must sum to 1.0)
+     * @param algorithms     Vector of N intra-slice algorithms
+     *
+     * Can be called at any time to update the scheduler policy (e.g., every 10 ms).
+     */
+    void SetSliceConfiguration(const std::vector<double>& prbWeights,
+                               const std::vector<IntraSliceAlgorithm>& algorithms);
+
+    /**
+     * @brief Map UE RNTIs to slices
+     *
+     * @param numSlices      Number of slices
+     * @param sliceUeRnti    Vector of N vectors; sliceUeRnti[s] lists RNTIs of slice s
+     */
+    void SetSliceUeMapping(uint32_t numSlices,
+                           const std::vector<std::vector<uint32_t>>& sliceUeRnti);
+
+    uint32_t GetNumSlices() const;
+    double GetPrbWeight(uint32_t sliceIdx) const;
+    IntraSliceAlgorithm GetIntraAlgorithm(uint32_t sliceIdx) const;
+
+    /**
+     * @brief Get the slice index for a given RNTI
+     * @param rnti  UE RNTI
+     * @return slice index or -1 if not found
+     */
+    int32_t GetSliceIndexForRnti(uint16_t rnti) const;
+
+    void DumpSliceConfiguration() const;
+    void SetScenarioName(const std::string& name);
+    void SetOutputDir(const std::string& dir);
+
+    /**
+     * @brief Check buffer status of a UE in m_ueMap
+     * @param rnti UE RNTI
+     * @return total DL buffer size in bytes, 0 if not found
+     */
+    uint32_t GetUeDlBufferSize(uint16_t rnti) const;
+
+    /**
+     * @brief Set current slot number for logging
+     * @param slot Current slot number
+     */
+    void SetCurrentSlot(uint32_t slot);
+
+    /**
+     * @brief Set current BWP ID for logging
+     * @param bwpId Current BWP ID
+     */
+    void SetBwpId(uint32_t bwpId);
+
+  protected:
+    std::shared_ptr<NrMacSchedulerUeInfo> CreateUeRepresentation(
+        const NrMacCschedSapProvider::CschedUeConfigReqParameters& params) const override;
+
+    BeamSymbolMap AssignDLRBG(uint32_t symAvail, const ActiveUeMap& activeDl) const override;
+
+    void AssignedDlResources(const UePtrAndBufferReq& ue,
+                             const FTResources& assigned,
+                             const FTResources& totAssigned) const override;
+
+    void AssignedUlResources(const UePtrAndBufferReq& ue,
+                             const FTResources& assigned,
+                             const FTResources& totAssigned) const override;
+
+    void NotAssignedDlResources(const UePtrAndBufferReq& ue,
+                                const FTResources& notAssigned,
+                                const FTResources& totalAssigned) const override;
+
+    void NotAssignedUlResources(const UePtrAndBufferReq& ue,
+                                const FTResources& notAssigned,
+                                const FTResources& totalAssigned) const override;
+
+    void BeforeDlSched(const UePtrAndBufferReq& ue,
+                       const FTResources& assignableInIteration) const override;
+
+    void BeforeUlSched(const UePtrAndBufferReq& ue,
+                       const FTResources& assignableInIteration) const override;
+
+  private:
+    /**
+     * @brief Sort UEs within a slice by the selected intra-slice algorithm
+     */
+    void SortUeVectorByAlgorithm(std::vector<UePtrAndBufferReq>& ueVector,
+                                  IntraSliceAlgorithm algo) const;
+
+    void OpenCsvFiles() const;
+
+    /**
+     * @brief Determine if current slot should be logged
+     * @param timeMs Current time in milliseconds
+     * @return true if this slot should be logged
+     */
+    bool ShouldLogSlot(uint64_t timeMs) const;
+
+    /**
+     * @brief Get current slot number for logging
+     * @return current slot number
+     */
+    uint32_t GetCurrentSlot() const;
+
+    /**
+     * @brief Get current BWP ID for logging
+     * @return current BWP ID
+     */
+    uint32_t GetBwpId() const;
+
+    /**
+     * @brief Increment and get next DL scheduling call ID
+     * @return next call ID
+     */
+    uint64_t GetNextCallId() const;
+
+    uint32_t m_numSlices{0};
+    std::vector<double> m_prbWeights;                     // per-slice PRB proportion
+    std::vector<IntraSliceAlgorithm> m_intraAlgorithms;    // per-slice algorithm
+    std::vector<std::vector<uint32_t>> m_sliceUeRnti;      // RNTIs per slice
+
+    double m_timeWindow{99.0}; //!< PF averaging time window
+    double m_alpha{0.0};       //!< PF fairness index (0 = full fairness)
+
+    bool m_fallbackUnmappedToSlice0{false};
+    mutable bool m_firstRun{true};
+
+    std::string m_scenarioName;
+    std::string m_outputDir;
+
+    mutable std::ofstream m_sliceAllocCsv;
+    mutable std::ofstream m_unmappedRntiCsv;
+    mutable std::ofstream m_ueAllocCsv;
+    mutable std::ofstream m_harqTrackingCsv;
+    mutable std::ofstream m_activeDlDiagCsv;
+
+    // Instrumentation: call counter and tracking
+    mutable uint64_t m_dlSchedCallSeq{0};
+    mutable uint32_t m_currentSlot{0};
+    mutable uint32_t m_bwpId{0};
+
+    // Logging control attributes
+    bool m_logAllMacSlots{false};
+    uint32_t m_macLoggingPeriodMs{100};
+    bool m_enableDetailedMacLogging{false};
+    mutable uint64_t m_lastLoggedMs{0};
+
+    /**
+     * @brief Last known DL buffer size per RNTI (updated during scheduling)
+     */
+    mutable std::map<uint16_t, uint32_t> m_lastDlBufferSize;
+
+    /**
+     * @brief Cumulative RBG allocation tracking per slice (updated every call,
+     *        not just logged slots). Used to diagnose scheduling gaps where
+     *        brief URLLC allocations happen between logged slots.
+     */
+    mutable std::vector<uint64_t> m_cumulSliceAllocRbg;
+    mutable std::vector<uint64_t> m_cumulSliceAllocCalls;
+
+    /**
+     * @brief Collect RNTIs present in the activeDl map
+     * @param activeDl Active UE map from base scheduler
+     * @return Set of RNTIs found in activeDl
+     */
+    std::set<uint16_t> CollectActiveRntis(const ActiveUeMap& activeDl) const;
+
+    /**
+     * @brief Log activeDl diagnostic: which slice RNTIs are present/missing
+     * @param callId Scheduling call ID
+     * @param timeMs Current time in ms
+     * @param activeDl Active UE map
+     */
+    void LogActiveDlDiagnostic(uint64_t callId, uint64_t timeMs, const ActiveUeMap& activeDl) const;
+
+    /**
+     * @brief Log HARQ state for all slice UEs
+     * @param callId Scheduling call ID
+     * @param timeMs Current time in ms
+     */
+    void LogHarqState(uint64_t callId, uint64_t timeMs) const;
+};
+
+} // namespace ns3

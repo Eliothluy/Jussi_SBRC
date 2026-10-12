@@ -1,0 +1,5 @@
+# Estado de tooling de agentes/workflows
+.zcode/
+
+# Backup do git original do fork MODA (repo Eliothluy/MODA intocado)
+moda-git-backup/

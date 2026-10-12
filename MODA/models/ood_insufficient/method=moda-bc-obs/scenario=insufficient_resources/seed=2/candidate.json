@@ -1,0 +1,14 @@
+{
+  "weights": [
+    0.3580999970436096,
+    0.09109999984502792,
+    0.5508000254631042
+  ],
+  "score_v1": -28.803145929999996,
+  "score_v2": -4267.38,
+  "failed": false,
+  "reason": "",
+  "method": "moda-bc-obs",
+  "scenario": "insufficient_resources",
+  "seed": 2
+}

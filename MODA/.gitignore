@@ -1,0 +1,42 @@
+# Root .gitignore — protege artefatos de simulação que não devem ir ao repo.
+#
+# Os resultados das campanhas são volumosos (centenas de MB a GBs) e ficam em
+# results_controlled/ tanto no ns-3-dev quanto no ns-o-ran-gym. Nunca commitá-los.
+# O ns-o-ran-gym/.gitignore já cobre seu próprio results_controlled/; este arquivo
+# estende a proteção ao ns-3-dev/ e a artefatos temporários da campanha.
+
+# Resultados de simulação (em qualquer nível)
+results_controlled/
+results_rslaq_*/
+results_metaheuristics/
+results_rslaq_metaheuristics/
+
+# Artefatos de campanha temporários / de retomada
+*.pid
+resume_campaign.log
+run_all_scenarios_parallel*.log
+run_meta_parallel*.log
+
+# Logs de execução de meta-heurística (por par)
+.meta_*.log
+
+# ns-3 build artifacts (já cobertos pelo ns-3-dev/.gitignore, reforçando)
+ns-3-dev/build/
+
+# Virtual environments (locais, não versionados)
+.venv-dashboard/
+.venv/
+
+# Pastas de artefatos/paper mantidas apenas localmente (2026-09-29)
+analysis_rslaq_validation/
+backup_v1_scratch_rslaq_20260626/
+figuras_overleaf/
+paper_ieee_v2_latex/
+paper_moda_offline_drl/
+paper_v2_campaign/
+projetoUFPA/
+resultados_cenarios_finalizados_20260715/
+paper_figures_completed_scenarios_en/
+
+# Estado de tooling de agentes/workflows
+.zcode/

@@ -1,0 +1,100 @@
+========================================
+  RSLAQ Simulation (Slice-Aware + IPC)
+========================================
+Scenario     : normal
+RF profile   : RAN650 n78 + AW3161-E-F-V2 outdoor panel
+Frequency    : 3.55 GHz
+Bandwidth    : 100 MHz
+Numerology   : 1 (SCS 30 kHz)
+UEs          : 20 (eMBB=5 URLLC=5 MTC=10)
+UE area      : uniform disc radius 100 m, UE height 1.5 m
+gNB height   : 10 m
+gNB antenna  : 4 ports, +/-45 deg pol, 17.9 dBi, 65x7 deg, tilt 6 deg, bearing 0 deg
+SimTime      : 5 s
+TxPower      : 43 dBm
+gNB NF       : 4 dB
+RLC mode     : UM
+Shadowing    : enabled
+Stats period : 10 ms
+BaselineMode : slice_custom
+IntraAlgo    : PF
+WeightPolicy : static
+Seed/Run     : 2/1
+IPC enabled  : NO (standalone)
+OutputDir    : /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=best_meta_(rerun)/scenario=normal/seed=2/results_rslaq_network_only/scenario=normal/mode=slice_custom/seed=2_run=1
+Weights      : eMBB=0.627274 URLLC=0.206918 MTC=0.165808
+
+UE  1 [eMBB] port=12001 rate=     14.00 Mbps pkt=1500 B
+UE  2 [eMBB] port=12002 rate=     14.00 Mbps pkt=1500 B
+UE  3 [eMBB] port=12003 rate=     14.00 Mbps pkt=1500 B
+UE  4 [eMBB] port=12004 rate=     14.00 Mbps pkt=1500 B
+UE  5 [eMBB] port=12005 rate=     14.00 Mbps pkt=1500 B
+UE  6 [URLLC] port=12006 rate=      0.20 Mbps pkt=50 B
+UE  7 [URLLC] port=12007 rate=      0.20 Mbps pkt=50 B
+UE  8 [URLLC] port=12008 rate=      0.20 Mbps pkt=50 B
+UE  9 [URLLC] port=12009 rate=      0.20 Mbps pkt=50 B
+UE 10 [URLLC] port=12010 rate=      0.20 Mbps pkt=50 B
+UE 11 [ MTC] port=12011 rate=      0.20 Mbps pkt=100 B
+UE 12 [ MTC] port=12012 rate=      0.20 Mbps pkt=100 B
+UE 13 [ MTC] port=12013 rate=      0.20 Mbps pkt=100 B
+UE 14 [ MTC] port=12014 rate=      0.20 Mbps pkt=100 B
+UE 15 [ MTC] port=12015 rate=      0.20 Mbps pkt=100 B
+UE 16 [ MTC] port=12016 rate=      0.20 Mbps pkt=100 B
+UE 17 [ MTC] port=12017 rate=      0.20 Mbps pkt=100 B
+UE 18 [ MTC] port=12018 rate=      0.20 Mbps pkt=100 B
+UE 19 [ MTC] port=12019 rate=      0.20 Mbps pkt=100 B
+UE 20 [ MTC] port=12020 rate=      0.20 Mbps pkt=100 B
+
+=== UE Mapping (RNTI real após attach) ===
+ Idx |   IMSI |   RNTI |  SliceId | SliceType
+-------------------------------------------
+   1 |      1 |      1 |        0 |     eMBB
+   2 |      2 |      2 |        0 |     eMBB
+   3 |      3 |      3 |        0 |     eMBB
+   4 |      4 |      4 |        0 |     eMBB
+   5 |      5 |      5 |        0 |     eMBB
+   6 |      6 |      6 |        1 |    URLLC
+   7 |      7 |      7 |        1 |    URLLC
+   8 |      8 |      8 |        1 |    URLLC
+   9 |      9 |      9 |        1 |    URLLC
+  10 |     10 |     10 |        1 |    URLLC
+  11 |     11 |     11 |        2 |      MTC
+  12 |     12 |     12 |        2 |      MTC
+  13 |     13 |     21 |        2 |      MTC
+  14 |     14 |     22 |        2 |      MTC
+  15 |     15 |     23 |        2 |      MTC
+  16 |     16 |     24 |        2 |      MTC
+  17 |     17 |     25 |        2 |      MTC
+  18 |     18 |     26 |        2 |      MTC
+  19 |     19 |     27 |        2 |      MTC
+  20 |     20 |     28 |        2 |      MTC
+==========================================
+UE/RNTI mapping written to: /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=best_meta_(rerun)/scenario=normal/seed=2/results_rslaq_network_only/scenario=normal/mode=slice_custom/seed=2_run=1/normal_ue_rnti_mapping.csv
+
+
+========================================
+  RESULTS (normal)
+========================================
+eMBB:
+  Throughput : 63.1064 Mbps
+  Avg delay  : 80.584 ms
+  PDR        : 0.8851
+  TX/RX pkts : 25665 / 22715
+
+URLLC:
+  Throughput : 0.9356 Mbps
+  Avg delay  : 3.593 ms
+  PDR        : 0.6000
+  TX/RX pkts : 10995 / 6597
+
+MTC:
+  Throughput : 2.3019 Mbps
+  Avg delay  : 4.315 ms
+  PDR        : 0.9000
+  TX/RX pkts : 10990 / 9891
+
+CSV outputs:
+  /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=best_meta_(rerun)/scenario=normal/seed=2/results_rslaq_network_only/scenario=normal/mode=slice_custom/seed=2_run=1/timeseries.csv
+  /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=best_meta_(rerun)/scenario=normal/seed=2/results_rslaq_network_only/scenario=normal/mode=slice_custom/seed=2_run=1/slice_alloc.csv
+  /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=best_meta_(rerun)/scenario=normal/seed=2/results_rslaq_network_only/scenario=normal/mode=slice_custom/seed=2_run=1/summary.csv
+  /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=best_meta_(rerun)/scenario=normal/seed=2/results_rslaq_network_only/scenario=normal/mode=slice_custom/seed=2_run=1/metadata.json

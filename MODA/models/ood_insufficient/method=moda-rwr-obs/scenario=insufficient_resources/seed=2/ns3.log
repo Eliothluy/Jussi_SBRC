@@ -1,0 +1,200 @@
+========================================
+  RSLAQ Simulation (Slice-Aware + IPC)
+========================================
+Scenario     : insufficient_resources
+RF profile   : RAN650 n78 + AW3161-E-F-V2 outdoor panel
+Frequency    : 3.55 GHz
+Bandwidth    : 100 MHz
+Numerology   : 1 (SCS 30 kHz)
+UEs          : 70 (eMBB=20 URLLC=10 MTC=40)
+UE area      : uniform disc radius 100 m, UE height 1.5 m
+gNB height   : 10 m
+gNB antenna  : 4 ports, +/-45 deg pol, 17.9 dBi, 65x7 deg, tilt 6 deg, bearing 0 deg
+SimTime      : 5 s
+TxPower      : 43 dBm
+gNB NF       : 4 dB
+RLC mode     : UM
+Shadowing    : enabled
+Stats period : 10 ms
+BaselineMode : slice_custom
+IntraAlgo    : PF
+WeightPolicy : static
+Seed/Run     : 2/1
+IPC enabled  : NO (standalone)
+OutputDir    : /home/eliothluy/Documentos/artigo_jussi/models/ood_insufficient/method=moda-rwr-obs/scenario=insufficient_resources/seed=2/results_rslaq_network_only/scenario=insufficient_resources/mode=slice_custom/seed=2_run=1
+Weights      : eMBB=0.45064 URLLC=0.238742 MTC=0.310618
+
+UE  1 [eMBB] port=12001 rate=     11.00 Mbps pkt=1500 B
+UE  2 [eMBB] port=12002 rate=     11.00 Mbps pkt=1500 B
+UE  3 [eMBB] port=12003 rate=     11.00 Mbps pkt=1500 B
+UE  4 [eMBB] port=12004 rate=     11.00 Mbps pkt=1500 B
+UE  5 [eMBB] port=12005 rate=     11.00 Mbps pkt=1500 B
+UE  6 [eMBB] port=12006 rate=     11.00 Mbps pkt=1500 B
+UE  7 [eMBB] port=12007 rate=     11.00 Mbps pkt=1500 B
+UE  8 [eMBB] port=12008 rate=     11.00 Mbps pkt=1500 B
+UE  9 [eMBB] port=12009 rate=     11.00 Mbps pkt=1500 B
+UE 10 [eMBB] port=12010 rate=     11.00 Mbps pkt=1500 B
+UE 11 [eMBB] port=12011 rate=     11.00 Mbps pkt=1500 B
+UE 12 [eMBB] port=12012 rate=     11.00 Mbps pkt=1500 B
+UE 13 [eMBB] port=12013 rate=     11.00 Mbps pkt=1500 B
+UE 14 [eMBB] port=12014 rate=     11.00 Mbps pkt=1500 B
+UE 15 [eMBB] port=12015 rate=     11.00 Mbps pkt=1500 B
+UE 16 [eMBB] port=12016 rate=     11.00 Mbps pkt=1500 B
+UE 17 [eMBB] port=12017 rate=     11.00 Mbps pkt=1500 B
+UE 18 [eMBB] port=12018 rate=     11.00 Mbps pkt=1500 B
+UE 19 [eMBB] port=12019 rate=     11.00 Mbps pkt=1500 B
+UE 20 [eMBB] port=12020 rate=     11.00 Mbps pkt=1500 B
+UE 21 [URLLC] port=12021 rate=      0.50 Mbps pkt=100 B
+UE 22 [URLLC] port=12022 rate=      0.50 Mbps pkt=100 B
+UE 23 [URLLC] port=12023 rate=      0.50 Mbps pkt=100 B
+UE 24 [URLLC] port=12024 rate=      0.50 Mbps pkt=100 B
+UE 25 [URLLC] port=12025 rate=      0.50 Mbps pkt=100 B
+UE 26 [URLLC] port=12026 rate=      0.50 Mbps pkt=100 B
+UE 27 [URLLC] port=12027 rate=      0.50 Mbps pkt=100 B
+UE 28 [URLLC] port=12028 rate=      0.50 Mbps pkt=100 B
+UE 29 [URLLC] port=12029 rate=      0.50 Mbps pkt=100 B
+UE 30 [URLLC] port=12030 rate=      0.50 Mbps pkt=100 B
+UE 31 [ MTC] port=12031 rate=      1.75 Mbps pkt=500 B
+UE 32 [ MTC] port=12032 rate=      1.75 Mbps pkt=500 B
+UE 33 [ MTC] port=12033 rate=      1.75 Mbps pkt=500 B
+UE 34 [ MTC] port=12034 rate=      1.75 Mbps pkt=500 B
+UE 35 [ MTC] port=12035 rate=      1.75 Mbps pkt=500 B
+UE 36 [ MTC] port=12036 rate=      1.75 Mbps pkt=500 B
+UE 37 [ MTC] port=12037 rate=      1.75 Mbps pkt=500 B
+UE 38 [ MTC] port=12038 rate=      1.75 Mbps pkt=500 B
+UE 39 [ MTC] port=12039 rate=      1.75 Mbps pkt=500 B
+UE 40 [ MTC] port=12040 rate=      1.75 Mbps pkt=500 B
+UE 41 [ MTC] port=12041 rate=      1.75 Mbps pkt=500 B
+UE 42 [ MTC] port=12042 rate=      1.75 Mbps pkt=500 B
+UE 43 [ MTC] port=12043 rate=      1.75 Mbps pkt=500 B
+UE 44 [ MTC] port=12044 rate=      1.75 Mbps pkt=500 B
+UE 45 [ MTC] port=12045 rate=      1.75 Mbps pkt=500 B
+UE 46 [ MTC] port=12046 rate=      1.75 Mbps pkt=500 B
+UE 47 [ MTC] port=12047 rate=      1.75 Mbps pkt=500 B
+UE 48 [ MTC] port=12048 rate=      1.75 Mbps pkt=500 B
+UE 49 [ MTC] port=12049 rate=      1.75 Mbps pkt=500 B
+UE 50 [ MTC] port=12050 rate=      1.75 Mbps pkt=500 B
+UE 51 [ MTC] port=12051 rate=      1.75 Mbps pkt=500 B
+UE 52 [ MTC] port=12052 rate=      1.75 Mbps pkt=500 B
+UE 53 [ MTC] port=12053 rate=      1.75 Mbps pkt=500 B
+UE 54 [ MTC] port=12054 rate=      1.75 Mbps pkt=500 B
+UE 55 [ MTC] port=12055 rate=      1.75 Mbps pkt=500 B
+UE 56 [ MTC] port=12056 rate=      1.75 Mbps pkt=500 B
+UE 57 [ MTC] port=12057 rate=      1.75 Mbps pkt=500 B
+UE 58 [ MTC] port=12058 rate=      1.75 Mbps pkt=500 B
+UE 59 [ MTC] port=12059 rate=      1.75 Mbps pkt=500 B
+UE 60 [ MTC] port=12060 rate=      1.75 Mbps pkt=500 B
+UE 61 [ MTC] port=12061 rate=      1.75 Mbps pkt=500 B
+UE 62 [ MTC] port=12062 rate=      1.75 Mbps pkt=500 B
+UE 63 [ MTC] port=12063 rate=      1.75 Mbps pkt=500 B
+UE 64 [ MTC] port=12064 rate=      1.75 Mbps pkt=500 B
+UE 65 [ MTC] port=12065 rate=      1.75 Mbps pkt=500 B
+UE 66 [ MTC] port=12066 rate=      1.75 Mbps pkt=500 B
+UE 67 [ MTC] port=12067 rate=      1.75 Mbps pkt=500 B
+UE 68 [ MTC] port=12068 rate=      1.75 Mbps pkt=500 B
+UE 69 [ MTC] port=12069 rate=      1.75 Mbps pkt=500 B
+UE 70 [ MTC] port=12070 rate=      1.75 Mbps pkt=500 B
+
+=== UE Mapping (RNTI real após attach) ===
+ Idx |   IMSI |   RNTI |  SliceId | SliceType
+-------------------------------------------
+   1 |      1 |      1 |        0 |     eMBB
+   2 |      2 |      2 |        0 |     eMBB
+   3 |      3 |      3 |        0 |     eMBB
+   4 |      4 |      4 |        0 |     eMBB
+   5 |      5 |      5 |        0 |     eMBB
+   6 |      6 |      6 |        0 |     eMBB
+   7 |      7 |      7 |        0 |     eMBB
+   8 |      8 |      8 |        0 |     eMBB
+   9 |      9 |      9 |        0 |     eMBB
+  10 |     10 |     10 |        0 |     eMBB
+  11 |     11 |     11 |        0 |     eMBB
+  12 |     12 |     12 |        0 |     eMBB
+  13 |     13 |     71 |        0 |     eMBB
+  14 |     14 |     72 |        0 |     eMBB
+  15 |     15 |     73 |        0 |     eMBB
+  16 |     16 |     74 |        0 |     eMBB
+  17 |     17 |     75 |        0 |     eMBB
+  18 |     18 |     76 |        0 |     eMBB
+  19 |     19 |     77 |        0 |     eMBB
+  20 |     20 |     78 |        0 |     eMBB
+  21 |     21 |     79 |        1 |    URLLC
+  22 |     22 |     80 |        1 |    URLLC
+  23 |     23 |     81 |        1 |    URLLC
+  24 |     24 |     82 |        1 |    URLLC
+  25 |     25 |     83 |        1 |    URLLC
+  26 |     26 |    129 |        1 |    URLLC
+  27 |     27 |    130 |        1 |    URLLC
+  28 |     28 |    131 |        1 |    URLLC
+  29 |     29 |    132 |        1 |    URLLC
+  30 |     30 |    133 |        1 |    URLLC
+  31 |     31 |    134 |        2 |      MTC
+  32 |     32 |    135 |        2 |      MTC
+  33 |     33 |    136 |        2 |      MTC
+  34 |     34 |    137 |        2 |      MTC
+  35 |     35 |    138 |        2 |      MTC
+  36 |     36 |    139 |        2 |      MTC
+  37 |     37 |    140 |        2 |      MTC
+  38 |     38 |    141 |        2 |      MTC
+  39 |     39 |    174 |        2 |      MTC
+  40 |     40 |    175 |        2 |      MTC
+  41 |     41 |    176 |        2 |      MTC
+  42 |     42 |    177 |        2 |      MTC
+  43 |     43 |    178 |        2 |      MTC
+  44 |     44 |    179 |        2 |      MTC
+  45 |     45 |    180 |        2 |      MTC
+  46 |     46 |    181 |        2 |      MTC
+  47 |     47 |    182 |        2 |      MTC
+  48 |     48 |    183 |        2 |      MTC
+  49 |     49 |    184 |        2 |      MTC
+  50 |     50 |    185 |        2 |      MTC
+  51 |     51 |    186 |        2 |      MTC
+  52 |     52 |    206 |        2 |      MTC
+  53 |     53 |    207 |        2 |      MTC
+  54 |     54 |    208 |        2 |      MTC
+  55 |     55 |    209 |        2 |      MTC
+  56 |     56 |    210 |        2 |      MTC
+  57 |     57 |    211 |        2 |      MTC
+  58 |     58 |    212 |        2 |      MTC
+  59 |     59 |    213 |        2 |      MTC
+  60 |     60 |    214 |        2 |      MTC
+  61 |     61 |    215 |        2 |      MTC
+  62 |     62 |    216 |        2 |      MTC
+  63 |     63 |    217 |        2 |      MTC
+  64 |     64 |    232 |        2 |      MTC
+  65 |     65 |    233 |        2 |      MTC
+  66 |     66 |    234 |        2 |      MTC
+  67 |     67 |    235 |        2 |      MTC
+  68 |     68 |    236 |        2 |      MTC
+  69 |     69 |    237 |        2 |      MTC
+  70 |     70 |    238 |        2 |      MTC
+==========================================
+UE/RNTI mapping written to: /home/eliothluy/Documentos/artigo_jussi/models/ood_insufficient/method=moda-rwr-obs/scenario=insufficient_resources/seed=2/results_rslaq_network_only/scenario=insufficient_resources/mode=slice_custom/seed=2_run=1/insufficient_resources_ue_rnti_mapping.csv
+
+
+========================================
+  RESULTS (insufficient_resources)
+========================================
+eMBB:
+  Throughput : 55.1985 Mbps
+  Avg delay  : 566.697 ms
+  PDR        : 0.2463
+  TX/RX pkts : 78820 / 19417
+
+URLLC:
+  Throughput : 5.7589 Mbps
+  Avg delay  : 6.079 ms
+  PDR        : 0.9000
+  TX/RX pkts : 26870 / 24183
+
+MTC:
+  Throughput : 30.5945 Mbps
+  Avg delay  : 330.625 ms
+  PDR        : 0.4139
+  TX/RX pkts : 75240 / 31145
+
+CSV outputs:
+  /home/eliothluy/Documentos/artigo_jussi/models/ood_insufficient/method=moda-rwr-obs/scenario=insufficient_resources/seed=2/results_rslaq_network_only/scenario=insufficient_resources/mode=slice_custom/seed=2_run=1/timeseries.csv
+  /home/eliothluy/Documentos/artigo_jussi/models/ood_insufficient/method=moda-rwr-obs/scenario=insufficient_resources/seed=2/results_rslaq_network_only/scenario=insufficient_resources/mode=slice_custom/seed=2_run=1/slice_alloc.csv
+  /home/eliothluy/Documentos/artigo_jussi/models/ood_insufficient/method=moda-rwr-obs/scenario=insufficient_resources/seed=2/results_rslaq_network_only/scenario=insufficient_resources/mode=slice_custom/seed=2_run=1/summary.csv
+  /home/eliothluy/Documentos/artigo_jussi/models/ood_insufficient/method=moda-rwr-obs/scenario=insufficient_resources/seed=2/results_rslaq_network_only/scenario=insufficient_resources/mode=slice_custom/seed=2_run=1/metadata.json

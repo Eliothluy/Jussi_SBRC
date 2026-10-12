@@ -1,0 +1,14 @@
+{
+  "weights": [
+    0.6,
+    0.0,
+    0.4
+  ],
+  "score_v1": -17.058915460000005,
+  "score_v2": -99900.0,
+  "failed": false,
+  "reason": "",
+  "method": "moda-q-obs",
+  "scenario": "insufficient_resources",
+  "seed": 3
+}

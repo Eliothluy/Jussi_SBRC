@@ -1,0 +1,80 @@
+========================================
+  RSLAQ Simulation (Slice-Aware + IPC)
+========================================
+Scenario     : low_traffic
+RF profile   : RAN650 n78 + AW3161-E-F-V2 outdoor panel
+Frequency    : 3.55 GHz
+Bandwidth    : 100 MHz
+Numerology   : 1 (SCS 30 kHz)
+UEs          : 10 (eMBB=2 URLLC=2 MTC=6)
+UE area      : uniform disc radius 100 m, UE height 1.5 m
+gNB height   : 10 m
+gNB antenna  : 4 ports, +/-45 deg pol, 17.9 dBi, 65x7 deg, tilt 6 deg, bearing 0 deg
+SimTime      : 5 s
+TxPower      : 43 dBm
+gNB NF       : 4 dB
+RLC mode     : UM
+Shadowing    : enabled
+Stats period : 10 ms
+BaselineMode : slice_custom
+IntraAlgo    : PF
+WeightPolicy : static
+Seed/Run     : 3/1
+IPC enabled  : NO (standalone)
+OutputDir    : /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=sac-offline/scenario=low_traffic/seed=3/results_rslaq_network_only/scenario=low_traffic/mode=slice_custom/seed=3_run=1
+Weights      : eMBB=0.588875 URLLC=0.085827 MTC=0.325298
+
+UE  1 [eMBB] port=12001 rate=     27.50 Mbps pkt=1500 B
+UE  2 [eMBB] port=12002 rate=     27.50 Mbps pkt=1500 B
+UE  3 [URLLC] port=12003 rate=      0.50 Mbps pkt=50 B
+UE  4 [URLLC] port=12004 rate=      0.50 Mbps pkt=50 B
+UE  5 [ MTC] port=12005 rate=      0.17 Mbps pkt=100 B
+UE  6 [ MTC] port=12006 rate=      0.17 Mbps pkt=100 B
+UE  7 [ MTC] port=12007 rate=      0.17 Mbps pkt=100 B
+UE  8 [ MTC] port=12008 rate=      0.17 Mbps pkt=100 B
+UE  9 [ MTC] port=12009 rate=      0.17 Mbps pkt=100 B
+UE 10 [ MTC] port=12010 rate=      0.17 Mbps pkt=100 B
+
+=== UE Mapping (RNTI real após attach) ===
+ Idx |   IMSI |   RNTI |  SliceId | SliceType
+-------------------------------------------
+   1 |      1 |      1 |        0 |     eMBB
+   2 |      2 |      2 |        0 |     eMBB
+   3 |      3 |      3 |        1 |    URLLC
+   4 |      4 |      4 |        1 |    URLLC
+   5 |      5 |      5 |        2 |      MTC
+   6 |      6 |      6 |        2 |      MTC
+   7 |      7 |      7 |        2 |      MTC
+   8 |      8 |      8 |        2 |      MTC
+   9 |      9 |      9 |        2 |      MTC
+  10 |     10 |     10 |        2 |      MTC
+==========================================
+UE/RNTI mapping written to: /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=sac-offline/scenario=low_traffic/seed=3/results_rslaq_network_only/scenario=low_traffic/mode=slice_custom/seed=3_run=1/low_traffic_ue_rnti_mapping.csv
+
+
+========================================
+  RESULTS (low_traffic)
+========================================
+eMBB:
+  Throughput : 25.7176 Mbps
+  Avg delay  : 77.049 ms
+  PDR        : 0.4590
+  TX/RX pkts : 20166 / 9257
+
+URLLC:
+  Throughput : 0.6346 Mbps
+  Avg delay  : 93.214 ms
+  PDR        : 0.4069
+  TX/RX pkts : 10998 / 4475
+
+MTC:
+  Throughput : 0.9470 Mbps
+  Avg delay  : 5.831 ms
+  PDR        : 0.7404
+  TX/RX pkts : 5496 / 4069
+
+CSV outputs:
+  /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=sac-offline/scenario=low_traffic/seed=3/results_rslaq_network_only/scenario=low_traffic/mode=slice_custom/seed=3_run=1/timeseries.csv
+  /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=sac-offline/scenario=low_traffic/seed=3/results_rslaq_network_only/scenario=low_traffic/mode=slice_custom/seed=3_run=1/slice_alloc.csv
+  /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=sac-offline/scenario=low_traffic/seed=3/results_rslaq_network_only/scenario=low_traffic/mode=slice_custom/seed=3_run=1/summary.csv
+  /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=sac-offline/scenario=low_traffic/seed=3/results_rslaq_network_only/scenario=low_traffic/mode=slice_custom/seed=3_run=1/metadata.json

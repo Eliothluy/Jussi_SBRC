@@ -1,0 +1,19 @@
+method,scenario,seed,weights,score_v1,score_v2,failed,reason
+moda-q-obs,insufficient_resources,1,"[0.6, 0.0, 0.4]",-17.135406250000003,-99900.0,False,
+moda-q-obs,insufficient_resources,2,"[0.6, 0.0, 0.4]",-15.107617279999996,-99900.0,False,
+moda-q-obs,insufficient_resources,3,"[0.6, 0.0, 0.4]",-17.058915460000005,-99900.0,False,
+moda-bc-obs,insufficient_resources,1,"[0.3580999970436096, 0.09109999984502792, 0.5508000254631042]",-30.85886826999999,-3591.62,False,
+moda-bc-obs,insufficient_resources,2,"[0.3580999970436096, 0.09109999984502792, 0.5508000254631042]",-28.803145929999996,-4267.38,False,
+moda-bc-obs,insufficient_resources,3,"[0.3580999970436096, 0.09109999984502792, 0.5508000254631042]",-1.1685989966666592,-1880.03,False,
+moda-rwr-obs,insufficient_resources,1,"[0.4505999982357025, 0.2387000024318695, 0.31060001254081726]",-1.0054283266666648,-52.870000000000005,False,
+moda-rwr-obs,insufficient_resources,2,"[0.4505999982357025, 0.2387000024318695, 0.31060001254081726]",3.2883303233333443,-62.40999999999999,False,
+moda-rwr-obs,insufficient_resources,3,"[0.4505999982357025, 0.2387000024318695, 0.31060001254081726]",-0.7907373499999977,-48.019999999999996,False,
+moda-q-full,insufficient_resources,1,"[0.5, 0.1, 0.4]",,,,not evaluated (approved budget: OBS only)
+moda-q-full,insufficient_resources,2,"[0.5, 0.1, 0.4]",,,,not evaluated (approved budget: OBS only)
+moda-q-full,insufficient_resources,3,"[0.5, 0.1, 0.4]",,,,not evaluated (approved budget: OBS only)
+moda-bc-full,insufficient_resources,1,"[0.5488, 0.1624, 0.2888]",,,,not evaluated (approved budget: OBS only)
+moda-bc-full,insufficient_resources,2,"[0.5488, 0.1624, 0.2888]",,,,not evaluated (approved budget: OBS only)
+moda-bc-full,insufficient_resources,3,"[0.5488, 0.1624, 0.2888]",,,,not evaluated (approved budget: OBS only)
+moda-rwr-full,insufficient_resources,1,"[0.4548, 0.2581, 0.287]",,,,not evaluated (approved budget: OBS only)
+moda-rwr-full,insufficient_resources,2,"[0.4548, 0.2581, 0.287]",,,,not evaluated (approved budget: OBS only)
+moda-rwr-full,insufficient_resources,3,"[0.4548, 0.2581, 0.287]",,,,not evaluated (approved budget: OBS only)

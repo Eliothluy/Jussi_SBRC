@@ -1,0 +1,88 @@
+========================================
+  RSLAQ Simulation (Slice-Aware + IPC)
+========================================
+Scenario     : stressed
+RF profile   : RAN650 n78 + AW3161-E-F-V2 outdoor panel
+Frequency    : 3.55 GHz
+Bandwidth    : 100 MHz
+Numerology   : 1 (SCS 30 kHz)
+UEs          : 40 (eMBB=8 URLLC=12 MTC=20)
+UE area      : uniform disc radius 100 m, UE height 1.5 m
+gNB height   : 10 m
+gNB antenna  : 4 ports, +/-45 deg pol, 17.9 dBi, 65x7 deg, tilt 6 deg, bearing 0 deg
+SimTime      : 5 s
+TxPower      : 43.0206 dBm
+gNB NF       : 4 dB
+RLC mode     : UM
+Shadowing    : enabled
+Stats period : 10 ms
+BaselineMode : slice_weighted_pf
+IntraAlgo    : PF
+WeightPolicy : static
+Seed/Run     : 1/1
+IPC enabled  : YES
+OutputDir    : ./results_rslaq_network_only/scenario=stressed/mode=slice_weighted_pf/seed=1_run=1
+Weights      : eMBB=0.3333 URLLC=0.4 MTC=0.2667
+
+[RslaqSim] IPC semaphores created: /sem_metrics_939bffa5-8f07-4db1-afc7-540afd9085bc and /sem_control_939bffa5-8f07-4db1-afc7-540afd9085bc
+UE  1 [eMBB] port=12001 rate=     12.50 Mbps pkt=1500 B
+UE  2 [eMBB] port=12002 rate=     12.50 Mbps pkt=1500 B
+UE  3 [eMBB] port=12003 rate=     12.50 Mbps pkt=1500 B
+UE  4 [eMBB] port=12004 rate=     12.50 Mbps pkt=1500 B
+UE  5 [eMBB] port=12005 rate=     12.50 Mbps pkt=1500 B
+UE  6 [eMBB] port=12006 rate=     12.50 Mbps pkt=1500 B
+UE  7 [eMBB] port=12007 rate=     12.50 Mbps pkt=1500 B
+UE  8 [eMBB] port=12008 rate=     12.50 Mbps pkt=1500 B
+UE  9 [URLLC] port=12009 rate=      0.25 Mbps pkt=100 B
+UE 10 [URLLC] port=12010 rate=      0.25 Mbps pkt=100 B
+UE 11 [URLLC] port=12011 rate=      0.25 Mbps pkt=100 B
+UE 12 [URLLC] port=12012 rate=      0.25 Mbps pkt=100 B
+UE 13 [URLLC] port=12013 rate=      0.25 Mbps pkt=100 B
+UE 14 [URLLC] port=12014 rate=      0.25 Mbps pkt=100 B
+UE 15 [URLLC] port=12015 rate=      0.25 Mbps pkt=100 B
+UE 16 [URLLC] port=12016 rate=      0.25 Mbps pkt=100 B
+UE 17 [URLLC] port=12017 rate=      0.25 Mbps pkt=100 B
+UE 18 [URLLC] port=12018 rate=      0.25 Mbps pkt=100 B
+UE 19 [URLLC] port=12019 rate=      0.25 Mbps pkt=100 B
+UE 20 [URLLC] port=12020 rate=      0.25 Mbps pkt=100 B
+UE 21 [ MTC] port=12021 rate=      1.25 Mbps pkt=500 B
+UE 22 [ MTC] port=12022 rate=      1.25 Mbps pkt=500 B
+UE 23 [ MTC] port=12023 rate=      1.25 Mbps pkt=500 B
+UE 24 [ MTC] port=12024 rate=      1.25 Mbps pkt=500 B
+UE 25 [ MTC] port=12025 rate=      1.25 Mbps pkt=500 B
+UE 26 [ MTC] port=12026 rate=      1.25 Mbps pkt=500 B
+UE 27 [ MTC] port=12027 rate=      1.25 Mbps pkt=500 B
+UE 28 [ MTC] port=12028 rate=      1.25 Mbps pkt=500 B
+UE 29 [ MTC] port=12029 rate=      1.25 Mbps pkt=500 B
+UE 30 [ MTC] port=12030 rate=      1.25 Mbps pkt=500 B
+UE 31 [ MTC] port=12031 rate=      1.25 Mbps pkt=500 B
+UE 32 [ MTC] port=12032 rate=      1.25 Mbps pkt=500 B
+UE 33 [ MTC] port=12033 rate=      1.25 Mbps pkt=500 B
+UE 34 [ MTC] port=12034 rate=      1.25 Mbps pkt=500 B
+UE 35 [ MTC] port=12035 rate=      1.25 Mbps pkt=500 B
+UE 36 [ MTC] port=12036 rate=      1.25 Mbps pkt=500 B
+UE 37 [ MTC] port=12037 rate=      1.25 Mbps pkt=500 B
+UE 38 [ MTC] port=12038 rate=      1.25 Mbps pkt=500 B
+UE 39 [ MTC] port=12039 rate=      1.25 Mbps pkt=500 B
+UE 40 [ MTC] port=12040 rate=      1.25 Mbps pkt=500 B
+[RslaqSim] IPC callback scheduled at t=410 ms
+
+=== UE Mapping (RNTI real após attach) ===
+ Idx |   IMSI |   RNTI |  SliceId | SliceType
+-------------------------------------------
+   1 |      1 |      1 |        0 |     eMBB
+   2 |      2 |      2 |        0 |     eMBB
+   3 |      3 |      3 |        0 |     eMBB
+   4 |      4 |      4 |        0 |     eMBB
+   5 |      5 |      5 |        0 |     eMBB
+   6 |      6 |      6 |        0 |     eMBB
+   7 |      7 |      7 |        0 |     eMBB
+   8 |      8 |      8 |        0 |     eMBB
+   9 |      9 |      9 |        1 |    URLLC
+  10 |     10 |     10 |        1 |    URLLC
+  11 |     11 |     11 |        1 |    URLLC
+  12 |     12 |     12 |        1 |    URLLC
+  13 |     13 |     41 |        1 |    URLLC
+  14 |     14 |     42 |        1 |    URLLC
+  15 |     15 |     43 |        1 |    URLLC
+  16 |

@@ -1,0 +1,1353 @@
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Slice-Aware 5G/NR Simulation — ns-3 / 5G-LENA com IPC para ns-o-ran-gym
+ *
+ * Protótipo de scheduler slice-aware com controle DRL via semáforos POSIX
+ * e troca de arquivos CSV (slice-kpms.txt, slice_actions_for_ns3.csv).
+ *
+ * Topologia: 1 gNB, N UEs (eMBB + URLLC + MTC configuráveis)
+ */
+
+#include "mac-scheduler.h"
+
+#include "ns3/antenna-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/core-module.h"
+#include "ns3/flow-monitor-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/mobility-module.h"
+#include "ns3/nr-module.h"
+#include "ns3/point-to-point-module.h"
+
+#include <algorithm>
+#include <cctype>
+#include <cmath>
+#include <cstdint>
+#include <ctime>
+#include <fcntl.h>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <map>
+#include <semaphore.h>
+#include <sstream>
+#include <string>
+#include <vector>
+
+using namespace ns3;
+
+NS_LOG_COMPONENT_DEFINE("SliceAwareSim");
+
+// ---------------------------------------------------------------------------
+// Tipos e constantes (declarados ANTES das variáveis globais)
+// ---------------------------------------------------------------------------
+
+enum class SliceType : uint8_t
+{
+    EMBB = 0,
+    URLLC = 1,
+    MTC = 2
+};
+
+// ---------------------------------------------------------------------------
+// Constantes IPC
+// ---------------------------------------------------------------------------
+
+static std::string g_simUuid;           // UUID passado via --simId
+static sem_t* g_semMetricsReady = nullptr;
+static sem_t* g_semControl = nullptr;
+static Ptr<MacScheduler> g_schedulerPtr = nullptr;
+static Ptr<FlowMonitor> g_monitorPtr = nullptr;
+static Ptr<Ipv4FlowClassifier> g_classifierPtr = nullptr;
+static std::map<uint16_t, uint16_t> g_portToUeId;
+static std::map<uint16_t, SliceType> g_ueToSlice;
+static std::map<uint16_t, uint16_t> g_ueIdToRnti;
+static uint32_t g_indicationPeriodMs = 10;
+static bool g_ipcEnabled = false;
+
+// Previous KPM values for delta calculation (IPC mode)
+struct KpmPrevValues
+{
+    uint64_t txBytes = 0;
+    uint64_t rxBytes = 0;
+    uint32_t txPackets = 0;
+    uint32_t rxPackets = 0;
+    uint32_t lostPackets = 0;
+};
+static std::map<uint16_t, KpmPrevValues> g_kpmPrevValues;
+
+// P_STA decomposition: 50% estático + 50% dinâmico do agente
+static const std::vector<double> P_STA_WEIGHTS = {0.33, 0.40, 0.27};
+
+static const uint32_t NUM_SLICES = 3;
+
+static uint32_t g_numUeEmbb = 5;
+static uint32_t g_numUeUrllc = 5;
+static uint32_t g_numUeMtc = 10;
+
+struct ScenarioConfig
+{
+    std::string name;
+    uint64_t embbRateBps;
+    uint64_t urllcRateBps;
+    uint64_t mtcRateBps;
+    uint32_t embbPktSize;
+    uint32_t urllcPktSize;
+    uint32_t mtcPktSize;
+};
+
+static SliceType
+GetSliceForUe(uint16_t ueId)
+{
+    if (ueId >= 1 && ueId <= g_numUeEmbb)
+    {
+        return SliceType::EMBB;
+    }
+    else if (ueId > g_numUeEmbb && ueId <= g_numUeEmbb + g_numUeUrllc)
+    {
+        return SliceType::URLLC;
+    }
+    else
+    {
+        return SliceType::MTC;
+    }
+}
+
+static uint32_t
+NumUesPerSlice(SliceType s)
+{
+    switch (s)
+    {
+    case SliceType::EMBB:
+        return g_numUeEmbb;
+    case SliceType::URLLC:
+        return g_numUeUrllc;
+    case SliceType::MTC:
+        return g_numUeMtc;
+    default:
+        return 0;
+    }
+}
+
+static std::string
+SliceName(SliceType s)
+{
+    switch (s)
+    {
+    case SliceType::EMBB:
+        return "eMBB";
+    case SliceType::URLLC:
+        return "URLLC";
+    case SliceType::MTC:
+        return "MTC";
+    default:
+        return "?";
+    }
+}
+
+static uint64_t
+RateForSlice(const ScenarioConfig& sc, SliceType s)
+{
+    switch (s)
+    {
+    case SliceType::EMBB:
+        return sc.embbRateBps;
+    case SliceType::URLLC:
+        return sc.urllcRateBps;
+    case SliceType::MTC:
+        return sc.mtcRateBps;
+    default:
+        return 0;
+    }
+}
+
+static uint32_t
+PktSizeForSlice(const ScenarioConfig& sc, SliceType s)
+{
+    switch (s)
+    {
+    case SliceType::EMBB:
+        return sc.embbPktSize;
+    case SliceType::URLLC:
+        return sc.urllcPktSize;
+    case SliceType::MTC:
+        return sc.mtcPktSize;
+    default:
+        return 1500;
+    }
+}
+
+static std::map<std::string, ScenarioConfig>
+InitScenarios()
+{
+    std::map<std::string, ScenarioConfig> m;
+    m["low_traffic"] = {"low_traffic", 5000000, 1000000, 2000000, 1500, 50, 100};
+    m["normal"] = {"normal", 70000000, 1000000, 2000000, 1500, 50, 100};
+    m["congestion"] = {"congestion", 100000000, 1000000, 100000000, 1500, 50, 100};
+    m["stressed"] = {"stressed", 100000000, 1000000, 100000000, 1500, 50, 100};
+    m["insufficient_resources"] = {"insufficient_resources", 100000000, 2000000, 100000000, 1500, 50, 100};
+    return m;
+}
+
+// ---------------------------------------------------------------------------
+// Deployment Configuration
+// ---------------------------------------------------------------------------
+
+struct DeploymentConfig
+{
+    std::string name;
+    double ueAreaRadius;
+    double gnbHeight;
+    double ueHeight;
+    std::string channelScenario;
+    bool defaultShadowing;
+};
+
+static DeploymentConfig
+GetDeploymentConfig(const std::string& scenarioName)
+{
+    DeploymentConfig config;
+
+    if (scenarioName == "indoor_small")
+    {
+        config.name = "indoor_small";
+        config.ueAreaRadius = 30.0;
+        config.gnbHeight = 10.0;
+        config.ueHeight = 1.5;
+        config.channelScenario = "UMi";
+        config.defaultShadowing = false;
+    }
+    else if (scenarioName == "campus_short")
+    {
+        config.name = "campus_short";
+        config.ueAreaRadius = 100.0;
+        config.gnbHeight = 10.0;
+        config.ueHeight = 1.5;
+        config.channelScenario = "UMi";
+        config.defaultShadowing = true;
+    }
+    else if (scenarioName == "outdoor_medium")
+    {
+        config.name = "outdoor_medium";
+        config.ueAreaRadius = 500.0;
+        config.gnbHeight = 15.0;
+        config.ueHeight = 1.5;
+        config.channelScenario = "UMi";
+        config.defaultShadowing = true;
+    }
+    else if (scenarioName == "fwa")
+    {
+        config.name = "fwa";
+        config.ueAreaRadius = 1000.0;
+        config.gnbHeight = 20.0;
+        config.ueHeight = 1.5;
+        config.channelScenario = "UMi";
+        config.defaultShadowing = true;
+    }
+    else
+    {
+        NS_FATAL_ERROR("Unknown deploymentScenario: " << scenarioName);
+    }
+
+    return config;
+}
+
+static std::string
+GetScsString(uint16_t numerology)
+{
+    switch (numerology)
+    {
+    case 0:
+        return "15 kHz";
+    case 1:
+        return "30 kHz";
+    case 2:
+        return "60 kHz";
+    case 3:
+        return "120 kHz";
+    case 4:
+        return "240 kHz";
+    default:
+        return "Unknown";
+    }
+}
+
+static void
+ValidateRan650Config(double centralFrequency, double bandwidth, uint16_t numerology)
+{
+    std::cout << "\n[RAN650 Configuration Info]\n";
+    std::cout << "  Benetel RAN650 n78 - aproximação PHY/MAC, não O-RU completa\n";
+    std::cout << "  Limitations:\n";
+    std::cout << "    - Simulação representa apenas camada PHY/MAC\n";
+    std::cout << "    - O-RAN Split 7.2x, fronthaul, sincronismo, M-plane, alarmes e\n";
+    std::cout << "      consumo energético não são modelados explicitamente\n";
+    std::cout << "    - Antena isotrópica 2x2 aproxima 4T4R sem padrão de radiação real\n";
+    std::cout << "    - Potência 43 dBm aprox. para 4 portas de 37 dBm (5W cada, total ~20W)\n";
+    std::cout << "    - Modelo de canal UMi é aproximação para cenários outdoor\n\n";
+
+    if (centralFrequency <= 0)
+    {
+        NS_FATAL_ERROR("Central frequency must be > 0 Hz");
+    }
+    if (bandwidth <= 0)
+    {
+        NS_FATAL_ERROR("Bandwidth must be > 0 Hz");
+    }
+    if (numerology > 4)
+    {
+        NS_FATAL_ERROR("Numerology must be 0-4");
+    }
+    if (centralFrequency < 3.3e9 || centralFrequency > 3.8e9)
+    {
+        NS_FATAL_ERROR("Band n78 frequency must be in 3.3-3.8 GHz range");
+    }
+    if (bandwidth > 100e6)
+    {
+        NS_FATAL_ERROR("RAN650 n78 max bandwidth is 100 MHz");
+    }
+}
+
+static std::vector<double>
+ParseWeights(const std::string& str)
+{
+    std::vector<double> w;
+    std::stringstream ss(str);
+    std::string token;
+    while (std::getline(ss, token, ','))
+    {
+        w.push_back(std::stod(token));
+    }
+    return w;
+}
+
+// ---------------------------------------------------------------------------
+// Estruturas para estatísticas (standalone mode)
+// ---------------------------------------------------------------------------
+
+struct UeStats
+{
+    uint16_t ueId = 0;
+    SliceType slice = SliceType::EMBB;
+    uint64_t txBytes = 0;
+    uint64_t rxBytes = 0;
+    uint64_t prevTxBytes = 0;
+    uint64_t prevRxBytes = 0;
+    uint32_t txPackets = 0;
+    uint32_t rxPackets = 0;
+    uint32_t lostPackets = 0;
+    uint32_t prevTxPackets = 0;
+    uint32_t prevRxPackets = 0;
+    uint32_t prevLostPackets = 0;
+    double delaySumSec = 0.0;
+    double prevDelaySumSec = 0.0;
+};
+
+struct SliceAggStats
+{
+    uint64_t txBytes = 0;
+    uint64_t rxBytes = 0;
+    uint32_t txPackets = 0;
+    uint32_t rxPackets = 0;
+    uint32_t lostPackets = 0;
+    double delaySumSec = 0.0;
+    double jitterSumSec = 0.0;
+};
+
+struct SimState
+{
+    std::map<uint16_t, UeStats> ueStats;
+    std::map<SliceType, SliceAggStats> sliceStats;
+    std::ofstream statsFile;
+    uint32_t stepCount{0};
+    std::string outputDir;
+    uint32_t indicationPeriodMs{10};
+    double activeDurationSec{0.0};
+};
+
+static SimState g_simStats;
+
+// ---------------------------------------------------------------------------
+// Callback de estatísticas (standalone)
+// ---------------------------------------------------------------------------
+
+static void
+StatsCallback()
+{
+    if (!g_monitorPtr || !g_classifierPtr)
+    {
+        Simulator::Schedule(MilliSeconds(g_simStats.indicationPeriodMs), &StatsCallback);
+        return;
+    }
+
+    g_monitorPtr->CheckForLostPackets();
+    FlowMonitor::FlowStatsContainer stats = g_monitorPtr->GetFlowStats();
+    uint64_t nowMs = static_cast<uint64_t>(Simulator::Now().GetMilliSeconds());
+    g_simStats.stepCount++;
+
+    if (!g_simStats.statsFile.is_open())
+    {
+        std::string path = g_simStats.outputDir + "/slice_stats_timeseries.csv";
+        g_simStats.statsFile.open(path, std::ios::out | std::ios::trunc);
+        // Added effective loss metrics (based on tx - rx, more reliable than FlowMonitor lostPackets)
+        g_simStats.statsFile << "timestamp_ms,ue_id,slice,thr_mbps,btx,bfs_pct,tdp,effective_lost_pcts,rsh_pct\n";
+    }
+
+    for (const auto& kv : stats)
+    {
+        FlowId flowId = kv.first;
+        const FlowMonitor::FlowStats& st = kv.second;
+        Ipv4FlowClassifier::FiveTuple tuple = g_classifierPtr->FindFlow(flowId);
+
+        if (tuple.protocol != 17)
+            continue;
+
+        auto itPort = g_portToUeId.find(tuple.destinationPort);
+        if (itPort == g_portToUeId.end())
+            continue;
+
+        uint16_t ueId = itPort->second;
+        SliceType slice = g_ueToSlice[ueId];
+        UeStats& ue = g_simStats.ueStats[ueId];
+
+        uint64_t dRxBytes = st.rxBytes - ue.prevRxBytes;
+        uint64_t dTxBytes = st.txBytes - ue.prevTxBytes;
+        uint32_t dTxPackets = st.txPackets - ue.prevTxPackets;
+        uint32_t dRxPackets = st.rxPackets - ue.prevRxPackets;
+        uint32_t dLostPackets = st.lostPackets - ue.prevLostPackets;
+
+        // Calculate effective loss based on tx - rx (more reliable than FlowMonitor lostPackets)
+        uint32_t effectiveLost = (dTxPackets >= dRxPackets) ? (dTxPackets - dRxPackets) : 0;
+        double effectiveLostPct = (dTxPackets > 0) ? (static_cast<double>(effectiveLost) / dTxPackets * 100.0) : 0.0;
+
+        double periodSec = static_cast<double>(g_simStats.indicationPeriodMs) / 1000.0;
+        double thrMbps = (periodSec > 0) ? (static_cast<double>(dRxBytes) * 8.0 / periodSec / 1e6) : 0.0;
+        double bfsPct = (dTxPackets > 0) ? (static_cast<double>(dLostPackets) / static_cast<double>(dTxPackets) * 100.0) : 0.0;
+        (void)dTxBytes;
+
+        int32_t sliceIdx = static_cast<int32_t>(slice);
+        double rshPct = 0.0;
+        if (g_schedulerPtr && sliceIdx >= 0)
+        {
+            rshPct = g_schedulerPtr->GetPrbWeight(static_cast<uint32_t>(sliceIdx)) * 100.0;
+        }
+
+        g_simStats.statsFile << nowMs << "," << ueId << "," << SliceName(slice) << ","
+                             << std::fixed << std::setprecision(4) << thrMbps << ","
+                             << dTxBytes << ","
+                             << std::setprecision(2) << bfsPct << ","
+                             << dLostPackets << ","
+                             << effectiveLostPct << ","
+                             << std::setprecision(2) << rshPct << "\n";
+
+        ue.prevRxBytes = st.rxBytes;
+        ue.prevTxBytes = st.txBytes;
+        ue.prevRxPackets = st.rxPackets;
+        ue.prevTxPackets = st.txPackets;
+        ue.prevLostPackets = st.lostPackets;
+        ue.prevDelaySumSec = st.delaySum.GetSeconds();
+
+        ue.txBytes = st.txBytes;
+        ue.rxBytes = st.rxBytes;
+        ue.txPackets = st.txPackets;
+        ue.rxPackets = st.rxPackets;
+        ue.lostPackets = st.lostPackets;
+        ue.delaySumSec = st.delaySum.GetSeconds();
+    }
+
+    g_simStats.statsFile.flush();
+    Simulator::Schedule(MilliSeconds(g_simStats.indicationPeriodMs), &StatsCallback);
+}
+
+// ---------------------------------------------------------------------------
+// CSV final (resumo pós-simulação)
+// ---------------------------------------------------------------------------
+
+static void
+WriteFinalCsv(const std::string& prefix)
+{
+    {
+        std::ofstream out(prefix + "_ue.csv", std::ios::out | std::ios::trunc);
+        // Added effective_lost_packets and effective_pdr
+        out << "ue_id,slice,tx_bytes,rx_bytes,tx_packets,rx_packets,lost_packets,"
+            << "effective_lost_packets,throughput_mbps,avg_delay_ms,pdr,effective_pdr\n";
+        for (const auto& kv : g_simStats.ueStats)
+        {
+            const UeStats& m = kv.second;
+            double thr = (g_simStats.activeDurationSec > 0)
+                             ? static_cast<double>(m.rxBytes) * 8.0 / g_simStats.activeDurationSec / 1e6
+                             : 0.0;
+            double avgDelay = (m.rxPackets > 0) ? m.delaySumSec / m.rxPackets * 1000.0 : 0.0;
+            double pdr = (m.txPackets > 0)
+                             ? static_cast<double>(m.rxPackets) / m.txPackets
+                             : 0.0;
+            // Calculate effective loss based on tx - rx (more reliable than FlowMonitor lostPackets)
+            uint32_t effectiveLost = (m.txPackets >= m.rxPackets) ? (m.txPackets - m.rxPackets) : 0;
+            double effectivePdr = (m.txPackets > 0)
+                                    ? static_cast<double>(m.rxPackets) / m.txPackets
+                                    : 0.0;
+
+            out << m.ueId << "," << SliceName(m.slice) << ","
+                << m.txBytes << "," << m.rxBytes << ","
+                << m.txPackets << "," << m.rxPackets << "," << m.lostPackets << ","
+                << effectiveLost << ","
+                << std::fixed << std::setprecision(4) << thr << ","
+                << std::setprecision(3) << avgDelay << ","
+                << std::setprecision(4) << pdr << ","
+                << std::setprecision(4) << effectivePdr << "\n";
+        }
+    }
+
+    {
+        std::ofstream out(prefix + "_slice.csv", std::ios::out | std::ios::trunc);
+        // Added effective_lost_packets and effective_pdr
+        out << "slice,tx_bytes,rx_bytes,tx_packets,rx_packets,lost_packets,"
+            << "effective_lost_packets,throughput_mbps,avg_delay_ms,pdr,effective_pdr\n";
+        for (const auto& kv : g_simStats.sliceStats)
+        {
+            const SliceAggStats& m = kv.second;
+            double thr = (g_simStats.activeDurationSec > 0)
+                             ? static_cast<double>(m.rxBytes) * 8.0 / g_simStats.activeDurationSec / 1e6
+                             : 0.0;
+            double avgDelay = (m.rxPackets > 0) ? m.delaySumSec / m.rxPackets * 1000.0 : 0.0;
+            double pdr = (m.txPackets > 0)
+                             ? static_cast<double>(m.rxPackets) / m.txPackets
+                             : 0.0;
+            // Calculate effective loss based on tx - rx
+            uint32_t effectiveLost = (m.txPackets >= m.rxPackets) ? (m.txPackets - m.rxPackets) : 0;
+            double effectivePdr = (m.txPackets > 0)
+                                    ? static_cast<double>(m.rxPackets) / m.txPackets
+                                    : 0.0;
+
+            out << SliceName(kv.first) << ","
+                << m.txBytes << "," << m.rxBytes << ","
+                << m.txPackets << "," << m.rxPackets << "," << m.lostPackets << ","
+                << effectiveLost << ","
+                << std::fixed << std::setprecision(4) << thr << ","
+                << std::setprecision(3) << avgDelay << ","
+                << std::setprecision(4) << pdr << ","
+                << std::setprecision(4) << effectivePdr << "\n";
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// IPC: KPM e Action callback
+// ---------------------------------------------------------------------------
+
+/**
+ * @brief Escreve slice-kpms.txt e sinaliza o gym via semáforo.
+ *        Depois espera ação do agente, lê o CSV e atualiza o scheduler.
+ *
+ * Formato KPM:
+ *   timestamp,ueImsi,sliceId,txBytes,plr,resourceSharePct,lostPackets,throughputMbps
+ */
+static void
+KpmAndControlCallback()
+{
+    if (!g_ipcEnabled || !g_monitorPtr || !g_classifierPtr || !g_schedulerPtr)
+    {
+        Simulator::Schedule(MilliSeconds(g_indicationPeriodMs), &KpmAndControlCallback);
+        return;
+    }
+
+    uint64_t nowMs = static_cast<uint64_t>(Simulator::Now().GetMilliSeconds());
+
+    // Coletar métricas do FlowMonitor
+    g_monitorPtr->CheckForLostPackets();
+    FlowMonitor::FlowStatsContainer stats = g_monitorPtr->GetFlowStats();
+
+    struct UeKpm
+    {
+        uint64_t txBytes = 0;
+        uint64_t rxBytes = 0;
+        uint32_t txPackets = 0;
+        uint32_t rxPackets = 0;
+        uint32_t lostPackets = 0;
+        double delaySumSec = 0.0;
+        uint32_t count = 0;
+    };
+
+    std::map<uint16_t, UeKpm> ueKpms; // key = ueId
+
+    for (const auto& kv : stats)
+    {
+        FlowId flowId = kv.first;
+        const FlowMonitor::FlowStats& st = kv.second;
+        Ipv4FlowClassifier::FiveTuple tuple = g_classifierPtr->FindFlow(flowId);
+
+        if (tuple.protocol != 17)
+            continue;
+
+        auto itPort = g_portToUeId.find(tuple.destinationPort);
+        if (itPort == g_portToUeId.end())
+            continue;
+
+        uint16_t ueId = itPort->second;
+        UeKpm& k = ueKpms[ueId];
+        k.txBytes += st.txBytes;
+        k.rxBytes += st.rxBytes;
+        k.txPackets += st.txPackets;
+        k.rxPackets += st.rxPackets;
+        k.lostPackets += st.lostPackets;
+        k.delaySumSec += st.delaySum.GetSeconds();
+        k.count++;
+    }
+
+    // Escrever slice-kpms.txt (now using delta-based metrics)
+    {
+        std::ofstream kpmFile("slice-kpms.txt", std::ios::out | std::ios::trunc);
+        kpmFile << "timestamp,ueImsi,sliceId,dTxBytes,dRxBytes,plr,resourceSharePct,dLostPackets,throughputMbps,bufferBytes\n";
+
+        for (const auto& kv : ueKpms)
+        {
+            uint16_t ueId = kv.first;
+            const UeKpm& k = kv.second;
+            SliceType slice = g_ueToSlice[ueId];
+            uint32_t sliceIdx = static_cast<uint32_t>(slice);
+
+            // Get previous values and calculate deltas
+            KpmPrevValues& prev = g_kpmPrevValues[ueId];
+            uint64_t dTxBytes = (k.txBytes >= prev.txBytes) ? (k.txBytes - prev.txBytes) : 0;
+            uint64_t dRxBytes = (k.rxBytes >= prev.rxBytes) ? (k.rxBytes - prev.rxBytes) : 0;
+            uint32_t dTxPackets = (k.txPackets >= prev.txPackets) ? (k.txPackets - prev.txPackets) : 0;
+            uint32_t dRxPackets = (k.rxPackets >= prev.rxPackets) ? (k.rxPackets - prev.rxPackets) : 0;
+
+            // Update previous values for next iteration
+            prev.txBytes = k.txBytes;
+            prev.rxBytes = k.rxBytes;
+            prev.txPackets = k.txPackets;
+            prev.rxPackets = k.rxPackets;
+            prev.lostPackets = k.lostPackets;
+
+            // Calculate effective loss (more reliable than FlowMonitor lostPackets)
+            uint32_t effectiveLost = (dTxPackets >= dRxPackets) ? (dTxPackets - dRxPackets) : 0;
+
+            double plr = (dTxPackets > 0)
+                             ? (static_cast<double>(effectiveLost) / dTxPackets * 100.0)
+                             : 0.0;
+            double rsh = (g_schedulerPtr)
+                             ? g_schedulerPtr->GetPrbWeight(sliceIdx) * 100.0
+                             : 0.0;
+            double periodSec = static_cast<double>(g_indicationPeriodMs) / 1000.0;
+            double thrMbps = (periodSec > 0)
+                                 ? (static_cast<double>(dRxBytes) * 8.0 / periodSec / 1e6)
+                                 : 0.0;
+
+            uint32_t bufferBytes = (g_schedulerPtr && g_ueIdToRnti.count(ueId))
+                                       ? g_schedulerPtr->GetUeDlBufferSize(g_ueIdToRnti[ueId])
+                                       : 0;
+
+            kpmFile << nowMs << "," << ueId << "," << sliceIdx << ","
+                    << dTxBytes << "," << dRxBytes << ","
+                    << std::fixed << std::setprecision(2) << plr << ","
+                    << std::setprecision(2) << rsh << ","
+                    << effectiveLost << ","
+                    << std::setprecision(4) << thrMbps << ","
+                    << bufferBytes << "\n";
+        }
+        kpmFile.flush();
+    }
+
+    // Sinalizar ao Python: métricas prontas
+    if (g_semMetricsReady)
+    {
+        sem_post(g_semMetricsReady);
+    }
+
+    // Esperar ação do agente (timeout curto de 50ms para não bloquear a simulação)
+    if (g_semControl)
+    {
+        struct timespec ts;
+        clock_gettime(CLOCK_REALTIME, &ts);
+        ts.tv_nsec += 50 * 1000 * 1000; // 50ms
+        if (ts.tv_nsec >= 1000000000)
+        {
+            ts.tv_sec += 1;
+            ts.tv_nsec -= 1000000000;
+        }
+        int ret = sem_timedwait(g_semControl, &ts);
+        if (ret == 0)
+        {
+            // Ler ação do agente
+            std::ifstream actionFile("slice_actions_for_ns3.csv");
+            if (actionFile.is_open())
+            {
+                std::string line;
+                std::vector<double> dedicatedPrb(NUM_SLICES, 33.33);
+                std::getline(actionFile, line); // skip header
+                while (std::getline(actionFile, line))
+                {
+                    std::stringstream ss(line);
+                    std::string token;
+                    std::vector<std::string> cols;
+                    while (std::getline(ss, token, ','))
+                    {
+                        cols.push_back(token);
+                    }
+                    if (cols.size() >= 4)
+                    {
+                        uint32_t sliceId = static_cast<uint32_t>(std::stoi(cols[1]));
+                        double ded = std::stod(cols[2]);
+                        if (sliceId < NUM_SLICES)
+                        {
+                            dedicatedPrb[sliceId] = ded;
+                        }
+                    }
+                }
+                actionFile.close();
+
+                // P_STA decomposition is applied in Python (slice_action_spaces.py)
+                // The agent sends dedicatedPRB as % of total, already including P_STA.
+                // We use these values directly to avoid double application.
+                double totalDed = dedicatedPrb[0] + dedicatedPrb[1] + dedicatedPrb[2];
+                if (totalDed > 0.0)
+                {
+                    std::vector<double> p_final(NUM_SLICES);
+                    for (uint32_t s = 0; s < NUM_SLICES; s++)
+                    {
+                        // Directly use the percentages from Python (already normalized)
+                        p_final[s] = dedicatedPrb[s] / totalDed;
+                    }
+
+                    // Renormalizar para somar 1.0 (guard contra floating point)
+                    double sum = p_final[0] + p_final[1] + p_final[2];
+                    if (sum > 0.0)
+                    {
+                        for (uint32_t s = 0; s < NUM_SLICES; s++)
+                        {
+                            p_final[s] /= sum;
+                        }
+                    }
+
+                    std::vector<MacScheduler::IntraSliceAlgorithm> algos = {
+                        MacScheduler::IntraSliceAlgorithm::PF,
+                        MacScheduler::IntraSliceAlgorithm::PF,
+                        MacScheduler::IntraSliceAlgorithm::PF};
+                    g_schedulerPtr->SetSliceConfiguration(p_final, algos);
+
+                    NS_LOG_INFO("[SliceAwareSim] IPC action applied at t=" << nowMs
+                                << "ms: weights=[" << p_final[0] << ", "
+                                << p_final[1] << ", " << p_final[2] << "]");
+                }
+            }
+        }
+        else
+        {
+            NS_LOG_WARN("[SliceAwareSim] sem_timedwait timeout — no action from agent");
+        }
+    }
+
+    // Agendar próximo callback
+    Simulator::Schedule(MilliSeconds(g_indicationPeriodMs), &KpmAndControlCallback);
+}
+
+// ---------------------------------------------------------------------------
+// main
+// ---------------------------------------------------------------------------
+
+int
+main(int argc, char* argv[])
+{
+    auto scenarios = InitScenarios();
+
+    std::string scenarioName = "normal";
+    std::string outputDir = ".";
+    uint32_t seed = 1;
+    double simTimeSec = 4.0;
+    double appStartSec = 0.4;
+    uint32_t indicationPeriodMs = 10;
+    std::string tddPattern = "D|D|D|D|D|D|D|D|D";
+    std::string weightsStr = "0.3333,0.4000,0.2667";
+    std::string simId = "";
+    bool logAllMacSlots = false;
+    uint32_t macLoggingPeriodMs = 97;
+
+    // RAN650 n78 fixed parameters
+    double centralFrequency = 3.55e9;  // Band n78: 3.55 GHz
+    double bandwidth = 100e6;          // 100 MHz
+    uint16_t numerology = 1;           // SCS 30 kHz (mu=1)
+    // RAN650: 37 dBm per port, 4 ports × 5 W = 20 W ≈ 43 dBm total equivalent
+    double txPowerDbm = 43.0;
+    const uint32_t gnbAntennaRows = 2;
+    const uint32_t gnbAntennaColumns = 2;
+
+    // Deployment configuration parameters
+    std::string deploymentScenario = "indoor_small";
+    int enableShadowing = -1;  // -1=deployment default, 0=disabled, 1=enabled
+    double ueAreaRadius = -1.0;
+    double gnbHeight = -1.0;
+    double ueHeight = 1.5;
+
+    CommandLine cmd(__FILE__);
+    cmd.AddValue("scenario", "1-5 or name", scenarioName);
+    cmd.AddValue("simTime", "Total sim time (s)", simTimeSec);
+    cmd.AddValue("appStart", "App start time (s)", appStartSec);
+    cmd.AddValue("seed", "RNG seed", seed);
+    cmd.AddValue("outputDir", "Output directory", outputDir);
+    cmd.AddValue("periodMs", "Stats indication period (ms)", indicationPeriodMs);
+    cmd.AddValue("tddPattern", "TDD slot pattern string (NOTE: currently NOT applied in this NR version)", tddPattern);
+    cmd.AddValue("embbUes", "Number of eMBB UEs", g_numUeEmbb);
+    cmd.AddValue("urllcUes", "Number of URLLC UEs", g_numUeUrllc);
+    cmd.AddValue("mtcUes", "Number of MTC UEs", g_numUeMtc);
+    cmd.AddValue("weights", "Slice weights as comma-separated list (eMBB,URLLC,MTC)", weightsStr);
+    cmd.AddValue("simId", "Simulation UUID for IPC semaphores", simId);
+    cmd.AddValue("LogAllMacSlots", "Log every MAC scheduling call (large files)", logAllMacSlots);
+    cmd.AddValue("MacLoggingPeriodMs", "MAC logging period in ms (when LogAllMacSlots=false)", macLoggingPeriodMs);
+    // Radio parameters (RAN650 n78 defaults, overridable)
+    cmd.AddValue("centralFrequency", "Central frequency in Hz (default: 3.55e9 for n78)", centralFrequency);
+    cmd.AddValue("bandwidth", "Bandwidth in Hz (default: 100e6 for n78)", bandwidth);
+    cmd.AddValue("numerology", "NR numerology 0-4 (default: 1 for 30 kHz SCS)", numerology);
+    cmd.AddValue("txPower", "gNB TX power in dBm (default: 43.0, approx 4x37 dBm RAN650 ports)", txPowerDbm);
+    cmd.AddValue("deploymentScenario", "Deployment: indoor_small, campus_short, outdoor_medium, fwa", deploymentScenario);
+    cmd.AddValue("enableShadowing", "Shadowing override: -1=deployment default, 0=disabled, 1=enabled", enableShadowing);
+    cmd.AddValue("ueAreaRadius", "UE distribution radius in meters", ueAreaRadius);
+    cmd.AddValue("gnbHeight", "gNB height in meters", gnbHeight);
+    cmd.AddValue("ueHeight", "UE height in meters", ueHeight);
+    cmd.Parse(argc, argv);
+
+    if (scenarioName.size() == 1 && std::isdigit(scenarioName[0]))
+    {
+        const char* names[] = {"low_traffic", "normal", "congestion", "stressed",
+                               "insufficient_resources"};
+        int idx = std::stoi(scenarioName) - 1;
+        if (idx < 0 || idx > 4)
+        {
+            NS_FATAL_ERROR("Scenario must be 1-5 or a valid name");
+        }
+        scenarioName = names[idx];
+    }
+
+    if (scenarios.find(scenarioName) == scenarios.end())
+    {
+        NS_FATAL_ERROR("Unknown scenario: " << scenarioName);
+    }
+
+    const ScenarioConfig scenario = scenarios.at(scenarioName);
+    const uint32_t numUeTotal = g_numUeEmbb + g_numUeUrllc + g_numUeMtc;
+
+    std::vector<double> sliceWeights = ParseWeights(weightsStr);
+    if (sliceWeights.size() != NUM_SLICES)
+    {
+        NS_FATAL_ERROR("Weights must have exactly " << NUM_SLICES << " elements");
+    }
+    double wsum = 0.0;
+    for (double w : sliceWeights)
+        wsum += w;
+    if (std::abs(wsum - 1.0) > 1e-3)
+    {
+        NS_FATAL_ERROR("Weights must sum to 1.0 (got " << wsum << ")");
+    }
+
+    std::vector<double> p_j = sliceWeights;
+    g_indicationPeriodMs = indicationPeriodMs;
+
+    // Get deployment configuration
+    DeploymentConfig deployConfig = GetDeploymentConfig(deploymentScenario);
+
+    // Apply command-line overrides for deployment
+    if (ueAreaRadius > 0)
+    {
+        deployConfig.ueAreaRadius = ueAreaRadius;
+    }
+    if (gnbHeight > 0)
+    {
+        deployConfig.gnbHeight = gnbHeight;
+    }
+    if (ueHeight > 0)
+    {
+        deployConfig.ueHeight = ueHeight;
+    }
+
+    // Shadowing tri-state override
+    bool shadowingEnabled = deployConfig.defaultShadowing;
+    if (enableShadowing == 0)
+    {
+        shadowingEnabled = false;
+    }
+    else if (enableShadowing == 1)
+    {
+        shadowingEnabled = true;
+    }
+    else if (enableShadowing != -1)
+    {
+        NS_FATAL_ERROR("enableShadowing must be -1, 0, or 1");
+    }
+
+    // Validate RAN650 n78 configuration
+    ValidateRan650Config(centralFrequency, bandwidth, numerology);
+
+    // Validate deployment overrides
+    if (txPowerDbm <= 0)
+    {
+        NS_FATAL_ERROR("txPowerDbm must be > 0");
+    }
+    if (deployConfig.ueAreaRadius <= 0)
+    {
+        NS_FATAL_ERROR("ueAreaRadius must be > 0");
+    }
+    if (deployConfig.gnbHeight <= 0)
+    {
+        NS_FATAL_ERROR("gnbHeight must be > 0");
+    }
+    if (deployConfig.ueHeight <= 0)
+    {
+        NS_FATAL_ERROR("ueHeight must be > 0");
+    }
+
+    const uint16_t baseDlPort = 12000;
+
+    std::cout << "========================================\n"
+              << "  Slice-Aware 5G/NR Simulation\n"
+              << "========================================\n"
+              << "Radio Profile : RAN650 n78 (Benetel)\n"
+              << "Deployment   : " << deployConfig.name << "\n"
+              << "Frequency    : " << centralFrequency / 1e9 << " GHz\n"
+              << "Bandwidth    : " << bandwidth / 1e6 << " MHz\n"
+              << "Numerology   : " << numerology << " (SCS " << GetScsString(numerology) << ")\n"
+              << "TxPower      : " << txPowerDbm << " dBm (approx 4x37 dBm RAN650 ports)\n"
+              << "gNB Antenna  : " << gnbAntennaRows << "x" << gnbAntennaColumns << " array (Isotropic)\n"
+              << "UE Area      : +/- " << deployConfig.ueAreaRadius << " m\n"
+              << "UE Height    : " << deployConfig.ueHeight << " m\n"
+              << "gNB Height   : " << deployConfig.gnbHeight << " m\n"
+              << "Channel      : " << deployConfig.channelScenario << ", ThreeGpp\n"
+              << "Shadowing    : " << (shadowingEnabled ? "ENABLED" : "DISABLED") << "\n"
+              << "Scenario     : " << scenario.name << "\n"
+              << "UEs          : " << numUeTotal
+              << " (eMBB=" << g_numUeEmbb
+              << " URLLC=" << g_numUeUrllc
+              << " MTC=" << g_numUeMtc << ")\n"
+              << "SimTime      : " << simTimeSec << " s\n"
+              << "Stats period : " << indicationPeriodMs << " ms\n"
+              << "IPC enabled  : " << (simId.empty() ? "NO (standalone)" : "YES") << "\n"
+              << "Weights      : eMBB=" << p_j[0]
+              << " URLLC=" << p_j[1]
+              << " MTC=" << p_j[2] << "\n"
+              << "========================================\n\n";
+
+    // Setup IPC semaphores if simId provided
+    if (!simId.empty())
+    {
+        g_simUuid = simId;
+        g_ipcEnabled = true;
+
+        std::string semMetricsName = "/slice_metrics_" + simId;
+        std::string semControlName = "/slice_control_" + simId;
+
+        g_semMetricsReady = sem_open(semMetricsName.c_str(), O_CREAT, 0660, 0);
+        g_semControl = sem_open(semControlName.c_str(), O_CREAT, 0660, 0);
+
+        if (g_semMetricsReady == SEM_FAILED || g_semControl == SEM_FAILED)
+        {
+            std::cerr << "WARNING: Failed to create POSIX semaphores. Running standalone.\n";
+            g_ipcEnabled = false;
+            if (g_semMetricsReady != SEM_FAILED)
+                sem_close(g_semMetricsReady);
+            if (g_semControl != SEM_FAILED)
+                sem_close(g_semControl);
+            g_semMetricsReady = nullptr;
+            g_semControl = nullptr;
+        }
+        else
+        {
+            std::cout << "[SliceAwareSim] IPC semaphores created: "
+                      << semMetricsName << " and " << semControlName << "\n";
+        }
+    }
+
+    RngSeedManager::SetSeed(seed);
+    RngSeedManager::SetRun(1);
+
+    Config::SetDefault("ns3::NrRlcUm::MaxTxBufferSize", UintegerValue(10485760));
+    Config::SetDefault("ns3::ThreeGppChannelModel::UpdatePeriod", TimeValue(MilliSeconds(0)));
+
+    // ---- Nodes ----
+    NodeContainer gNbNodes;
+    gNbNodes.Create(1);
+    NodeContainer ueNodes;
+    ueNodes.Create(numUeTotal);
+    NodeContainer remoteHostContainer;
+    remoteHostContainer.Create(1);
+
+    // ---- Mobility ----
+    MobilityHelper mobility;
+    mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+    {
+        // gNB position at origin with specified height
+        Ptr<ListPositionAllocator> pos = CreateObject<ListPositionAllocator>();
+        pos->Add(Vector(0.0, 0.0, deployConfig.gnbHeight));
+        mobility.SetPositionAllocator(pos);
+        mobility.Install(gNbNodes);
+    }
+    {
+        // UEs distributed in a circle around gNB
+        Ptr<RandomRectanglePositionAllocator> pos =
+            CreateObject<RandomRectanglePositionAllocator>();
+        std::string xRange = "ns3::UniformRandomVariable[Min=-" + std::to_string(deployConfig.ueAreaRadius) +
+                           "|Max=" + std::to_string(deployConfig.ueAreaRadius) + "]";
+        std::string yRange = "ns3::UniformRandomVariable[Min=-" + std::to_string(deployConfig.ueAreaRadius) +
+                           "|Max=" + std::to_string(deployConfig.ueAreaRadius) + "]";
+        pos->SetAttribute("X", StringValue(xRange));
+        pos->SetAttribute("Y", StringValue(yRange));
+        MobilityHelper ueMob;
+        ueMob.SetPositionAllocator(pos);
+        ueMob.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+        ueMob.Install(ueNodes);
+
+        // Set UE height
+        for (uint32_t i = 0; i < ueNodes.GetN(); ++i)
+        {
+            Ptr<MobilityModel> mob = ueNodes.Get(i)->GetObject<MobilityModel>();
+            Vector v = mob->GetPosition();
+            v.z = deployConfig.ueHeight;
+            mob->SetPosition(v);
+        }
+    }
+
+    // ---- NR Helpers ----
+    Ptr<NrPointToPointEpcHelper> epcHelper = CreateObject<NrPointToPointEpcHelper>();
+    Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
+    nrHelper->SetEpcHelper(epcHelper);
+
+    nrHelper->SetSchedulerTypeId(MacScheduler::GetTypeId());
+
+    nrHelper->SetUeAntennaAttribute("NumRows", UintegerValue(1));
+    nrHelper->SetUeAntennaAttribute("NumColumns", UintegerValue(1));
+    nrHelper->SetUeAntennaAttribute("AntennaElement",
+                                     PointerValue(CreateObject<IsotropicAntennaModel>()));
+    nrHelper->SetGnbAntennaAttribute("NumRows", UintegerValue(gnbAntennaRows));
+    nrHelper->SetGnbAntennaAttribute("NumColumns", UintegerValue(gnbAntennaColumns));
+    nrHelper->SetGnbAntennaAttribute("AntennaElement",
+                                      PointerValue(CreateObject<IsotropicAntennaModel>()));
+
+    // ---- Spectrum: 1 CC / 1 BWP ----
+    CcBwpCreator ccBwpCreator;
+    CcBwpCreator::SimpleOperationBandConf bandConf(centralFrequency, bandwidth, 1);
+    bandConf.m_numBwp = 1;
+    OperationBandInfo band = ccBwpCreator.CreateOperationBandContiguousCc(bandConf);
+
+    Ptr<NrChannelHelper> channelHelper = CreateObject<NrChannelHelper>();
+    channelHelper->ConfigureFactories(deployConfig.channelScenario, "Default", "ThreeGpp");
+    channelHelper->SetChannelConditionModelAttribute("UpdatePeriod", TimeValue(MilliSeconds(0)));
+    channelHelper->SetPathlossAttribute("ShadowingEnabled", BooleanValue(shadowingEnabled));
+    channelHelper->AssignChannelsToBands({band});
+
+    BandwidthPartInfoPtrVector allBwps = CcBwpCreator::GetAllBwps({band});
+
+    // ---- Internet stack ----
+    InternetStackHelper internet;
+    internet.Install(remoteHostContainer);
+    internet.Install(ueNodes);
+
+    // ---- Install NR devices ----
+    NetDeviceContainer gnbNetDev = nrHelper->InstallGnbDevice(gNbNodes, allBwps);
+    NetDeviceContainer ueNetDev = nrHelper->InstallUeDevice(ueNodes, allBwps);
+
+    int64_t randomStream = seed;
+    randomStream += nrHelper->AssignStreams(gnbNetDev, randomStream);
+    randomStream += nrHelper->AssignStreams(ueNetDev, randomStream);
+
+    // ---- PHY configuration ----
+    nrHelper->GetGnbPhy(gnbNetDev.Get(0), 0)->SetAttribute("Numerology", UintegerValue(numerology));
+    nrHelper->GetGnbPhy(gnbNetDev.Get(0), 0)->SetAttribute("TxPower", DoubleValue(txPowerDbm));
+
+    // ---- EPC backhaul ----
+    Ptr<Node> pgw = epcHelper->GetPgwNode();
+    PointToPointHelper p2ph;
+    p2ph.SetDeviceAttribute("DataRate", DataRateValue(DataRate("100Gbps")));
+    p2ph.SetDeviceAttribute("Mtu", UintegerValue(2500));
+    p2ph.SetChannelAttribute("Delay", TimeValue(Seconds(0.001)));
+    NetDeviceContainer internetDevices = p2ph.Install(pgw, remoteHostContainer.Get(0));
+
+    Ipv4AddressHelper ipv4h;
+    ipv4h.SetBase("1.0.0.0", "255.0.0.0");
+    Ipv4InterfaceContainer internetIpIfaces = ipv4h.Assign(internetDevices);
+
+    Ipv4StaticRoutingHelper ipv4RoutingHelper;
+    Ptr<Ipv4StaticRouting> remoteStatic =
+        ipv4RoutingHelper.GetStaticRouting(remoteHostContainer.Get(0)->GetObject<Ipv4>());
+    remoteStatic->AddNetworkRouteTo(Ipv4Address("7.0.0.0"), Ipv4Mask("255.0.0.0"), 1);
+
+    Ipv4InterfaceContainer ueIpIfaces = epcHelper->AssignUeIpv4Address(NetDeviceContainer(ueNetDev));
+    for (uint32_t i = 0; i < ueNodes.GetN(); ++i)
+    {
+        Ptr<Ipv4StaticRouting> ueStatic =
+            ipv4RoutingHelper.GetStaticRouting(ueNodes.Get(i)->GetObject<Ipv4>());
+        ueStatic->SetDefaultRoute(epcHelper->GetUeDefaultGatewayAddress(), 1);
+    }
+
+    // ---- Attach UEs ----
+    nrHelper->AttachToClosestGnb(ueNetDev, gnbNetDev);
+
+    // ---- Configure the Slice-Aware Meta-Scheduler ----
+    Ptr<NrMacScheduler> schedBase = NrHelper::GetScheduler(gnbNetDev.Get(0), 0);
+    Ptr<MacScheduler> scheduler = DynamicCast<MacScheduler>(schedBase);
+    NS_ASSERT_MSG(scheduler != nullptr, "Failed to cast to MacScheduler");
+    g_schedulerPtr = scheduler;
+
+    scheduler->SetScenarioName(scenarioName);
+    scheduler->SetOutputDir(outputDir);
+
+    // Configure MAC logging attributes
+    scheduler->SetAttribute("LogAllMacSlots", BooleanValue(logAllMacSlots));
+    scheduler->SetAttribute("MacLoggingPeriodMs", UintegerValue(macLoggingPeriodMs));
+    scheduler->SetAttribute("EnableDetailedMacLogging", BooleanValue(true)); // Enable detailed logging
+
+    // Mapeamento RNTI real pós-attach
+    double mappingTime = std::min(0.1, appStartSec - 0.05);
+    if (mappingTime < 0.0)
+        mappingTime = 0.05;
+
+    Simulator::Schedule(Seconds(mappingTime), [scheduler, ueNetDev, &p_j, &scenarioName, &outputDir, &ueIpIfaces]() {
+        std::vector<std::vector<uint32_t>> sliceRntis(NUM_SLICES);
+        std::cout << "\n=== UE Mapping (RNTI real após attach) ===\n"
+                  << std::setw(4) << "Idx" << " | "
+                  << std::setw(6) << "IMSI" << " | "
+                  << std::setw(6) << "RNTI" << " | "
+                  << std::setw(8) << "SliceId" << " | "
+                  << std::setw(8) << "SliceType" << "\n"
+                  << "-------------------------------------------\n";
+
+        // Write UE/RNTI mapping CSV
+        std::string mappingPrefix = outputDir;
+        if (!mappingPrefix.empty() && mappingPrefix.back() != '/')
+        {
+            mappingPrefix += '/';
+        }
+        std::string mappingPath = mappingPrefix + scenarioName + "_ue_rnti_mapping.csv";
+        std::ofstream mappingFile(mappingPath, std::ios::out | std::ios::trunc);
+        mappingFile << "scenario,ueId,imsi,rnti,sliceId,sliceName,ip,port\n";
+
+        for (uint32_t i = 0; i < ueNetDev.GetN(); ++i)
+        {
+            uint16_t ueId = static_cast<uint16_t>(i + 1);
+            SliceType slice = GetSliceForUe(ueId);
+            uint32_t sliceIdx = static_cast<uint32_t>(slice);
+            uint16_t port = 12000 + ueId; // baseDlPort + ueId
+
+            Ptr<NrUeNetDevice> ueDev = DynamicCast<NrUeNetDevice>(ueNetDev.Get(i));
+            uint16_t rnti = UINT16_MAX;
+            uint64_t imsi = 0;
+            if (ueDev)
+            {
+                if (ueDev->GetRrc())
+                {
+                    rnti = ueDev->GetRrc()->GetRnti();
+                }
+                imsi = ueDev->GetImsi();
+            }
+
+            if (rnti == UINT16_MAX || rnti == 0)
+            {
+                std::cerr << "WARNING: UE " << ueId
+                          << " ainda não possui RNTI válido no momento do mapeamento!\n";
+            }
+
+            sliceRntis[sliceIdx].push_back(rnti);
+            g_ueToSlice[ueId] = slice;
+            g_ueIdToRnti[ueId] = rnti;
+
+            std::cout << std::setw(4) << ueId << " | "
+                      << std::setw(6) << imsi << " | "
+                      << std::setw(6) << rnti << " | "
+                      << std::setw(8) << sliceIdx << " | "
+                      << std::setw(8) << SliceName(slice) << "\n";
+
+            // Write to mapping CSV
+            Ipv4Address ueAddr = ueIpIfaces.GetAddress(i);
+            mappingFile << scenarioName << "," << ueId << "," << imsi << "," << rnti << ","
+                       << sliceIdx << "," << SliceName(slice) << "," << ueAddr << "," << port << "\n";
+        }
+        mappingFile.close();
+        std::cout << "==========================================\n";
+        std::cout << "UE/RNTI mapping written to: " << mappingPath << "\n\n";
+
+        scheduler->SetSliceUeMapping(NUM_SLICES, sliceRntis);
+
+        std::vector<MacScheduler::IntraSliceAlgorithm> defaultAlgos = {
+            MacScheduler::IntraSliceAlgorithm::PF,
+            MacScheduler::IntraSliceAlgorithm::PF,
+            MacScheduler::IntraSliceAlgorithm::PF};
+        scheduler->SetSliceConfiguration(p_j, defaultAlgos);
+    });
+
+    // ---- Applications (DL traffic) ----
+    ApplicationContainer serverApps;
+    ApplicationContainer clientApps;
+    std::map<uint16_t, uint16_t> portToUeId;
+
+    for (uint32_t i = 0; i < ueNetDev.GetN(); ++i)
+    {
+        uint16_t ueId = static_cast<uint16_t>(i + 1);
+        SliceType slice = GetSliceForUe(ueId);
+        uint16_t port = baseDlPort + ueId;
+        Ipv4Address ueAddr = ueIpIfaces.GetAddress(i);
+
+        portToUeId[port] = ueId;
+
+        UdpServerHelper serverHelper(port);
+        serverApps.Add(serverHelper.Install(ueNodes.Get(i)));
+
+        uint64_t sliceRateBps = RateForSlice(scenario, slice) / NumUesPerSlice(slice);
+        uint32_t pktSize = PktSizeForSlice(scenario, slice);
+
+        OnOffHelper onOff("ns3::UdpSocketFactory", InetSocketAddress(ueAddr, port));
+        onOff.SetConstantRate(DataRate(sliceRateBps), pktSize);
+        clientApps.Add(onOff.Install(remoteHostContainer.Get(0)));
+
+        std::cout << "UE " << std::setw(2) << ueId
+                  << " [" << std::setw(4) << SliceName(slice) << "]"
+                  << " port=" << port
+                  << " rate=" << std::setw(10) << std::fixed << std::setprecision(2)
+                  << static_cast<double>(sliceRateBps) / 1e6 << " Mbps"
+                  << " pkt=" << pktSize << " B\n";
+    }
+    g_portToUeId = portToUeId;
+
+    serverApps.Start(Seconds(appStartSec));
+    clientApps.Start(Seconds(appStartSec));
+    serverApps.Stop(Seconds(simTimeSec));
+    clientApps.Stop(Seconds(simTimeSec));
+
+    // ---- Flow Monitor ----
+    FlowMonitorHelper flowmonHelper;
+    NodeContainer endpointNodes;
+    endpointNodes.Add(remoteHostContainer);
+    endpointNodes.Add(ueNodes);
+    Ptr<FlowMonitor> monitor = flowmonHelper.Install(endpointNodes);
+    monitor->SetAttribute("DelayBinWidth", DoubleValue(0.001));
+    monitor->SetAttribute("JitterBinWidth", DoubleValue(0.001));
+    monitor->SetAttribute("PacketSizeBinWidth", DoubleValue(20));
+    Ptr<Ipv4FlowClassifier> classifier =
+        DynamicCast<Ipv4FlowClassifier>(flowmonHelper.GetClassifier());
+
+    g_monitorPtr = monitor;
+    g_classifierPtr = classifier;
+
+    // ---- Initialize simulation stats ----
+    g_simStats.outputDir = outputDir;
+    g_simStats.indicationPeriodMs = indicationPeriodMs;
+    g_simStats.activeDurationSec = simTimeSec - appStartSec;
+    g_simStats.sliceStats[SliceType::EMBB] = SliceAggStats();
+    g_simStats.sliceStats[SliceType::URLLC] = SliceAggStats();
+    g_simStats.sliceStats[SliceType::MTC] = SliceAggStats();
+    for (uint32_t i = 0; i < numUeTotal; i++)
+    {
+        uint16_t ueId = static_cast<uint16_t>(i + 1);
+        SliceType slice = GetSliceForUe(ueId);
+        g_simStats.ueStats[ueId].ueId = ueId;
+        g_simStats.ueStats[ueId].slice = slice;
+    }
+
+    // ---- Schedule callbacks ----
+    Time firstCallback = Seconds(appStartSec) + MilliSeconds(indicationPeriodMs);
+    Simulator::Schedule(firstCallback, &StatsCallback);
+
+    if (g_ipcEnabled)
+    {
+        Simulator::Schedule(firstCallback, &KpmAndControlCallback);
+        std::cout << "[SliceAwareSim] IPC callback scheduled at t=" << firstCallback.GetMilliSeconds() << " ms\n";
+    }
+
+    // ---- Run ----
+    Simulator::Stop(Seconds(simTimeSec));
+    Simulator::Run();
+
+    // ---- Final stats ----
+    if (g_simStats.statsFile.is_open())
+    {
+        g_simStats.statsFile.close();
+    }
+
+    monitor->CheckForLostPackets();
+    FlowMonitor::FlowStatsContainer finalStats = monitor->GetFlowStats();
+
+    // Zerar slice stats para acumular corretamente
+    g_simStats.sliceStats[SliceType::EMBB] = SliceAggStats();
+    g_simStats.sliceStats[SliceType::URLLC] = SliceAggStats();
+    g_simStats.sliceStats[SliceType::MTC] = SliceAggStats();
+
+    for (const auto& kv : finalStats)
+    {
+        FlowId flowId = kv.first;
+        const FlowMonitor::FlowStats& st = kv.second;
+        Ipv4FlowClassifier::FiveTuple tuple = classifier->FindFlow(flowId);
+
+        if (tuple.protocol != 17)
+            continue;
+
+        auto itPort = portToUeId.find(tuple.destinationPort);
+        if (itPort == portToUeId.end())
+            continue;
+
+        uint16_t ueId = itPort->second;
+        SliceType slice = g_ueToSlice[ueId];
+        UeStats& ue = g_simStats.ueStats[ueId];
+        SliceAggStats& sa = g_simStats.sliceStats[slice];
+
+        ue.txBytes = st.txBytes;
+        ue.rxBytes = st.rxBytes;
+        ue.txPackets = st.txPackets;
+        ue.rxPackets = st.rxPackets;
+        ue.lostPackets = st.lostPackets;
+        ue.delaySumSec = st.delaySum.GetSeconds();
+
+        sa.txBytes += st.txBytes;
+        sa.rxBytes += st.rxBytes;
+        sa.txPackets += st.txPackets;
+        sa.rxPackets += st.rxPackets;
+        sa.lostPackets += st.lostPackets;
+        sa.delaySumSec += st.delaySum.GetSeconds();
+        sa.jitterSumSec += st.jitterSum.GetSeconds();
+    }
+
+    std::cout << "\n========================================\n"
+              << "  RESULTS (" << scenario.name << ")\n"
+              << "========================================\n";
+
+    for (const auto& kv : g_simStats.sliceStats)
+    {
+        const SliceAggStats& m = kv.second;
+        double thr = (g_simStats.activeDurationSec > 0)
+                         ? static_cast<double>(m.rxBytes) * 8.0 / g_simStats.activeDurationSec / 1e6
+                         : 0.0;
+        double avgDelay = (m.rxPackets > 0) ? m.delaySumSec / m.rxPackets * 1000.0 : 0.0;
+        double pdr = (m.txPackets > 0)
+                         ? static_cast<double>(m.rxPackets) / m.txPackets
+                         : 0.0;
+
+        std::cout << SliceName(kv.first) << ":\n"
+                  << "  Throughput : " << std::fixed << std::setprecision(4) << thr << " Mbps\n"
+                  << "  Avg delay  : " << std::setprecision(3) << avgDelay << " ms\n"
+                  << "  PDR        : " << std::setprecision(4) << pdr << "\n"
+                  << "  TX/RX pkts : " << m.txPackets << " / " << m.rxPackets << "\n\n";
+    }
+
+    std::string prefix = outputDir + "/slice_" + scenario.name;
+    WriteFinalCsv(prefix);
+
+    std::cout << "CSV outputs:\n"
+              << "  " << prefix << "_ue.csv\n"
+              << "  " << prefix << "_slice.csv\n"
+              << "  " << outputDir << "/slice_stats_timeseries.csv\n";
+
+    // ---- Cleanup IPC ----
+    if (g_ipcEnabled)
+    {
+        if (g_semMetricsReady)
+        {
+            sem_close(g_semMetricsReady);
+            std::string name = "/slice_metrics_" + g_simUuid;
+            sem_unlink(name.c_str());
+        }
+        if (g_semControl)
+        {
+            sem_close(g_semControl);
+            std::string name = "/slice_control_" + g_simUuid;
+            sem_unlink(name.c_str());
+        }
+        std::cout << "[SliceAwareSim] IPC semaphores cleaned up.\n";
+    }
+
+    Simulator::Destroy();
+    return 0;
+}

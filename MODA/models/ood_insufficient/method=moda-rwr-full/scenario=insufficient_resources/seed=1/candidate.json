@@ -1,0 +1,14 @@
+{
+  "weights": [
+    0.4548,
+    0.2581,
+    0.287
+  ],
+  "score_v1": null,
+  "score_v2": null,
+  "failed": null,
+  "reason": "not evaluated (approved budget: OBS only)",
+  "method": "moda-rwr-full",
+  "scenario": "insufficient_resources",
+  "seed": 1
+}

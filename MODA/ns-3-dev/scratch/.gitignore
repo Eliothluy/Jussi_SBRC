@@ -1,0 +1,14 @@
+# Ignore everything on scratch by default, except the provided examples
+/*
+!.gitignore
+
+!nested-subdir/
+!subdir/
+!our_paper/
+!our_paper/**
+!scratch-simulator.cc
+!CMakeLists.txt
+
+# SQR (CCNC 2026): código novo versionado conforme AGENTS.md §5.8
+!sqr/
+sqr/smoke_out/

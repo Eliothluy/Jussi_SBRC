@@ -1,0 +1,180 @@
+========================================
+  RSLAQ Simulation (Slice-Aware + IPC)
+========================================
+Scenario     : congestion
+RF profile   : RAN650 n78 + AW3161-E-F-V2 outdoor panel
+Frequency    : 3.55 GHz
+Bandwidth    : 100 MHz
+Numerology   : 1 (SCS 30 kHz)
+UEs          : 60 (eMBB=15 URLLC=10 MTC=35)
+UE area      : uniform disc radius 100 m, UE height 1.5 m
+gNB height   : 10 m
+gNB antenna  : 4 ports, +/-45 deg pol, 17.9 dBi, 65x7 deg, tilt 6 deg, bearing 0 deg
+SimTime      : 5 s
+TxPower      : 43 dBm
+gNB NF       : 4 dB
+RLC mode     : UM
+Shadowing    : enabled
+Stats period : 10 ms
+BaselineMode : slice_custom
+IntraAlgo    : PF
+WeightPolicy : static
+Seed/Run     : 1/1
+IPC enabled  : NO (standalone)
+OutputDir    : /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=rslaq_fixed_033-040-027/scenario=congestion/seed=1/results_rslaq_network_only/scenario=congestion/mode=slice_custom/seed=1_run=1
+Weights      : eMBB=0.3333 URLLC=0.4 MTC=0.2667
+
+UE  1 [eMBB] port=12001 rate=     12.00 Mbps pkt=1500 B
+UE  2 [eMBB] port=12002 rate=     12.00 Mbps pkt=1500 B
+UE  3 [eMBB] port=12003 rate=     12.00 Mbps pkt=1500 B
+UE  4 [eMBB] port=12004 rate=     12.00 Mbps pkt=1500 B
+UE  5 [eMBB] port=12005 rate=     12.00 Mbps pkt=1500 B
+UE  6 [eMBB] port=12006 rate=     12.00 Mbps pkt=1500 B
+UE  7 [eMBB] port=12007 rate=     12.00 Mbps pkt=1500 B
+UE  8 [eMBB] port=12008 rate=     12.00 Mbps pkt=1500 B
+UE  9 [eMBB] port=12009 rate=     12.00 Mbps pkt=1500 B
+UE 10 [eMBB] port=12010 rate=     12.00 Mbps pkt=1500 B
+UE 11 [eMBB] port=12011 rate=     12.00 Mbps pkt=1500 B
+UE 12 [eMBB] port=12012 rate=     12.00 Mbps pkt=1500 B
+UE 13 [eMBB] port=12013 rate=     12.00 Mbps pkt=1500 B
+UE 14 [eMBB] port=12014 rate=     12.00 Mbps pkt=1500 B
+UE 15 [eMBB] port=12015 rate=     12.00 Mbps pkt=1500 B
+UE 16 [URLLC] port=12016 rate=      0.50 Mbps pkt=100 B
+UE 17 [URLLC] port=12017 rate=      0.50 Mbps pkt=100 B
+UE 18 [URLLC] port=12018 rate=      0.50 Mbps pkt=100 B
+UE 19 [URLLC] port=12019 rate=      0.50 Mbps pkt=100 B
+UE 20 [URLLC] port=12020 rate=      0.50 Mbps pkt=100 B
+UE 21 [URLLC] port=12021 rate=      0.50 Mbps pkt=100 B
+UE 22 [URLLC] port=12022 rate=      0.50 Mbps pkt=100 B
+UE 23 [URLLC] port=12023 rate=      0.50 Mbps pkt=100 B
+UE 24 [URLLC] port=12024 rate=      0.50 Mbps pkt=100 B
+UE 25 [URLLC] port=12025 rate=      0.50 Mbps pkt=100 B
+UE 26 [ MTC] port=12026 rate=      1.71 Mbps pkt=500 B
+UE 27 [ MTC] port=12027 rate=      1.71 Mbps pkt=500 B
+UE 28 [ MTC] port=12028 rate=      1.71 Mbps pkt=500 B
+UE 29 [ MTC] port=12029 rate=      1.71 Mbps pkt=500 B
+UE 30 [ MTC] port=12030 rate=      1.71 Mbps pkt=500 B
+UE 31 [ MTC] port=12031 rate=      1.71 Mbps pkt=500 B
+UE 32 [ MTC] port=12032 rate=      1.71 Mbps pkt=500 B
+UE 33 [ MTC] port=12033 rate=      1.71 Mbps pkt=500 B
+UE 34 [ MTC] port=12034 rate=      1.71 Mbps pkt=500 B
+UE 35 [ MTC] port=12035 rate=      1.71 Mbps pkt=500 B
+UE 36 [ MTC] port=12036 rate=      1.71 Mbps pkt=500 B
+UE 37 [ MTC] port=12037 rate=      1.71 Mbps pkt=500 B
+UE 38 [ MTC] port=12038 rate=      1.71 Mbps pkt=500 B
+UE 39 [ MTC] port=12039 rate=      1.71 Mbps pkt=500 B
+UE 40 [ MTC] port=12040 rate=      1.71 Mbps pkt=500 B
+UE 41 [ MTC] port=12041 rate=      1.71 Mbps pkt=500 B
+UE 42 [ MTC] port=12042 rate=      1.71 Mbps pkt=500 B
+UE 43 [ MTC] port=12043 rate=      1.71 Mbps pkt=500 B
+UE 44 [ MTC] port=12044 rate=      1.71 Mbps pkt=500 B
+UE 45 [ MTC] port=12045 rate=      1.71 Mbps pkt=500 B
+UE 46 [ MTC] port=12046 rate=      1.71 Mbps pkt=500 B
+UE 47 [ MTC] port=12047 rate=      1.71 Mbps pkt=500 B
+UE 48 [ MTC] port=12048 rate=      1.71 Mbps pkt=500 B
+UE 49 [ MTC] port=12049 rate=      1.71 Mbps pkt=500 B
+UE 50 [ MTC] port=12050 rate=      1.71 Mbps pkt=500 B
+UE 51 [ MTC] port=12051 rate=      1.71 Mbps pkt=500 B
+UE 52 [ MTC] port=12052 rate=      1.71 Mbps pkt=500 B
+UE 53 [ MTC] port=12053 rate=      1.71 Mbps pkt=500 B
+UE 54 [ MTC] port=12054 rate=      1.71 Mbps pkt=500 B
+UE 55 [ MTC] port=12055 rate=      1.71 Mbps pkt=500 B
+UE 56 [ MTC] port=12056 rate=      1.71 Mbps pkt=500 B
+UE 57 [ MTC] port=12057 rate=      1.71 Mbps pkt=500 B
+UE 58 [ MTC] port=12058 rate=      1.71 Mbps pkt=500 B
+UE 59 [ MTC] port=12059 rate=      1.71 Mbps pkt=500 B
+UE 60 [ MTC] port=12060 rate=      1.71 Mbps pkt=500 B
+
+=== UE Mapping (RNTI real após attach) ===
+ Idx |   IMSI |   RNTI |  SliceId | SliceType
+-------------------------------------------
+   1 |      1 |      1 |        0 |     eMBB
+   2 |      2 |      2 |        0 |     eMBB
+   3 |      3 |      3 |        0 |     eMBB
+   4 |      4 |      4 |        0 |     eMBB
+   5 |      5 |      5 |        0 |     eMBB
+   6 |      6 |      6 |        0 |     eMBB
+   7 |      7 |      7 |        0 |     eMBB
+   8 |      8 |      8 |        0 |     eMBB
+   9 |      9 |      9 |        0 |     eMBB
+  10 |     10 |     10 |        0 |     eMBB
+  11 |     11 |     11 |        0 |     eMBB
+  12 |     12 |     12 |        0 |     eMBB
+  13 |     13 |     61 |        0 |     eMBB
+  14 |     14 |     62 |        0 |     eMBB
+  15 |     15 |     63 |        0 |     eMBB
+  16 |     16 |     64 |        1 |    URLLC
+  17 |     17 |     65 |        1 |    URLLC
+  18 |     18 |     66 |        1 |    URLLC
+  19 |     19 |     67 |        1 |    URLLC
+  20 |     20 |     68 |        1 |    URLLC
+  21 |     21 |     69 |        1 |    URLLC
+  22 |     22 |     70 |        1 |    URLLC
+  23 |     23 |     71 |        1 |    URLLC
+  24 |     24 |     72 |        1 |    URLLC
+  25 |     25 |     73 |        1 |    URLLC
+  26 |     26 |    109 |        2 |      MTC
+  27 |     27 |    110 |        2 |      MTC
+  28 |     28 |    111 |        2 |      MTC
+  29 |     29 |    112 |        2 |      MTC
+  30 |     30 |    113 |        2 |      MTC
+  31 |     31 |    114 |        2 |      MTC
+  32 |     32 |    115 |        2 |      MTC
+  33 |     33 |    116 |        2 |      MTC
+  34 |     34 |    117 |        2 |      MTC
+  35 |     35 |    118 |        2 |      MTC
+  36 |     36 |    119 |        2 |      MTC
+  37 |     37 |    120 |        2 |      MTC
+  38 |     38 |    121 |        2 |      MTC
+  39 |     39 |    144 |        2 |      MTC
+  40 |     40 |    145 |        2 |      MTC
+  41 |     41 |    146 |        2 |      MTC
+  42 |     42 |    147 |        2 |      MTC
+  43 |     43 |    148 |        2 |      MTC
+  44 |     44 |    149 |        2 |      MTC
+  45 |     45 |    150 |        2 |      MTC
+  46 |     46 |    151 |        2 |      MTC
+  47 |     47 |    152 |        2 |      MTC
+  48 |     48 |    153 |        2 |      MTC
+  49 |     49 |    154 |        2 |      MTC
+  50 |     50 |    155 |        2 |      MTC
+  51 |     51 |    156 |        2 |      MTC
+  52 |     52 |    166 |        2 |      MTC
+  53 |     53 |    167 |        2 |      MTC
+  54 |     54 |    168 |        2 |      MTC
+  55 |     55 |    169 |        2 |      MTC
+  56 |     56 |    170 |        2 |      MTC
+  57 |     57 |    171 |        2 |      MTC
+  58 |     58 |    172 |        2 |      MTC
+  59 |     59 |    173 |        2 |      MTC
+  60 |     60 |    174 |        2 |      MTC
+==========================================
+UE/RNTI mapping written to: /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=rslaq_fixed_033-040-027/scenario=congestion/seed=1/results_rslaq_network_only/scenario=congestion/mode=slice_custom/seed=1_run=1/congestion_ue_rnti_mapping.csv
+
+
+========================================
+  RESULTS (congestion)
+========================================
+eMBB:
+  Throughput : 47.5430 Mbps
+  Avg delay  : 505.121 ms
+  PDR        : 0.2593
+  TX/RX pkts : 65985 / 17113
+
+URLLC:
+  Throughput : 5.3949 Mbps
+  Avg delay  : 5.642 ms
+  PDR        : 0.8433
+  TX/RX pkts : 27490 / 23181
+
+MTC:
+  Throughput : 31.8422 Mbps
+  Avg delay  : 229.963 ms
+  PDR        : 0.5028
+  TX/RX pkts : 65975 / 33169
+
+CSV outputs:
+  /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=rslaq_fixed_033-040-027/scenario=congestion/seed=1/results_rslaq_network_only/scenario=congestion/mode=slice_custom/seed=1_run=1/timeseries.csv
+  /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=rslaq_fixed_033-040-027/scenario=congestion/seed=1/results_rslaq_network_only/scenario=congestion/mode=slice_custom/seed=1_run=1/slice_alloc.csv
+  /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=rslaq_fixed_033-040-027/scenario=congestion/seed=1/results_rslaq_network_only/scenario=congestion/mode=slice_custom/seed=1_run=1/summary.csv
+  /home/eliothluy/Documentos/artigo_jussi/models/closedloop_eval/method=rslaq_fixed_033-040-027/scenario=congestion/seed=1/results_rslaq_network_only/scenario=congestion/mode=slice_custom/seed=1_run=1/metadata.json

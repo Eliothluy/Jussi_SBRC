@@ -1,0 +1,22 @@
+{
+    "simTime": [10.0],
+    "scenario": ["greenran_normal"],
+    "seed": [1],
+    "periodMs": [100],
+    "weights": ["0.4000,0.1500,0.4500"],
+    "txPower": [43.0],
+    "LogAllMacSlots": [false],
+    "MacLoggingPeriodMs": [100],
+    "EnableUlSliceScheduling": [true],
+    "centralFrequency": [3550000000],
+    "bandwidth": [100000000],
+    "numerology": [1],
+    "deploymentScenario": ["umi"],
+    "enableShadowing": [-1],
+    "hardwareProfile": ["ran650_aw3161_outdoor"],
+    "ran650PowerMode": ["perPort"],
+    "enableHardwareValidation": [true],
+    "allowOutOfDatasheetConfig": [false],
+    "enablePosixSync": [true],
+    "enableDrlControl": [true]
+}

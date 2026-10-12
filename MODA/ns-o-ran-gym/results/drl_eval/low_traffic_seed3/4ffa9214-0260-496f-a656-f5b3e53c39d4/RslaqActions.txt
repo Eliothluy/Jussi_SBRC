@@ -1,0 +1,1 @@
+timestamp,sliceId,dedicatedPRB,minPRB,maxPRB

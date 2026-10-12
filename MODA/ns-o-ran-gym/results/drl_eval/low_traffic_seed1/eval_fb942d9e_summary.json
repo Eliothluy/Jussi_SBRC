@@ -1,0 +1,14 @@
+{
+  "run_id": "fb942d9e",
+  "algo": "ddqn",
+  "checkpoint": "results_controlled/heuristics_metaheuristics/20260626_122326/rslaq_ddqn_paper/ddqn_paper_low_traffic_seed1/ddqn_final.pt",
+  "scenario": "low_traffic",
+  "episodes": 1,
+  "seed": 1,
+  "num_ues_per_slice": {
+    "eMBB": 2,
+    "URLLC": 2,
+    "MTC": 6
+  },
+  "num_ues": 10
+}
