@@ -1,0 +1,10 @@
+method,slice_id,sla_mbps,ue_time_violation_pct_mean,ue_time_violation_pct_ci_lo,ue_time_violation_pct_ci_hi,slice_time_violation_pct_mean,slice_time_violation_pct_ci_lo,slice_time_violation_pct_ci_hi,ue_denominator_mean,slice_denominator_mean,n_seeds
+kbrl,0,0.5,,,,,,,0.0,0.0,0
+kbrl,1,1.0,100.0,100.0,100.0,100.0,100.0,100.0,1.0,1.0,1
+kbrl,2,1.5,100.0,100.0,100.0,100.0,100.0,100.0,159.0,159.0,1
+sqr-g0,0,0.5,,,,,,,0.0,0.0,0
+sqr-g0,1,1.0,100.0,100.0,100.0,100.0,100.0,100.0,1.0,1.0,1
+sqr-g0,2,1.5,100.0,100.0,100.0,100.0,100.0,100.0,159.0,159.0,1
+sqr-g1,0,0.5,,,,,,,0.0,0.0,0
+sqr-g1,1,1.0,100.0,100.0,100.0,100.0,100.0,100.0,1.0,1.0,1
+sqr-g1,2,1.5,100.0,100.0,100.0,100.0,100.0,100.0,159.0,159.0,1

@@ -1,0 +1,9 @@
+{
+  "method": "kbrl",
+  "controller_args": "--controller kbrl",
+  "seed": 8,
+  "simTime": 600,
+  "expected_steps": 5995,
+  "ns3_exit_code": 0,
+  "done_at": "2026-10-13T11:49:36-03:00"
+}

@@ -1,0 +1,9 @@
+{
+  "method": "equal",
+  "controller_args": "--controller equal",
+  "seed": 1,
+  "simTime": 60,
+  "expected_steps": 595,
+  "ns3_exit_code": 0,
+  "done_at": "2026-10-12T23:52:25-03:00"
+}

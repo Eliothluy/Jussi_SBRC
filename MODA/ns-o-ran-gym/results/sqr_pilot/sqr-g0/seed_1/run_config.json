@@ -1,0 +1,12 @@
+{
+  "method": "sqr-g0",
+  "controller_args": "--controller sqr --gamma 0",
+  "seed": 1,
+  "simTime": 60,
+  "periodMs": 100,
+  "c_prbs_initial": 52,
+  "warmup_s": 0,
+  "expected_steps": 595,
+  "started_at": "2026-10-12T23:49:15-03:00",
+  "driver": "run_sqr_campaign.sh"
+}

@@ -1,0 +1,12 @@
+{
+  "method": "equal",
+  "controller_args": "--controller equal",
+  "seed": 1,
+  "simTime": 60,
+  "periodMs": 100,
+  "c_prbs_initial": 52,
+  "warmup_s": 0,
+  "expected_steps": 595,
+  "started_at": "2026-10-12T23:52:08-03:00",
+  "driver": "run_sqr_campaign.sh"
+}

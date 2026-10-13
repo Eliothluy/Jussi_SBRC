@@ -1,0 +1,3 @@
+timestamp,ueImsi,sliceId,dTxBytes,dRxBytes,plr,resourceSharePct,dLostPackets,throughputMbps,bufferBytes,windowThroughputMbps,snrDb,queueBytes
+599900,21,2,1274352,0,100.00,0.00,834,0.0000,1668523,0.0000,-2.18,1668523
+599900,24,1,1272824,0,100.00,11.32,833,0.0000,3802904,0.0000,-0.20,3802904

@@ -1,0 +1,1235 @@
+========================================
+  SQR Simulation (cenario fiel ao artigo, IPC opcional)
+========================================
+Frequency    : 2 GHz [ARTIGO Tabela I]
+Bandwidth    : 10 MHz (C=52 PRBs aprox., mu=0)
+Numerology   : 0 (SCS 15 kHz, slot 1 ms)
+TxPower      : 30 dBm [ARTIGO]
+Antenna gain : 15 dBi [ARTIGO]
+UE noise fig : 9 dB [ARTIGO]
+Pathloss     : 3GPP UMa (urban macro) [ARTIGO]
+Cell radius  : 2000 m [ARTIGO]
+UE churn     : Poisson 2 UEs/min, session Exp(60 s) [ARTIGO]
+Mobility     : RandomWalk2d ~1 m/s [ASSUMIDO]
+Slices       : 3x eMBB, SLA/UE = 0.5,1.0,1.5 Mbps [ARTIGO]
+Offered/UE   : 100 Mbps UDP greedy full-buffer [ASSUMIDO R04]
+Scheduler    : SqrMacScheduler (cota absoluta de RBGs, R27)
+Decision pd  : 100 ms [ARTIGO: 100 TTIs]
+RLC mode     : UM
+TDD pattern  : DL|DL|DL|S|UL|UL|UL|
+IntraAlgo    : PF
+Seed/Run     : 1/1
+IPC enabled  : YES
+OutputDir    : ./results_sqr_network_only/seed=1_run=1
+
+[SqrSim] IPC semaphores created: /sem_metrics_d1f1d9b6-4584-49fe-a552-0ce2fd763794 and /sem_control_d1f1d9b6-4584-49fe-a552-0ce2fd763794
+[SqrSim] Initial absolute quota (RBG): [] totalRbg=0 totalPrb=0 (deferred — quota materialized on first DL slot)
+[SqrSim] Callbacks scheduled (attach check, KPM period=100 ms, Poisson lambda=2 UEs/min)
+[SqrSim] PRB_WINDOW t=100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 0, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=100ms prb_requested_pct=[18.87, 18.87, 18.87] prb_executed_rbg=[10, 10, 10] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[10, 10, 10] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=200ms prb_requested_pct=[18.87, 37.74, 18.87] prb_executed_rbg=[10, 20, 10] totalRbg=53 pctSum=75.47
+[SqrSim] PRB_WINDOW t=300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[10, 20, 10] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=300ms prb_requested_pct=[18.87, 18.87, 18.87] prb_executed_rbg=[10, 10, 10] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[10, 10, 10] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=400ms prb_requested_pct=[18.87, 37.74, 18.87] prb_executed_rbg=[10, 20, 10] totalRbg=53 pctSum=75.47
+[SqrSim] PRB_WINDOW t=500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[10, 20, 10] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=500ms prb_requested_pct=[18.87, 18.87, 18.87] prb_executed_rbg=[10, 10, 10] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[10, 10, 10] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=600ms prb_requested_pct=[18.87, 33.96, 18.87] prb_executed_rbg=[10, 18, 10] totalRbg=53 pctSum=71.70
+[SqrSim] PRB_WINDOW t=700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[10, 18, 10] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=700ms prb_requested_pct=[18.87, 18.87, 18.87] prb_executed_rbg=[10, 10, 10] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[10, 10, 10] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=800ms prb_requested_pct=[18.87, 18.87, 18.87] prb_executed_rbg=[10, 10, 10] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[10, 10, 10] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=900ms prb_requested_pct=[18.87, 18.87, 18.87] prb_executed_rbg=[10, 10, 10] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=1000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[10, 10, 10] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=1000ms prb_requested_pct=[71.70, 15.09, 13.21] prb_executed_rbg=[38, 8, 7] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=1100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[38, 8, 7] dl_slots=0 prb_idle_rbg=0 totalRbg=53[SqrSim] ACTION t=1100ms prb_requested_pct=[5.66, 47.17, 47.17] prb_executed_rbg=[3, 25, 25] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=1200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[3, 25, 25] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=1200ms prb_requested_pct=[5.66, 1.89, 1.89] prb_executed_rbg=[3, 1, 1] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=1300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[3, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=1300ms prb_requested_pct=[33.96, 33.96, 32.08] prb_executed_rbg=[18, 18, 17] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=1400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[18, 18, 17] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=1400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=1500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=1500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=1600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=1600ms prb_requested_pct=[1.89, 20.75, 1.89] prb_executed_rbg=[1, 11, 1] totalRbg=53 pctSum=24.53
+[SqrSim] PRB_WINDOW t=1700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 11, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=1700ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=1800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=1800ms prb_requested_pct=[1.89, 3.77, 3.77] prb_executed_rbg=[1, 2, 2] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=1900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 2, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=1900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=2000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=2000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=2100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=2100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=2200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=2200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=2300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=2300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=2400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=2400ms prb_requested_pct=[1.89, 37.74, 1.89] prb_executed_rbg=[1, 20, 1] totalRbg=53 pctSum=41.51
+[SqrSim] PRB_WINDOW t=2500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 20, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=2500ms prb_requested_pct=[0.00, 1.89, 0.00] prb_executed_rbg=[0, 1, 0] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=2600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=2600ms prb_requested_pct=[1.89, 3.77, 3.77] prb_executed_rbg=[1, 2, 2] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=2700ms prb_scheduled_rbg=[0, 0, 0]prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 2, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=2700ms prb_requested_pct=[1.89, 1.89, 20.75] prb_executed_rbg=[1, 1, 11] totalRbg=53 pctSum=24.53
+[SqrSim] PRB_WINDOW t=2800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 11] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=2800ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=2900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=2900ms prb_requested_pct=[1.89, 39.62, 3.77] prb_executed_rbg=[1, 21, 2] totalRbg=53 pctSum=45.28
+[SqrSim] PRB_WINDOW t=3000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 21, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=3000ms prb_requested_pct=[0.00, 1.89, 0.00] prb_executed_rbg=[0, 1, 0] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=3100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=3100ms prb_requested_pct=[1.89, 22.64, 75.47] prb_executed_rbg=[1, 12, 40] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=3200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 12, 40] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=3200ms prb_requested_pct=[5.66, 3.77, 9.43] prb_executed_rbg=[3, 2, 5] totalRbg=53 pctSum=18.87
+[SqrSim] PRB_WINDOW t=3300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[3, 2, 5] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=3300ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=3400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=3400ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=3500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=3500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=3600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=3600ms prb_requested_pct=[56.60, 1.89, 1.89] prb_executed_rbg=[30, 1, 1] totalRbg=53 pctSum=60.38
+[SqrSim] PRB_WINDOW t=3700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[30, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=3700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=3800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=3800ms prb_requested_pct=[66.04, 1.89, 1.89] prb_executed_rbg=[35, 1, 1] totalRbg=53 pctSum=69.81
+[SqrSim] PRB_WINDOW t=3900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[35, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=3900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=4000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=4000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=4100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=4100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=4200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=4200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=4300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=4300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=4400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=4400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=4500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=4500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=4600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=4600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=4700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=4700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=4800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=4800ms prb_requested_pct=[1.89, 1.89, 26.42] prb_executed_rbg=[1, 1, 14] totalRbg=53 pctSum=30.19
+[SqrSim] PRB_WINDOW t=4900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 14] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=4900ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=5000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=5000ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=5100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=5100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=5200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=5200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=5300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=5300ms prb_requested_pct=[86.79, 1.89, 1.89] prb_executed_rbg=[46, 1, 1] totalRbg=53 pctSum=90.57
+[SqrSim] PRB_WINDOW t=5400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[46, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=5400ms prb_requested_pct=[1.89, 13.21, 3.77] prb_executed_rbg=[1, 7, 2] totalRbg=53 pctSum=18.87
+[SqrSim] PRB_WINDOW t=5500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 7, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=5500ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=5600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=5600ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=5700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=5700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=5800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=5800ms prb_requested_pct=[66.04, 1.89, 1.89] prb_executed_rbg=[35, 1, 1] totalRbg=53 pctSum=69.81
+[SqrSim] PRB_WINDOW t=5900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[35, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=5900ms prb_requested_pct=[1.89, 1.89, 11.32] prb_executed_rbg=[1, 1, 6] totalRbg=53 pctSum=15.09
+[SqrSim] PRB_WINDOW t=6000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 6] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=6000ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=6100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=6100ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=6200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=6200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=6300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=6300ms prb_requested_pct=[1.89, 1.89, 75.47] prb_executed_rbg=[1, 1, 40] totalRbg=53 pctSum=79.25
+[SqrSim] PRB_WINDOW t=6400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 40] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=6400ms prb_requested_pct=[3.77, 3.77, 1.89] prb_executed_rbg=[2, 2, 1] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=6500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[2, 2, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=6500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=6600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=6600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=6700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=6700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=6800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=6800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=6900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=6900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=7000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=7000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=7100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=7100ms prb_requested_pct=[69.81, 1.89, 1.89] prb_executed_rbg=[37, 1, 1] totalRbg=53 pctSum=73.58
+[SqrSim] PRB_WINDOW t=7200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[37, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=7200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=7300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=7300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=7400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0,0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=7400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=7500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=7500ms prb_requested_pct=[1.89, 1.89, 5.66] prb_executed_rbg=[1, 1, 3] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=7600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 3] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=7600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=7700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=7700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=7800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=7800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=7900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=7900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=8000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=8000ms prb_requested_pct=[83.02, 1.89, 1.89] prb_executed_rbg=[44, 1, 1] totalRbg=53 pctSum=86.79
+[SqrSim] PRB_WINDOW t=8100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[44, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=8100ms prb_requested_pct=[1.89, 3.77, 56.60] prb_executed_rbg=[1, 2, 30] totalRbg=53 pctSum=62.26
+[SqrSim] PRB_WINDOW t=8200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 2, 30] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=8200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=8300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=8300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=8400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=8400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=8500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=8500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=8600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=8600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=8700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=8700ms prb_requested_pct=[26.42, 26.42, 18.87] prb_executed_rbg=[14, 14, 10] totalRbg=53 pctSum=71.70
+[SqrSim] PRB_WINDOW t=8800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[14, 14, 10] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=8800ms prb_requested_pct=[0.00, 0.00, 22.64] prb_executed_rbg=[0, 0, 12] totalRbg=53 pctSum=22.64
+[SqrSim] PRB_WINDOW t=8900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 0, 12] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=8900ms prb_requested_pct=[0.00, 35.85, 3.77] prb_executed_rbg=[0, 19, 2] totalRbg=53pctSum=39.62
+[SqrSim] PRB_WINDOW t=9000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 19, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=9000ms prb_requested_pct=[0.00, 1.89, 0.00] prb_executed_rbg=[0, 1, 0] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=9100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=9100ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=9200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=9200ms prb_requested_pct=[1.89, 22.64, 1.89] prb_executed_rbg=[1, 12, 1] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=9300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 12, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=9300ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=9400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=9400ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=9500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=9500ms prb_requested_pct=[1.89, 1.89, 26.42] prb_executed_rbg=[1, 1, 14] totalRbg=53 pctSum=30.19
+[SqrSim] PRB_WINDOW t=9600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 14] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=9600ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=9700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=9700ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=9800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=9800ms prb_requested_pct=[1.89, 73.58, 1.89] prb_executed_rbg=[1, 39, 1] totalRbg=53 pctSum=77.36
+[SqrSim] PRB_WINDOW t=9900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 39, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=9900ms prb_requested_pct=[3.77, 1.89, 3.77] prb_executed_rbg=[2, 1, 2] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=10000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[2, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=10000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=10100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=10100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=10200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=10200ms prb_requested_pct=[1.89, 9.43, 1.89] prb_executed_rbg=[1, 5, 1] totalRbg=53 pctSum=13.21
+[SqrSim] PRB_WINDOW t=10300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 5, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=10300ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=10400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=10400ms prb_requested_pct=[26.42, 1.89, 3.77] prb_executed_rbg=[14, 1, 2] totalRbg=53 pctSum=32.08
+[SqrSim] PRB_WINDOW t=10500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[14, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=10500ms prb_requested_pct=[1.89, 0.00, 1.89] prb_executed_rbg=[1, 0, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=10600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 0, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=10600ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=10700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=10700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=10800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=10800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=10900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=10900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=11000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=11000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=11100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=11100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=11200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=11200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=11300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=11300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=11400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=11400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=11500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=11500ms prb_requested_pct=[1.89, 1.89, 96.23] prb_executed_rbg=[1, 1, 51] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=11600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 51] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=11600ms prb_requested_pct=[5.66, 5.66, 1.89] prb_executed_rbg=[3, 3, 1] totalRbg=53 pctSum=13.21
+[SqrSim] PRB_WINDOW t=11700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[3, 3, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=11700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=11800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=11800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=11900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=11900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=12000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=12000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=12100ms prb_scheduled_rbg=[0,0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=12100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=12200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=12200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=12300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=12300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=12400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=12400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=12500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=12500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=12600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=12600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=12700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=12700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=12800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=12800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=12900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=12900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=13000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=13000ms prb_requested_pct=[1.89, 75.47, 1.89] prb_executed_rbg=[1, 40, 1] totalRbg=53 pctSum=79.25
+[SqrSim] PRB_WINDOW t=13100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 40, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=13100ms prb_requested_pct=[3.77, 1.89, 3.77] prb_executed_rbg=[2, 1, 2] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=13200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[2, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=13200ms prb_requested_pct=[52.83, 1.89, 1.89] prb_executed_rbg=[28, 1, 1] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=13300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[28, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=13300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=13400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=13400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=13500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=13500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=13600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=13600ms prb_requested_pct=[1.89, 1.89, 1.89]prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=13700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=13700ms prb_requested_pct=[1.89, 7.55, 1.89] prb_executed_rbg=[1, 4, 1] totalRbg=53 pctSum=11.32
+[SqrSim] PRB_WINDOW t=13800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 4, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=13800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=13900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=13900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=14000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=14000ms prb_requested_pct=[1.89, 56.60, 1.89] prb_executed_rbg=[1, 30, 1] totalRbg=53 pctSum=60.38
+[SqrSim] PRB_WINDOW t=14100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 30, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=14100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=14200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=14200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=14300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=14300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=14400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=14400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=14500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=14500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=14600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=14600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=14700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=14700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=14800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=14800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=14900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=14900ms prb_requested_pct=[1.89, 81.13, 1.89] prb_executed_rbg=[1, 43, 1] totalRbg=53 pctSum=84.91
+[SqrSim] PRB_WINDOW t=15000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 43, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=15000ms prb_requested_pct=[5.66, 1.89, 3.77] prb_executed_rbg=[3, 1, 2] totalRbg=53 pctSum=11.32
+[SqrSim] PRB_WINDOW t=15100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[3, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=15100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=15200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1,1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=15200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=15300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=15300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=15400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=15400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=15500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=15500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=15600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=15600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=15700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=15700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=15800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=15800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=15900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=15900ms prb_requested_pct=[1.89, 64.15, 1.89] prb_executed_rbg=[1, 34, 1] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=16000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 34, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=16000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=16100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=16100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=16200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=16200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=16300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=16300ms prb_requested_pct=[1.89, 1.89, 13.21] prb_executed_rbg=[1, 1, 7] totalRbg=53 pctSum=16.98
+[SqrSim] PRB_WINDOW t=16400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 7] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=16400ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=16500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=16500ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=16600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=16600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=16700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=16700ms prb_requested_pct=[52.83, 1.89, 1.89] prb_executed_rbg=[28, 1, 1] totalRbg=53 pctSum=56.60[SqrSim] PRB_WINDOW t=16800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[28, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=16800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=16900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=16900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=17000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=17000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=17100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=17100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=17200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=17200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=17300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=17300ms prb_requested_pct=[1.89, 43.40, 54.72] prb_executed_rbg=[1, 23, 29] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=17400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 23, 29] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=17400ms prb_requested_pct=[33.96, 1.89, 64.15] prb_executed_rbg=[18, 1, 34] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=17500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[18, 1, 34] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=17500ms prb_requested_pct=[1.89, 35.85, 0.00] prb_executed_rbg=[1, 19, 0] totalRbg=53 pctSum=37.74
+[SqrSim] PRB_WINDOW t=17600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 19, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=17600ms prb_requested_pct=[0.00, 1.89, 0.00] prb_executed_rbg=[0, 1, 0] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=17700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=17700ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=17800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=17800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=17900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=17900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=18000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=18000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=18100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=18100ms prb_requested_pct=[1.89, 1.89, 13.21] prb_executed_rbg=[1, 1, 7] totalRbg=53 pctSum=16.98
+[SqrSim] PRB_WINDOW t=18200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 7] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=18200ms prb_requested_pct=[0.00, 84.91, 1.89] prb_executed_rbg=[0, 45, 1] totalRbg=53 pctSum=86.79
+[SqrSim] PRB_WINDOW t=18300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 45, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=18300ms prb_requested_pct=[45.28, 1.89, 3.77] prb_executed_rbg=[24, 1, 2] totalRbg=53 pctSum=50.94
+[SqrSim] PRB_WINDOW t=18400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[24, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=18400ms prb_requested_pct=[1.89, 58.49, 1.89] prb_executed_rbg=[1, 31, 1] totalRbg=53 pctSum=62.26
+[SqrSim] PRB_WINDOW t=18500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 31, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=18500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=18600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=18600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=18700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=18700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=18800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=18800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=18900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=18900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=19000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=19000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=19100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=19100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=19200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=19200ms prb_requested_pct=[1.89, 39.62, 1.89] prb_executed_rbg=[1, 21, 1] totalRbg=53 pctSum=43.40
+[SqrSim] PRB_WINDOW t=19300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 21, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=19300ms prb_requested_pct=[0.00, 1.89, 0.00] prb_executed_rbg=[0, 1, 0] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=19400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=19400ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=19500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=19500ms prb_requested_pct=[1.89, 39.62, 43.40] prb_executed_rbg=[1, 21, 23] totalRbg=53 pctSum=84.91
+[SqrSim] PRB_WINDOW t=19600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 21, 23] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=19600ms prb_requested_pct=[3.77, 0.00, 0.00] prb_executed_rbg=[2, 0, 0] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=19700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[2, 0, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=19700ms prb_requested_pct=[1.89, 1.89, 71.70] prb_executed_rbg=[1, 1, 38] totalRbg=53 pctSum=75.47
+[SqrSim] PRB_WINDOW t=19800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 38] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=19800ms prb_requested_pct=[94.34, 3.77, 1.89] prb_executed_rbg=[50, 2, 1] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=19900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[50, 2, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=19900ms prb_requested_pct=[1.89, 5.66, 5.66] prb_executed_rbg=[1, 3, 3] totalRbg=53 pctSum=13.21
+[SqrSim] PRB_WINDOW t=20000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 3, 3] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=20000ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=20100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=20100ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=20200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=20200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=20300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=20300ms prb_requested_pct=[18.87, 1.89, 1.89] prb_executed_rbg=[10, 1, 1] totalRbg=53 pctSum=22.64
+[SqrSim] PRB_WINDOW t=20400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[10, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=20400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=20500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=20500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=20600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=20600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=20700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=20700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=20800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=20800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=20900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=20900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=21000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=21000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=21100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=21100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=21200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=21200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=21300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=21300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=21400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=21400ms prb_requested_pct=[18.87, 1.89, 1.89] prb_executed_rbg=[10, 1, 1] totalRbg=53 pctSum=22.64
+[SqrSim] PRB_WINDOW t=21500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[10, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=21500ms prb_requested_pct=[1.89, 1.89, 52.83] prb_executed_rbg=[1, 1, 28] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=21600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 28] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=21600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=21700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=21700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=21800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=21800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=21900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=21900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=22000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=22000ms prb_requested_pct=[1.89, 84.91, 1.89] prb_executed_rbg=[1, 45, 1] totalRbg=53 pctSum=88.68
+[SqrSim] PRB_WINDOW t=22100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 45, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=22100ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=22200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=22200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=22300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=22300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=22400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=22400ms prb_requested_pct=[13.21, 1.89, 1.89] prb_executed_rbg=[7, 1, 1] totalRbg=53 pctSum=16.98
+[SqrSim] PRB_WINDOW t=22500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[7, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=22500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=22600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=22600ms prb_requested_pct=[64.15, 1.89, 1.89] prb_executed_rbg=[34, 1, 1] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=22700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[34, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=22700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=22800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=22800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=22900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=22900ms prb_requested_pct=[1.89, 1.89, 43.40] prb_executed_rbg=[1, 1, 23] totalRbg=53 pctSum=47.17
+[SqrSim] PRB_WINDOW t=23000ms prb_scheduled_rbg=[0, 0, 0]prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 23] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=23000ms prb_requested_pct=[75.47, 22.64, 1.89] prb_executed_rbg=[40, 12, 1] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=23100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[40, 12, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=23100ms prb_requested_pct=[0.00, 16.98, 5.66] prb_executed_rbg=[0, 9, 3] totalRbg=53 pctSum=22.64
+[SqrSim] PRB_WINDOW t=23200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 9, 3] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=23200ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=23300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=23300ms prb_requested_pct=[45.28, 1.89, 3.77] prb_executed_rbg=[24, 1, 2] totalRbg=53 pctSum=50.94
+[SqrSim] PRB_WINDOW t=23400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[24, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=23400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=23500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=23500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=23600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=23600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=23700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=23700ms prb_requested_pct=[9.43, 1.89, 1.89] prb_executed_rbg=[5, 1, 1] totalRbg=53 pctSum=13.21
+[SqrSim] PRB_WINDOW t=23800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[5, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=23800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=23900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=23900ms prb_requested_pct=[1.89, 1.89, 73.58] prb_executed_rbg=[1, 1, 39] totalRbg=53 pctSum=77.36
+[SqrSim] PRB_WINDOW t=24000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 39] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=24000ms prb_requested_pct=[3.77, 3.77, 1.89] prb_executed_rbg=[2, 2, 1] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=24100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[2, 2, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=24100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=24200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=24200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=24300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=24300ms prb_requested_pct=[83.02, 1.89, 1.89] prb_executed_rbg=[44, 1, 1] totalRbg=53 pctSum=86.79
+[SqrSim] PRB_WINDOW t=24400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[44, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=24400ms prb_requested_pct=[9.43, 3.77, 3.77] prb_executed_rbg=[5, 2, 2] totalRbg=53 pctSum=16.98
+[SqrSim] PRB_WINDOW t=24500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[5, 2, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=24500ms prb_requested_pct=[1.89,1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=24600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=24600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=24700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=24700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=24800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=24800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=24900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=24900ms prb_requested_pct=[1.89, 86.79, 1.89] prb_executed_rbg=[1, 46, 1] totalRbg=53 pctSum=90.57
+[SqrSim] PRB_WINDOW t=25000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 46, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=25000ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=25100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=25100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=25200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=25200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=25300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=25300ms prb_requested_pct=[94.34, 1.89, 1.89] prb_executed_rbg=[50, 1, 1] totalRbg=53 pctSum=98.11
+[SqrSim] PRB_WINDOW t=25400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[50, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=25400ms prb_requested_pct=[1.89, 5.66, 5.66] prb_executed_rbg=[1, 3, 3] totalRbg=53 pctSum=13.21
+[SqrSim] PRB_WINDOW t=25500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 3, 3] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=25500ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=25600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=25600ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=25700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=25700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=25800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=25800ms prb_requested_pct=[64.15, 1.89, 1.89] prb_executed_rbg=[34, 1, 1] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=25900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[34, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=25900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=26000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=26000ms prb_requested_pct=[81.13, 1.89, 1.89] prb_executed_rbg=[43, 1, 1] totalRbg=53 pctSum=84.91
+[SqrSim] PRB_WINDOW t=26100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[43, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=26100ms prb_requested_pct=[1.89, 3.77, 3.77] prb_executed_rbg=[1, 2, 2] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=26200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 2, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=26200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=26300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=26300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=26400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=26400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=26500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=26500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=26600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=26600ms prb_requested_pct=[7.55, 1.89, 1.89] prb_executed_rbg=[4, 1, 1] totalRbg=53 pctSum=11.32
+[SqrSim] PRB_WINDOW t=26700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[4, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=26700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=26800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=26800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=26900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=26900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=27000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=27000ms prb_requested_pct=[1.89, 1.89, 33.96] prb_executed_rbg=[1, 1, 18] totalRbg=53 pctSum=37.74
+[SqrSim] PRB_WINDOW t=27100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 18] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=27100ms prb_requested_pct=[0.00, 0.00, 1.89] prb_executed_rbg=[0, 0, 1] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=27200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 0, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=27200ms prb_requested_pct=[16.98, 1.89, 3.77] prb_executed_rbg=[9, 1, 2] totalRbg=53 pctSum=22.64
+[SqrSim] PRB_WINDOW t=27300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[9, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=27300ms prb_requested_pct=[1.89, 1.89, 11.32] prb_executed_rbg=[1, 1, 6] totalRbg=53 pctSum=15.09
+[SqrSim] PRB_WINDOW t=27400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 6] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=27400ms prb_requested_pct=[0.00, 81.13, 1.89] prb_executed_rbg=[0, 43, 1] totalRbg=53 pctSum=83.02
+[SqrSim] PRB_WINDOW t=27500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 43, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=27500ms prb_requested_pct=[3.77, 35.85, 3.77] prb_executed_rbg=[2, 19, 2] totalRbg=53 pctSum=43.40
+[SqrSim] PRB_WINDOW t=27600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[2, 19, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=27600ms prb_requested_pct=[0.00, 1.89, 0.00] prb_executed_rbg=[0, 1,0] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=27700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=27700ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=27800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=27800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=27900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=27900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=28000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=28000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=28100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=28100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=28200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=28200ms prb_requested_pct=[39.62, 1.89, 1.89] prb_executed_rbg=[21, 1, 1] totalRbg=53 pctSum=43.40
+[SqrSim] PRB_WINDOW t=28300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[21, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=28300ms prb_requested_pct=[1.89, 0.00, 0.00] prb_executed_rbg=[1, 0, 0] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=28400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 0, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=28400ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=28500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=28500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=28600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=28600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=28700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=28700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=28800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=28800ms prb_requested_pct=[1.89, 94.34, 1.89] prb_executed_rbg=[1, 50, 1] totalRbg=53 pctSum=98.11
+[SqrSim] PRB_WINDOW t=28900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 50, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=28900ms prb_requested_pct=[1.89, 1.89, 5.66] prb_executed_rbg=[1, 1, 3] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=29000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 3] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=29000ms prb_requested_pct=[5.66, 1.89, 1.89] prb_executed_rbg=[3, 1, 1] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=29100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[3, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=29100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=29200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=29200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=29300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=29300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=29400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=29400ms prb_requested_pct=[32.08, 1.89, 66.04] prb_executed_rbg=[17, 1, 35] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=29500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[17, 1, 35] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=29500ms prb_requested_pct=[66.04, 5.66, 0.00] prb_executed_rbg=[35, 3, 0] totalRbg=53 pctSum=71.70
+[SqrSim] PRB_WINDOW t=29600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[35, 3, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=29600ms prb_requested_pct=[7.55, 26.42, 1.89] prb_executed_rbg=[4, 14, 1] totalRbg=53 pctSum=35.85
+[SqrSim] PRB_WINDOW t=29700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[4, 14, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=29700ms prb_requested_pct=[26.42, 1.89, 11.32] prb_executed_rbg=[14, 1, 6] totalRbg=53 pctSum=39.62
+[SqrSim] PRB_WINDOW t=29800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[14, 1, 6] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=29800ms prb_requested_pct=[0.00, 0.00, 1.89] prb_executed_rbg=[0, 0, 1] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=29900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 0, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=29900ms prb_requested_pct=[1.89, 30.19, 3.77] prb_executed_rbg=[1, 16, 2] totalRbg=53 pctSum=35.85
+[SqrSim] PRB_WINDOW t=30000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 16, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=30000ms prb_requested_pct=[0.00, 1.89, 0.00] prb_executed_rbg=[0, 1, 0] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=30100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=30100ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=30200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=30200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=30300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=30300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=30400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=30400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=30500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=30500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=30600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=30600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=30700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=30700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=30800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=30800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=30900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=30900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=31000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=31000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=31100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=31100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=31200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=31200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=31300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=31300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=31400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=31400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=31500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=31500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=31600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=31600ms prb_requested_pct=[1.89, 1.89, 52.83] prb_executed_rbg=[1, 1, 28] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=31700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 28] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=31700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=31800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=31800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=31900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=31900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=32000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=32000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=32100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=32100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=32200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=32200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=32300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=32300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=32400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=32400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=32500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=32500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=32600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=32600ms prb_requested_pct=[83.02, 1.89, 1.89] prb_executed_rbg=[44, 1, 1] totalRbg=53 pctSum=86.79
+[SqrSim] PRB_WINDOW t=32700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[44, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=32700ms prb_requested_pct=[83.02, 3.77, 3.77] prb_executed_rbg=[44, 2, 2] totalRbg=53 pctSum=90.57
+[SqrSim] PRB_WINDOW t=32800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[44, 2, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=32800ms prb_requested_pct=[1.89, 3.77, 30.19] prb_executed_rbg=[1, 2, 16] totalRbg=53 pctSum=35.85
+[SqrSim] PRB_WINDOW t=32900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 2, 16] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=32900ms prb_requested_pct=[0.00, 0.00, 1.89] prb_executed_rbg=[0, 0, 1] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=33000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 0, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=33000ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=33100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=33100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=33200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=33200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=33300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=33300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=33400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=33400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=33500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=33500ms prb_requested_pct=[1.89, 1.89, 39.62] prb_executed_rbg=[1, 1, 21] totalRbg=53 pctSum=43.40
+[SqrSim] PRB_WINDOW t=33600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 21] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=33600ms prb_requested_pct=[0.00, 0.00, 1.89] prb_executed_rbg=[0, 0, 1] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=33700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 0, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=33700ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=33800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=33800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=33900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=33900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=34000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=34000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=34100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=34100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=34200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=34200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=34300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=34300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=34400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=34400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=34500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=34500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=34600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=34600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=34700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=34700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=34800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=34800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=34900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=34900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=35000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=35000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=35100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=35100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=35200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=35200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=35300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=35300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=35400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=35400ms prb_requested_pct=[1.89, 75.47, 1.89] prb_executed_rbg=[1, 40, 1] totalRbg=53 pctSum=79.25
+[SqrSim] PRB_WINDOW t=35500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 40, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=35500ms prb_requested_pct=[3.77, 1.89, 3.77] prb_executed_rbg=[2, 1, 2] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=35600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[2, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=35600ms prb_requested_pct=[1.89, 3.77, 1.89] prb_executed_rbg=[1, 2, 1] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=35700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 2, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=35700ms prb_requested_pct=[1.89, 5.66, 1.89] prb_executed_rbg=[1, 3, 1] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=35800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 3, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=35800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=35900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=35900ms prb_requested_pct=[1.89, 1.89, 18.87] prb_executed_rbg=[1, 1, 10] totalRbg=53 pctSum=22.64
+[SqrSim] PRB_WINDOW t=36000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 10] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=36000ms prb_requested_pct=[0.00, 1.89, 1.89] prb_executed_rbg=[0, 1, 1] totalRbg=53 pctSum=3.77
+[SqrSim] PRB_WINDOW t=36100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=36100ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=36200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=36200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=36300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=36300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=36400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=36400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=36500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=36500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=36600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=36600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=36700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=36700ms prb_requested_pct=[1.89, 1.89, 69.81] prb_executed_rbg=[1, 1, 37] totalRbg=53 pctSum=73.58
+[SqrSim] PRB_WINDOW t=36800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 37] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=36800ms prb_requested_pct=[3.77, 1.89, 1.89] prb_executed_rbg=[2, 1, 1] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=36900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[2, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=36900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=37000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=37000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=37100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=37100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=37200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=37200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=37300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=37300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=37400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=37400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=37500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=37500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=37600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=37600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=37700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=37700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=37800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=37800ms prb_requested_pct=[9.43, 1.89, 1.89] prb_executed_rbg=[5, 1, 1] totalRbg=53 pctSum=13.21
+[SqrSim] PRB_WINDOW t=37900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[5, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=37900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=38000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=38000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=38100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=38100ms prb_requested_pct=[1.89, 49.06, 1.89] prb_executed_rbg=[1, 26, 1] totalRbg=53 pctSum=52.83
+[SqrSim] PRB_WINDOW t=38200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 26, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=38200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=38300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=38300ms prb_requested_pct=[69.81, 1.89, 1.89] prb_executed_rbg=[37, 1, 1] totalRbg=53 pctSum=73.58
+[SqrSim] PRB_WINDOW t=38400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[37, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=38400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=38500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=38500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=38600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=38600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=38700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=38700ms prb_requested_pct=[1.89, 1.89, 41.51] prb_executed_rbg=[1, 1, 22] totalRbg=53 pctSum=45.28
+[SqrSim] PRB_WINDOW t=38800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 22] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=38800ms prb_requested_pct=[0.00, 0.00, 1.89] prb_executed_rbg=[0, 0, 1] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=38900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 0, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=38900ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=39000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=39000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=39100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=39100ms prb_requested_pct=[1.89, 1.89, 96.23] prb_executed_rbg=[1, 1, 51] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=39200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 51] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=39200ms prb_requested_pct=[1.89, 41.51, 1.89] prb_executed_rbg=[1, 22, 1] totalRbg=53 pctSum=45.28
+[SqrSim] PRB_WINDOW t=39300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 22, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=39300ms prb_requested_pct=[0.00, 1.89, 0.00] prb_executed_rbg=[0, 1, 0] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=39400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 1, 0] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=39400ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=39500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=39500ms prb_requested_pct=[1.89, 1.89, 39.62] prb_executed_rbg=[1, 1, 21] totalRbg=53 pctSum=43.40
+[SqrSim] PRB_WINDOW t=39600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 21] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=39600ms prb_requested_pct=[0.00, 0.00, 83.02] prb_executed_rbg=[0, 0, 44] totalRbg=53 pctSum=83.02
+[SqrSim] PRB_WINDOW t=39700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 0, 44] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=39700ms prb_requested_pct=[3.77, 3.77, 3.77] prb_executed_rbg=[2, 2, 2] totalRbg=53 pctSum=11.32
+[SqrSim] PRB_WINDOW t=39800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[2, 2, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=39800ms prb_requested_pct=[1.89, 1.89, 52.83] prb_executed_rbg=[1, 1, 28] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=39900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 28] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=39900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=40000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=40000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=40100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=40100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=40200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=40200ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=40300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=40300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=40400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=40400ms prb_requested_pct=[1.89, 1.89, 62.26] prb_executed_rbg=[1, 1, 33] totalRbg=53 pctSum=66.04
+[SqrSim] PRB_WINDOW t=40500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 33] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=40500ms prb_requested_pct=[1.89, 49.06, 1.89] prb_executed_rbg=[1, 26, 1] totalRbg=53 pctSum=52.83
+[SqrSim] PRB_WINDOW t=40600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 26, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=40600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=40700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=40700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=40800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=40800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=40900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=40900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=41000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=41000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=41100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=41100ms prb_requested_pct=[1.89, 88.68, 1.89] prb_executed_rbg=[1, 47, 1] totalRbg=53 pctSum=92.45
+[SqrSim] PRB_WINDOW t=41200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 47, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=41200ms prb_requested_pct=[1.89, 75.47, 5.66] prb_executed_rbg=[1, 40, 3] totalRbg=53 pctSum=83.02
+[SqrSim] PRB_WINDOW t=41300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 40, 3] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=41300ms prb_requested_pct=[3.77, 73.58, 3.77] prb_executed_rbg=[2, 39, 2] totalRbg=53 pctSum=81.13
+[SqrSim] PRB_WINDOW t=41400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[2, 39, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=41400ms prb_requested_pct=[3.77, 1.89, 3.77] prb_executed_rbg=[2, 1, 2] totalRbg=53 pctSum=9.43
+[SqrSim] PRB_WINDOW t=41500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[2, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=41500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=41600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=41600ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=41700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=41700ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=41800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=41800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=41900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=41900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] UE_ARRIVAL ueId=1 slice=2 t=41.902s session=16.334s departure=58.236s port=12001 offered=100.000 Mbps sla=1.500 Mbps activeUes=1
+[SqrSim] UE_ATTACHED ueId=1 rnti=2 slice=2 t=41.955s
+[SqrSim] PRB_WINDOW t=42000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=42000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=42100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=42100ms prb_requested_pct=[16.98, 1.89, 24.53] prb_executed_rbg=[9, 1, 13] totalRbg=53 pctSum=43.40
+[SqrSim] PRB_WINDOW t=42200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[9, 1, 13] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=42200ms prb_requested_pct=[0.00, 0.00, 1.89] prb_executed_rbg=[0, 0, 1] totalRbg=53 pctSum=1.89
+[SqrSim] PRB_WINDOW t=42300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[0, 0, 1] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=42300ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=42400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 0, 0] prb_executed_rbg=[1, 1, 2] dl_slots=0 prb_idle_rbg=0 totalRbg=53
+[SqrSim] ACTION t=42400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=42500ms prb_scheduled_rbg=[0, 0, 56] prb_budget_rbg=[56, 56, 56] prb_executed_rbg=[1, 1, 1] dl_slots=56 prb_idle_rbg=2912 totalRbg=53
+[SqrSim] ACTION t=42500ms prb_requested_pct=[1.89, 1.89, 26.42] prb_executed_rbg=[1, 1, 14] totalRbg=53 pctSum=30.19
+[SqrSim] PRB_WINDOW t=42600ms prb_scheduled_rbg=[0, 0, 616] prb_budget_rbg=[44, 44, 616] prb_executed_rbg=[1, 1, 14] dl_slots=44 prb_idle_rbg=1716 totalRbg=53
+[SqrSim] ACTION t=42600ms prb_requested_pct=[0.00, 1.89, 33.96] prb_executed_rbg=[0, 1, 18] totalRbg=53 pctSum=35.85
+[SqrSim] PRB_WINDOW t=42700ms prb_scheduled_rbg=[0, 0, 1044] prb_budget_rbg=[0, 58, 1044] prb_executed_rbg=[0, 1, 18] dl_slots=58 prb_idle_rbg=2030 totalRbg=53
+[SqrSim] ACTION t=42700ms prb_requested_pct=[0.00, 0.00, 33.96] prb_executed_rbg=[0, 0, 18] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=42800ms prb_scheduled_rbg=[0, 0, 1044] prb_budget_rbg=[0, 0, 1044] prb_executed_rbg=[0, 0, 18] dl_slots=58 prb_idle_rbg=2030 totalRbg=53
+[SqrSim] ACTION t=42800ms prb_requested_pct=[0.00, 0.00, 33.96] prb_executed_rbg=[0, 0, 18] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=42900ms prb_scheduled_rbg=[0, 0, 1008] prb_budget_rbg=[0, 0, 1008] prb_executed_rbg=[0, 0, 18] dl_slots=56 prb_idle_rbg=1960 totalRbg=53
+[SqrSim] ACTION t=42900ms prb_requested_pct=[0.00, 0.00, 33.96] prb_executed_rbg=[0, 0, 18] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=43000ms prb_scheduled_rbg=[0, 0, 1026] prb_budget_rbg=[0, 0, 1026] prb_executed_rbg=[0, 0, 18] dl_slots=57 prb_idle_rbg=1995 totalRbg=53
+[SqrSim] ACTION t=43000ms prb_requested_pct=[0.00, 0.00, 33.96] prb_executed_rbg=[0, 0, 18] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=43100ms prb_scheduled_rbg=[0, 0, 1044] prb_budget_rbg=[0, 0, 1044] prb_executed_rbg=[0, 0, 18] dl_slots=58 prb_idle_rbg=2030 totalRbg=53
+[SqrSim] ACTION t=43100ms prb_requested_pct=[0.00, 0.00, 33.96] prb_executed_rbg=[0, 0, 18] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=43200ms prb_scheduled_rbg=[0, 0, 1026] prb_budget_rbg=[0, 0, 1026] prb_executed_rbg=[0, 0, 18] dl_slots=57 prb_idle_rbg=1995 totalRbg=53
+[SqrSim] ACTION t=43200ms prb_requested_pct=[0.00, 0.00, 33.96] prb_executed_rbg=[0, 0, 18] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=43300ms prb_scheduled_rbg=[0, 0, 1008] prb_budget_rbg=[0, 0, 1008] prb_executed_rbg=[0, 0, 18] dl_slots=56 prb_idle_rbg=1960 totalRbg=53
+[SqrSim] ACTION t=43300ms prb_requested_pct=[0.00, 0.00, 33.96] prb_executed_rbg=[0, 0, 18] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=43400ms prb_scheduled_rbg=[0, 0, 1044] prb_budget_rbg=[0, 0, 1044] prb_executed_rbg=[0, 0, 18] dl_slots=58 prb_idle_rbg=2030 totalRbg=53
+[SqrSim] ACTION t=43400ms prb_requested_pct=[0.00, 0.00, 66.04] prb_executed_rbg=[0, 0, 35] totalRbg=53 pctSum=66.04
+[SqrSim] PRB_WINDOW t=43500ms prb_scheduled_rbg=[0, 0, 1960] prb_budget_rbg=[0, 0, 1960] prb_executed_rbg=[0, 0, 35] dl_slots=56 prb_idle_rbg=1008 totalRbg=53
+[SqrSim] ACTION t=43500ms prb_requested_pct=[1.89, 1.89, 33.96] prb_executed_rbg=[1, 1, 18] totalRbg=53 pctSum=37.74
+[SqrSim] PRB_WINDOW t=43600ms prb_scheduled_rbg=[0, 0, 990] prb_budget_rbg=[55, 55, 990] prb_executed_rbg=[1, 1, 18] dl_slots=55 prb_idle_rbg=1925 totalRbg=53
+[SqrSim] ACTION t=43600ms prb_requested_pct=[0.00, 0.00, 24.53] prb_executed_rbg=[0, 0, 13] totalRbg=53 pctSum=24.53
+[SqrSim] PRB_WINDOW t=43700ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 0, 728] prb_executed_rbg=[0, 0, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=43700ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=43800ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=43800ms prb_requested_pct=[0.00, 1.89, 66.04] prb_executed_rbg=[0, 1, 35] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=43900ms prb_scheduled_rbg=[0, 0, 1925] prb_budget_rbg=[0, 55, 1925] prb_executed_rbg=[0, 1, 35] dl_slots=55 prb_idle_rbg=990 totalRbg=53
+[SqrSim] ACTION t=43900ms prb_requested_pct=[39.62, 1.89, 24.53] prb_executed_rbg=[21, 1, 13] totalRbg=53 pctSum=66.04
+[SqrSim] PRB_WINDOW t=44000ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[1176, 56, 728] prb_executed_rbg=[21, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=44000ms prb_requested_pct=[0.00, 1.89, 26.42] prb_executed_rbg=[0, 1, 14] totalRbg=53 pctSum=28.30
+[SqrSim] PRB_WINDOW t=44100ms prb_scheduled_rbg=[0, 0, 784] prb_budget_rbg=[0, 56, 784] prb_executed_rbg=[0, 1, 14] dl_slots=56 prb_idle_rbg=2184 totalRbg=53
+[SqrSim] ACTION t=44100ms prb_requested_pct=[0.00, 1.89, 66.04] prb_executed_rbg=[0, 1, 35] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=44200ms prb_scheduled_rbg=[0, 0, 1960] prb_budget_rbg=[0, 56, 1960] prb_executed_rbg=[0, 1, 35] dl_slots=56 prb_idle_rbg=1008 totalRbg=53
+[SqrSim] ACTION t=44200ms prb_requested_pct=[3.77, 1.89, 24.53] prb_executed_rbg=[2, 1, 13] totalRbg=53 pctSum=30.19
+[SqrSim] PRB_WINDOW t=44300ms prb_scheduled_rbg=[0, 0, 715] prb_budget_rbg=[110, 55, 715] prb_executed_rbg=[2, 1, 13] dl_slots=55 prb_idle_rbg=2200 totalRbg=53
+[SqrSim] ACTION t=44300ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=44400ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 57, 741] prb_executed_rbg=[0, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=44400ms prb_requested_pct=[28.30, 1.89, 24.53] prb_executed_rbg=[15, 1, 13] totalRbg=53 pctSum=54.72
+[SqrSim] PRB_WINDOW t=44500ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[870, 58, 754] prb_executed_rbg=[15, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=44500ms prb_requested_pct=[0.00, 1.89, 26.42] prb_executed_rbg=[0, 1, 14] totalRbg=53 pctSum=28.30
+[SqrSim] PRB_WINDOW t=44600ms prb_scheduled_rbg=[0, 0, 798] prb_budget_rbg=[0, 57, 798] prb_executed_rbg=[0, 1, 14] dl_slots=57 prb_idle_rbg=2223 totalRbg=53
+[SqrSim] ACTION t=44600ms prb_requested_pct=[15.09, 1.89, 66.04] prb_executed_rbg=[8, 1, 35] totalRbg=53 pctSum=83.02
+[SqrSim] PRB_WINDOW t=44700ms prb_scheduled_rbg=[0, 0, 1820] prb_budget_rbg=[416, 52, 1820] prb_executed_rbg=[8, 1, 35] dl_slots=52 prb_idle_rbg=936 totalRbg=53
+[SqrSim] ACTION t=44700ms prb_requested_pct=[3.77, 3.77, 60.38] prb_executed_rbg=[2, 2, 32] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=44800ms prb_scheduled_rbg=[0, 0, 1856] prb_budget_rbg=[116, 116, 1856] prb_executed_rbg=[2, 2, 32] dl_slots=58 prb_idle_rbg=1218 totalRbg=53
+[SqrSim] ACTION t=44800ms prb_requested_pct=[1.89, 1.89, 24.53] prb_executed_rbg=[1, 1, 13] totalRbg=53 pctSum=28.30
+[SqrSim] PRB_WINDOW t=44900ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[58, 58, 754] prb_executed_rbg=[1, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=44900ms prb_requested_pct=[0.00, 1.89, 66.04] prb_executed_rbg=[0, 1, 35] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=45000ms prb_scheduled_rbg=[0, 0, 1820] prb_budget_rbg=[0, 52, 1820] prb_executed_rbg=[0, 1, 35] dl_slots=52 prb_idle_rbg=936 totalRbg=53
+[SqrSim] ACTION t=45000ms prb_requested_pct=[3.77, 1.89, 24.53] prb_executed_rbg=[2, 1, 13] totalRbg=53 pctSum=30.19
+[SqrSim] PRB_WINDOW t=45100ms prb_scheduled_rbg=[0, 0, 572] prb_budget_rbg=[88, 44, 572] prb_executed_rbg=[2, 1, 13] dl_slots=44 prb_idle_rbg=1760 totalRbg=53
+[SqrSim] ACTION t=45100ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=45200ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=45200ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=45300ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=45300ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=45400ms prb_scheduled_rbg=[0, 0, 559] prb_budget_rbg=[0, 43, 559] prb_executed_rbg=[0, 1, 13] dl_slots=43 prb_idle_rbg=1720 totalRbg=53
+[SqrSim] ACTION t=45400ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=45500ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=45500ms prb_requested_pct=[0.00, 1.89, 66.04] prb_executed_rbg=[0, 1, 35] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=45600ms prb_scheduled_rbg=[0, 0, 1960] prb_budget_rbg=[0, 56, 1960] prb_executed_rbg=[0, 1, 35] dl_slots=56 prb_idle_rbg=1008 totalRbg=53
+[SqrSim] ACTION t=45600ms prb_requested_pct=[3.77, 1.89, 24.53] prb_executed_rbg=[2, 1, 13] totalRbg=53 pctSum=30.19
+[SqrSim] PRB_WINDOW t=45700ms prb_scheduled_rbg=[0, 0, 702] prb_budget_rbg=[108, 54, 702] prb_executed_rbg=[2, 1, 13] dl_slots=54 prb_idle_rbg=2160 totalRbg=53
+[SqrSim] ACTION t=45700ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=45800ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=45800ms prb_requested_pct=[0.00, 43.40, 56.60] prb_executed_rbg=[0, 23, 30] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=45900ms prb_scheduled_rbg=[0, 0, 1650] prb_budget_rbg=[0, 1265, 1650] prb_executed_rbg=[0, 23, 30] dl_slots=55 prb_idle_rbg=1265 totalRbg=53
+[SqrSim] ACTION t=45900ms prb_requested_pct=[1.89, 1.89, 26.42] prb_executed_rbg=[1, 1, 14] totalRbg=53 pctSum=30.19
+[SqrSim] PRB_WINDOW t=46000ms prb_scheduled_rbg=[0, 0, 798] prb_budget_rbg=[57, 57, 798] prb_executed_rbg=[1, 1, 14] dl_slots=57 prb_idle_rbg=2223 totalRbg=53
+[SqrSim] ACTION t=46000ms prb_requested_pct=[11.32, 37.74, 50.94] prb_executed_rbg=[6, 20, 27] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=46100ms prb_scheduled_rbg=[0, 0, 1404] prb_budget_rbg=[312, 1040, 1404] prb_executed_rbg=[6, 20, 27] dl_slots=52 prb_idle_rbg=1352 totalRbg=53
+[SqrSim] ACTION t=46100ms prb_requested_pct=[1.89, 1.89, 26.42] prb_executed_rbg=[1, 1, 14] totalRbg=53 pctSum=30.19
+[SqrSim] PRB_WINDOW t=46200ms prb_scheduled_rbg=[0, 0, 812] prb_budget_rbg=[58, 58, 812] prb_executed_rbg=[1, 1, 14] dl_slots=58 prb_idle_rbg=2262 totalRbg=53
+[SqrSim] ACTION t=46200ms prb_requested_pct=[30.19, 1.89, 56.60] prb_executed_rbg=[16, 1, 30] totalRbg=53 pctSum=88.68
+[SqrSim] PRB_WINDOW t=46300ms prb_scheduled_rbg=[0, 0, 1680] prb_budget_rbg=[896, 56, 1680] prb_executed_rbg=[16, 1, 30] dl_slots=56 prb_idle_rbg=1288 totalRbg=53
+[SqrSim] ACTION t=46300ms prb_requested_pct=[1.89, 3.77, 26.42] prb_executed_rbg=[1, 2, 14] totalRbg=53 pctSum=32.08
+[SqrSim] PRB_WINDOW t=46400ms prb_scheduled_rbg=[0, 0, 784] prb_budget_rbg=[56, 112, 784] prb_executed_rbg=[1, 2, 14] dl_slots=56 prb_idle_rbg=2184 totalRbg=53
+[SqrSim] ACTION t=46400ms prb_requested_pct=[0.00, 1.89, 50.94] prb_executed_rbg=[0, 1, 27] totalRbg=53 pctSum=52.83
+[SqrSim] PRB_WINDOW t=46500ms prb_scheduled_rbg=[0, 0, 1431] prb_budget_rbg=[0, 53, 1431] prb_executed_rbg=[0, 1, 27] dl_slots=53 prb_idle_rbg=1378 totalRbg=53
+[SqrSim] ACTION t=46500ms prb_requested_pct=[1.89, 1.89, 56.60] prb_executed_rbg=[1, 1, 30] totalRbg=53 pctSum=60.38
+[SqrSim] PRB_WINDOW t=46600ms prb_scheduled_rbg=[0, 0, 1740] prb_budget_rbg=[58, 58, 1740] prb_executed_rbg=[1, 1, 30] dl_slots=58 prb_idle_rbg=1334 totalRbg=53
+[SqrSim] ACTION t=46600ms prb_requested_pct=[37.74, 1.89, 24.53] prb_executed_rbg=[20, 1, 13] totalRbg=53 pctSum=64.15
+[SqrSim] PRB_WINDOW t=46700ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[1140, 57, 741] prb_executed_rbg=[20, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=46700ms prb_requested_pct=[0.00, 1.89, 26.42] prb_executed_rbg=[0, 1, 14] totalRbg=53 pctSum=28.30
+[SqrSim] PRB_WINDOW t=46800ms prb_scheduled_rbg=[0, 0, 742] prb_budget_rbg=[0, 53, 742] prb_executed_rbg=[0, 1, 14] dl_slots=53 prb_idle_rbg=2067 totalRbg=53
+[SqrSim] ACTION t=46800ms prb_requested_pct=[0.00, 1.89, 56.60] prb_executed_rbg=[0, 1, 30] totalRbg=53 pctSum=58.49
+[SqrSim] PRB_WINDOW t=46900ms prb_scheduled_rbg=[0, 0, 1620] prb_budget_rbg=[0, 54, 1620] prb_executed_rbg=[0, 1, 30] dl_slots=54 prb_idle_rbg=1242 totalRbg=53
+[SqrSim] ACTION t=46900ms prb_requested_pct=[1.89, 1.89, 56.60] prb_executed_rbg=[1, 1, 30] totalRbg=53 pctSum=60.38
+[SqrSim] PRB_WINDOW t=47000ms prb_scheduled_rbg=[0, 0, 1740] prb_budget_rbg=[58, 58, 1740] prb_executed_rbg=[1, 1, 30] dl_slots=58 prb_idle_rbg=1334 totalRbg=53
+[SqrSim] ACTION t=47000ms prb_requested_pct=[1.89, 1.89, 24.53] prb_executed_rbg=[1, 1, 13] totalRbg=53 pctSum=28.30
+[SqrSim] PRB_WINDOW t=47100ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[56, 56, 728] prb_executed_rbg=[1, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=47100ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=47200ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 57, 741] prb_executed_rbg=[0, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=47200ms prb_requested_pct=[0.00, 1.89, 56.60] prb_executed_rbg=[0, 1, 30] totalRbg=53 pctSum=58.49
+[SqrSim] PRB_WINDOW t=47300ms prb_scheduled_rbg=[0, 0, 1650] prb_budget_rbg=[0, 55, 1650] prb_executed_rbg=[0, 1, 30] dl_slots=55 prb_idle_rbg=1265 totalRbg=53
+[SqrSim] ACTION t=47300ms prb_requested_pct=[1.89, 1.89, 24.53] prb_executed_rbg=[1, 1, 13] totalRbg=53 pctSum=28.30
+[SqrSim] PRB_WINDOW t=47400ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[57, 57, 741] prb_executed_rbg=[1, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=47400ms prb_requested_pct=[0.00, 1.89, 33.96] prb_executed_rbg=[0, 1, 18] totalRbg=53 pctSum=35.85
+[SqrSim] PRB_WINDOW t=47500ms prb_scheduled_rbg=[0, 0, 1008] prb_budget_rbg=[0, 56, 1008] prb_executed_rbg=[0, 1, 18] dl_slots=56 prb_idle_rbg=1960 totalRbg=53
+[SqrSim] ACTION t=47500ms prb_requested_pct=[0.00, 0.00, 24.53] prb_executed_rbg=[0, 0, 13] totalRbg=53 pctSum=24.53
+[SqrSim] PRB_WINDOW t=47600ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 0, 754] prb_executed_rbg=[0, 0, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=47600ms prb_requested_pct=[0.00, 1.89, 66.04] prb_executed_rbg=[0, 1, 35] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=47700ms prb_scheduled_rbg=[0, 0, 1960] prb_budget_rbg=[0, 56, 1960] prb_executed_rbg=[0, 1, 35] dl_slots=56 prb_idle_rbg=1008 totalRbg=53
+[SqrSim] ACTION t=47700ms prb_requested_pct=[3.77, 1.89, 33.96] prb_executed_rbg=[2, 1, 18] totalRbg=53 pctSum=39.62
+[SqrSim] PRB_WINDOW t=47800ms prb_scheduled_rbg=[0, 0, 1008] prb_budget_rbg=[112, 56, 1008] prb_executed_rbg=[2, 1, 18] dl_slots=56 prb_idle_rbg=1960 totalRbg=53
+[SqrSim] ACTION t=47800ms prb_requested_pct=[0.00, 0.00, 66.04] prb_executed_rbg=[0, 0, 35] totalRbg=53 pctSum=66.04
+[SqrSim] PRB_WINDOW t=47900ms prb_scheduled_rbg=[0, 0, 1855] prb_budget_rbg=[0, 0, 1855] prb_executed_rbg=[0, 0, 35] dl_slots=53 prb_idle_rbg=954 totalRbg=53
+[SqrSim] ACTION t=47900ms prb_requested_pct=[1.89, 1.89, 52.83] prb_executed_rbg=[1, 1, 28] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=48000ms prb_scheduled_rbg=[0, 0, 1624] prb_budget_rbg=[58, 58, 1624] prb_executed_rbg=[1, 1, 28] dl_slots=58 prb_idle_rbg=1450 totalRbg=53
+[SqrSim] ACTION t=48000ms prb_requested_pct=[1.89, 1.89, 33.96] prb_executed_rbg=[1, 1, 18] totalRbg=53 pctSum=37.74
+[SqrSim] PRB_WINDOW t=48100ms prb_scheduled_rbg=[0, 0, 1026] prb_budget_rbg=[57, 57, 1026] prb_executed_rbg=[1, 1, 18] dl_slots=57 prb_idle_rbg=1995 totalRbg=53
+[SqrSim] ACTION t=48100ms prb_requested_pct=[0.00, 0.00, 11.32] prb_executed_rbg=[0, 0, 6] totalRbg=53 pctSum=11.32
+[SqrSim] PRB_WINDOW t=48200ms prb_scheduled_rbg=[0, 0, 294] prb_budget_rbg=[0, 0, 294] prb_executed_rbg=[0, 0, 6] dl_slots=49 prb_idle_rbg=2303 totalRbg=53
+[SqrSim] ACTION t=48200ms prb_requested_pct=[0.00, 1.89, 66.04] prb_executed_rbg=[0, 1, 35] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=48300ms prb_scheduled_rbg=[0, 0, 1610] prb_budget_rbg=[0, 46, 1610] prb_executed_rbg=[0, 1, 35] dl_slots=46 prb_idle_rbg=828 totalRbg=53
+[SqrSim] ACTION t=48300ms prb_requested_pct=[3.77, 1.89, 92.45] prb_executed_rbg=[2, 1, 49] totalRbg=53 pctSum=98.11
+[SqrSim] PRB_WINDOW t=48400ms prb_scheduled_rbg=[0, 0, 2744] prb_budget_rbg=[112, 56, 2744] prb_executed_rbg=[2, 1, 49] dl_slots=56 prb_idle_rbg=224 totalRbg=53
+[SqrSim] ACTION t=48400ms prb_requested_pct=[1.89, 5.66, 52.83] prb_executed_rbg=[1, 3, 28] totalRbg=53 pctSum=60.38
+[SqrSim] PRB_WINDOW t=48500ms prb_scheduled_rbg=[0, 0, 1568] prb_budget_rbg=[56, 168, 1568] prb_executed_rbg=[1, 3, 28] dl_slots=56 prb_idle_rbg=1400 totalRbg=53
+[SqrSim] ACTION t=48500ms prb_requested_pct=[1.89, 1.89, 24.53] prb_executed_rbg=[1, 1, 13] totalRbg=53 pctSum=28.30
+[SqrSim] PRB_WINDOW t=48600ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[57, 57, 741] prb_executed_rbg=[1, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=48600ms prb_requested_pct=[0.00, 1.89, 66.04] prb_executed_rbg=[0, 1, 35] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=48700ms prb_scheduled_rbg=[0, 0, 1925] prb_budget_rbg=[0, 55, 1925] prb_executed_rbg=[0, 1, 35] dl_slots=55 prb_idle_rbg=990 totalRbg=53
+[SqrSim] ACTION t=48700ms prb_requested_pct=[3.77, 1.89, 33.96] prb_executed_rbg=[2, 1, 18] totalRbg=53 pctSum=39.62
+[SqrSim] PRB_WINDOW t=48800ms prb_scheduled_rbg=[0, 0, 1026] prb_budget_rbg=[114, 57, 1026] prb_executed_rbg=[2, 1, 18] dl_slots=57 prb_idle_rbg=1995 totalRbg=53
+[SqrSim] ACTION t=48800ms prb_requested_pct=[0.00, 0.00, 24.53] prb_executed_rbg=[0, 0, 13] totalRbg=53 pctSum=24.53
+[SqrSim] PRB_WINDOW t=48900ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 0, 728] prb_executed_rbg=[0, 0, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=48900ms prb_requested_pct=[0.00, 1.89, 15.09] prb_executed_rbg=[0, 1, 8] totalRbg=53 pctSum=16.98
+[SqrSim] PRB_WINDOW t=49000ms prb_scheduled_rbg=[0, 0, 464] prb_budget_rbg=[0, 58, 464] prb_executed_rbg=[0, 1, 8] dl_slots=58 prb_idle_rbg=2610 totalRbg=53
+[SqrSim] ACTION t=49000ms prb_requested_pct=[0.00, 1.89, 73.58] prb_executed_rbg=[0, 1, 39] totalRbg=53 pctSum=75.47
+[SqrSim] PRB_WINDOW t=49100ms prb_scheduled_rbg=[0, 0, 2184] prb_budget_rbg=[0, 56, 2184] prb_executed_rbg=[0, 1, 39] dl_slots=56 prb_idle_rbg=784 totalRbg=53
+[SqrSim] ACTION t=49100ms prb_requested_pct=[3.77, 3.77, 24.53] prb_executed_rbg=[2, 2, 13] totalRbg=53 pctSum=32.08
+[SqrSim] PRB_WINDOW t=49200ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[112, 112, 728] prb_executed_rbg=[2, 2, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=49200ms prb_requested_pct=[0.00, 43.40, 56.60] prb_executed_rbg=[0, 23, 30] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=49300ms prb_scheduled_rbg=[0, 0, 1620] prb_budget_rbg=[0, 1242, 1620] prb_executed_rbg=[0, 23, 30] dl_slots=54 prb_idle_rbg=1242 totalRbg=53
+[SqrSim] ACTION t=49300ms prb_requested_pct=[1.89, 1.89, 26.42] prb_executed_rbg=[1, 1, 14] totalRbg=53 pctSum=30.19
+[SqrSim] PRB_WINDOW t=49400ms prb_scheduled_rbg=[0, 0, 812] prb_budget_rbg=[58, 58, 812] prb_executed_rbg=[1, 1, 14] dl_slots=58 prb_idle_rbg=2262 totalRbg=53
+[SqrSim] ACTION t=49400ms prb_requested_pct=[60.38, 1.89, 37.74] prb_executed_rbg=[32, 1, 20] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=49500ms prb_scheduled_rbg=[0, 0, 1140] prb_budget_rbg=[1824, 57, 1140] prb_executed_rbg=[32, 1, 20] dl_slots=57 prb_idle_rbg=1881 totalRbg=53
+[SqrSim] ACTION t=49500ms prb_requested_pct=[0.00, 5.66, 28.30] prb_executed_rbg=[0, 3, 15] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=49600ms prb_scheduled_rbg=[0, 0, 840] prb_budget_rbg=[0, 168, 840] prb_executed_rbg=[0, 3, 15] dl_slots=56 prb_idle_rbg=2128 totalRbg=53
+[SqrSim] ACTION t=49600ms prb_requested_pct=[0.00, 1.89, 50.94] prb_executed_rbg=[0, 1, 27] totalRbg=53 pctSum=52.83
+[SqrSim] PRB_WINDOW t=49700ms prb_scheduled_rbg=[0, 0, 1512] prb_budget_rbg=[0, 56, 1512] prb_executed_rbg=[0, 1, 27] dl_slots=56 prb_idle_rbg=1456 totalRbg=53
+[SqrSim] ACTION t=49700ms prb_requested_pct=[1.89, 1.89, 24.53] prb_executed_rbg=[1, 1, 13] totalRbg=53 pctSum=28.30
+[SqrSim] PRB_WINDOW t=49800ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[57, 57, 741] prb_executed_rbg=[1, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=49800ms prb_requested_pct=[0.00, 1.89, 66.04] prb_executed_rbg=[0, 1, 35] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=49900ms prb_scheduled_rbg=[0, 0, 1820] prb_budget_rbg=[0, 52, 1820] prb_executed_rbg=[0, 1, 35] dl_slots=52 prb_idle_rbg=936 totalRbg=53
+[SqrSim] ACTION t=49900ms prb_requested_pct=[3.77, 1.89, 33.96] prb_executed_rbg=[2, 1, 18] totalRbg=53 pctSum=39.62
+[SqrSim] PRB_WINDOW t=50000ms prb_scheduled_rbg=[0, 0, 1026] prb_budget_rbg=[114, 57, 1026] prb_executed_rbg=[2, 1, 18] dl_slots=57 prb_idle_rbg=1995 totalRbg=53
+[SqrSim] ACTION t=50000ms prb_requested_pct=[0.00, 0.00, 33.96] prb_executed_rbg=[0, 0, 18] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=50100ms prb_scheduled_rbg=[0, 0, 1044] prb_budget_rbg=[0, 0, 1044] prb_executed_rbg=[0, 0, 18] dl_slots=58 prb_idle_rbg=2030 totalRbg=53
+[SqrSim] ACTION t=50100ms prb_requested_pct=[0.00, 0.00, 24.53] prb_executed_rbg=[0, 0, 13] totalRbg=53 pctSum=24.53
+[SqrSim] PRB_WINDOW t=50200ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 0, 741] prb_executed_rbg=[0, 0, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=50200ms prb_requested_pct=[0.00, 1.89, 66.04] prb_executed_rbg=[0, 1, 35] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=50300ms prb_scheduled_rbg=[0, 0, 1820] prb_budget_rbg=[0, 52, 1820] prb_executed_rbg=[0, 1, 35] dl_slots=52 prb_idle_rbg=936 totalRbg=53
+[SqrSim] ACTION t=50300ms prb_requested_pct=[3.77, 1.89, 33.96] prb_executed_rbg=[2, 1, 18] totalRbg=53 pctSum=39.62
+[SqrSim] PRB_WINDOW t=50400ms prb_scheduled_rbg=[0, 0, 1044] prb_budget_rbg=[116, 58, 1044] prb_executed_rbg=[2, 1, 18] dl_slots=58 prb_idle_rbg=2030 totalRbg=53
+[SqrSim] ACTION t=50400ms prb_requested_pct=[73.58, 0.00, 26.42] prb_executed_rbg=[39, 0, 14] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=50500ms prb_scheduled_rbg=[0, 0, 812] prb_budget_rbg=[2262, 0, 812] prb_executed_rbg=[39, 0, 14] dl_slots=58 prb_idle_rbg=2262 totalRbg=53
+[SqrSim]ACTION t=50500ms prb_requested_pct=[0.00, 5.66, 28.30] prb_executed_rbg=[0, 3, 15] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=50600ms prb_scheduled_rbg=[0, 0, 840] prb_budget_rbg=[0, 168, 840] prb_executed_rbg=[0, 3, 15] dl_slots=56 prb_idle_rbg=2128 totalRbg=53
+[SqrSim] ACTION t=50600ms prb_requested_pct=[0.00, 1.89, 66.04] prb_executed_rbg=[0, 1, 35] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=50700ms prb_scheduled_rbg=[0, 0, 1855] prb_budget_rbg=[0, 53, 1855] prb_executed_rbg=[0, 1, 35] dl_slots=53 prb_idle_rbg=954 totalRbg=53
+[SqrSim] ACTION t=50700ms prb_requested_pct=[3.77, 1.89, 24.53] prb_executed_rbg=[2, 1, 13] totalRbg=53 pctSum=30.19
+[SqrSim] PRB_WINDOW t=50800ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[116, 58, 754] prb_executed_rbg=[2, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=50800ms prb_requested_pct=[0.00, 1.89, 66.04] prb_executed_rbg=[0, 1, 35] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=50900ms prb_scheduled_rbg=[0, 0, 1925] prb_budget_rbg=[0, 55, 1925] prb_executed_rbg=[0, 1, 35] dl_slots=55 prb_idle_rbg=990 totalRbg=53
+[SqrSim] ACTION t=50900ms prb_requested_pct=[3.77, 1.89, 30.19] prb_executed_rbg=[2, 1, 16] totalRbg=53 pctSum=35.85
+[SqrSim] PRB_WINDOW t=51000ms prb_scheduled_rbg=[0, 0, 896] prb_budget_rbg=[112, 56, 896] prb_executed_rbg=[2, 1, 16] dl_slots=56 prb_idle_rbg=2072 totalRbg=53
+[SqrSim] ACTION t=51000ms prb_requested_pct=[0.00, 0.00, 66.04] prb_executed_rbg=[0, 0, 35] totalRbg=53 pctSum=66.04
+[SqrSim] PRB_WINDOW t=51100ms prb_scheduled_rbg=[0, 0, 1890] prb_budget_rbg=[0, 0, 1890] prb_executed_rbg=[0, 0, 35] dl_slots=54 prb_idle_rbg=972 totalRbg=53
+[SqrSim] ACTION t=51100ms prb_requested_pct=[1.89, 1.89, 52.83] prb_executed_rbg=[1, 1, 28] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=51200ms prb_scheduled_rbg=[0, 0, 1624] prb_budget_rbg=[58, 58, 1624] prb_executed_rbg=[1, 1, 28] dl_slots=58 prb_idle_rbg=1450 totalRbg=53
+[SqrSim] ACTION t=51200ms prb_requested_pct=[1.89, 1.89, 56.60] prb_executed_rbg=[1, 1, 30] totalRbg=53 pctSum=60.38
+[SqrSim] PRB_WINDOW t=51300ms prb_scheduled_rbg=[0, 0, 1680] prb_budget_rbg=[56, 56, 1680] prb_executed_rbg=[1, 1, 30] dl_slots=56 prb_idle_rbg=1288 totalRbg=53
+[SqrSim] ACTION t=51300ms prb_requested_pct=[7.55, 1.89, 56.60] prb_executed_rbg=[4, 1, 30] totalRbg=53 pctSum=66.04
+[SqrSim] PRB_WINDOW t=51400ms prb_scheduled_rbg=[0, 0, 1710] prb_budget_rbg=[228, 57, 1710] prb_executed_rbg=[4, 1, 30] dl_slots=57 prb_idle_rbg=1311 totalRbg=53
+[SqrSim] ACTION t=51400ms prb_requested_pct=[9.43, 1.89, 66.04] prb_executed_rbg=[5, 1, 35] totalRbg=53 pctSum=77.36
+[SqrSim] PRB_WINDOW t=51500ms prb_scheduled_rbg=[0, 0, 2030] prb_budget_rbg=[290, 58, 2030] prb_executed_rbg=[5, 1, 35] dl_slots=58 prb_idle_rbg=1044 totalRbg=53
+[SqrSim] ACTION t=51500ms prb_requested_pct=[3.77, 3.77, 24.53] prb_executed_rbg=[2, 2, 13] totalRbg=53 pctSum=32.08
+[SqrSim] PRB_WINDOW t=51600ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[114, 114, 741] prb_executed_rbg=[2, 2, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=51600ms prb_requested_pct=[0.00, 1.89, 33.96] prb_executed_rbg=[0, 1, 18] totalRbg=53 pctSum=35.85
+[SqrSim] PRB_WINDOW t=51700ms prb_scheduled_rbg=[0, 0, 936] prb_budget_rbg=[0, 52, 936] prb_executed_rbg=[0, 1, 18] dl_slots=52 prb_idle_rbg=1820 totalRbg=53
+[SqrSim] ACTION t=51700ms prb_requested_pct=[0.00, 0.00, 33.96] prb_executed_rbg=[0, 0, 18] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=51800ms prb_scheduled_rbg=[0, 0, 1044] prb_budget_rbg=[0, 0, 1044] prb_executed_rbg=[0, 0, 18] dl_slots=58 prb_idle_rbg=2030 totalRbg=53
+[SqrSim] ACTION t=51800ms prb_requested_pct=[0.00, 0.00, 33.96] prb_executed_rbg=[0, 0, 18] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=51900ms prb_scheduled_rbg=[0, 0, 1044] prb_budget_rbg=[0, 0, 1044] prb_executed_rbg=[0, 0, 18] dl_slots=58 prb_idle_rbg=2030 totalRbg=53
+[SqrSim] ACTION t=51900ms prb_requested_pct=[0.00, 0.00, 56.60] prb_executed_rbg=[0, 0, 30] totalRbg=53 pctSum=56.60
+[SqrSim] PRB_WINDOW t=52000ms prb_scheduled_rbg=[0, 0, 1680] prb_budget_rbg=[0, 0, 1680] prb_executed_rbg=[0, 0,30] dl_slots=56 prb_idle_rbg=1288 totalRbg=53
+[SqrSim] ACTION t=52000ms prb_requested_pct=[1.89, 1.89, 33.96] prb_executed_rbg=[1, 1, 18] totalRbg=53 pctSum=37.74
+[SqrSim] PRB_WINDOW t=52100ms prb_scheduled_rbg=[0, 0, 1026] prb_budget_rbg=[57, 57, 1026] prb_executed_rbg=[1, 1, 18] dl_slots=57 prb_idle_rbg=1995 totalRbg=53
+[SqrSim] ACTION t=52100ms prb_requested_pct=[0.00, 0.00, 66.04] prb_executed_rbg=[0, 0, 35] totalRbg=53 pctSum=66.04
+[SqrSim] PRB_WINDOW t=52200ms prb_scheduled_rbg=[0, 0, 1925] prb_budget_rbg=[0, 0, 1925] prb_executed_rbg=[0, 0, 35] dl_slots=55 prb_idle_rbg=990 totalRbg=53
+[SqrSim] ACTION t=52200ms prb_requested_pct=[1.89, 1.89, 24.53] prb_executed_rbg=[1, 1, 13] totalRbg=53 pctSum=28.30
+[SqrSim] PRB_WINDOW t=52300ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[57, 57, 741] prb_executed_rbg=[1, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=52300ms prb_requested_pct=[0.00, 1.89, 33.96] prb_executed_rbg=[0, 1, 18] totalRbg=53 pctSum=35.85
+[SqrSim] PRB_WINDOW t=52400ms prb_scheduled_rbg=[0, 0, 1008] prb_budget_rbg=[0, 56, 1008] prb_executed_rbg=[0, 1, 18] dl_slots=56 prb_idle_rbg=1960 totalRbg=53
+[SqrSim] ACTION t=52400ms prb_requested_pct=[0.00, 0.00, 33.96] prb_executed_rbg=[0, 0, 18] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=52500ms prb_scheduled_rbg=[0, 0, 1044] prb_budget_rbg=[0, 0, 1044] prb_executed_rbg=[0, 0, 18] dl_slots=58 prb_idle_rbg=2030 totalRbg=53
+[SqrSim] ACTION t=52500ms prb_requested_pct=[0.00, 0.00, 33.96] prb_executed_rbg=[0, 0, 18] totalRbg=53 pctSum=33.96
+[SqrSim] PRB_WINDOW t=52600ms prb_scheduled_rbg=[0, 0, 1044] prb_budget_rbg=[0, 0, 1044] prb_executed_rbg=[0, 0, 18] dl_slots=58 prb_idle_rbg=2030 totalRbg=53
+[SqrSim] ACTION t=52600ms prb_requested_pct=[0.00, 0.00, 24.53] prb_executed_rbg=[0, 0, 13] totalRbg=53 pctSum=24.53
+[SqrSim] PRB_WINDOW t=52700ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 0, 728] prb_executed_rbg=[0, 0, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=52700ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=52800ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=52800ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=52900ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=52900ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=53000ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=53000ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=53100ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=53100ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=53200ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=53200ms prb_requested_pct=[0.00, 1.89, 96.23] prb_executed_rbg=[0, 1, 51] totalRbg=53 pctSum=98.11
+[SqrSim] PRB_WINDOW t=53300ms prb_scheduled_rbg=[0, 0, 2856] prb_budget_rbg=[0, 56, 2856] prb_executed_rbg=[0, 1, 51] dl_slots=56 prb_idle_rbg=112 totalRbg=53
+[SqrSim] ACTION t=53300ms prb_requested_pct=[1.89, 5.66, 52.83] prb_executed_rbg=[1, 3, 28] totalRbg=53 pctSum=60.38
+[SqrSim] PRB_WINDOW t=53400ms prb_scheduled_rbg=[0, 0, 1568] prb_budget_rbg=[56, 168, 1568] prb_executed_rbg=[1, 3, 28] dl_slots=56 prb_idle_rbg=1400 totalRbg=53
+[SqrSim] ACTION t=53400ms prb_requested_pct=[1.89, 1.89, 24.53] prb_executed_rbg=[1, 1, 13] totalRbg=53 pctSum=28.30
+[SqrSim] PRB_WINDOW t=53500ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[57, 57, 741] prb_executed_rbg=[1, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=53500ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=53600ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=53600ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=53700ms prb_scheduled_rbg=[0, 0, 689] prb_budget_rbg=[0, 53, 689] prb_executed_rbg=[0, 1, 13] dl_slots=53 prb_idle_rbg=2120 totalRbg=53
+[SqrSim] ACTION t=53700ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=53800ms prb_scheduled_rbg=[0, 0, 702] prb_budget_rbg=[0, 54, 702] prb_executed_rbg=[0, 1, 13] dl_slots=54 prb_idle_rbg=2160 totalRbg=53
+[SqrSim] ACTION t=53800ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=53900ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 57, 741] prb_executed_rbg=[0, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=53900ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=54000ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=54000ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=54100ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=54100ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=54200ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=54200ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=54300ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 57, 741] prb_executed_rbg=[0, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=54300ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=54400ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 57, 741] prb_executed_rbg=[0, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=54400ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=54500ms prb_scheduled_rbg=[0, 0, 715] prb_budget_rbg=[0, 55, 715] prb_executed_rbg=[0, 1, 13] dl_slots=55 prb_idle_rbg=2200 totalRbg=53
+[SqrSim] ACTION t=54500ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=54600ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=54600ms prb_requested_pct=[0.00, 1.89, 5.66] prb_executed_rbg=[0, 1, 3] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=54700ms prb_scheduled_rbg=[0, 0, 174] prb_budget_rbg=[0, 58, 174] prb_executed_rbg=[0, 1, 3] dl_slots=58 prb_idle_rbg=2900 totalRbg=53
+[SqrSim] ACTION t=54700ms prb_requested_pct=[1.89, 1.89, 71.70] prb_executed_rbg=[1, 1, 38] totalRbg=53 pctSum=75.47
+[SqrSim] PRB_WINDOW t=54800ms prb_scheduled_rbg=[0, 0, 1672] prb_budget_rbg=[44, 44, 1672] prb_executed_rbg=[1, 1, 38] dl_slots=44 prb_idle_rbg=660 totalRbg=53
+[SqrSim] ACTION t=54800ms prb_requested_pct=[3.77, 3.77, 24.53] prb_executed_rbg=[2, 2, 13] totalRbg=53 pctSum=32.08
+[SqrSim] PRB_WINDOW t=54900ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[112, 112, 728] prb_executed_rbg=[2, 2, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=54900ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=55000ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=55000ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=55100ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=55100ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=55200ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=55200ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=55300ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=55300ms prb_requested_pct=[73.58, 1.89, 24.53] prb_executed_rbg=[39, 1, 13] totalRbg=53 pctSum=100.00
+[SqrSim] PRB_WINDOW t=55400ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[2184, 56, 728] prb_executed_rbg=[39, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=55400ms prb_requested_pct=[0.00, 5.66, 33.96] prb_executed_rbg=[0, 3, 18] totalRbg=53 pctSum=39.62
+[SqrSim] PRB_WINDOW t=55500ms prb_scheduled_rbg=[0, 0, 1008] prb_budget_rbg=[0, 168, 1008] prb_executed_rbg=[0, 3, 18] dl_slots=56 prb_idle_rbg=1960 totalRbg=53
+[SqrSim] ACTION t=55500ms prb_requested_pct=[0.00, 0.00, 24.53] prb_executed_rbg=[0, 0, 13] totalRbg=53 pctSum=24.53
+[SqrSim] PRB_WINDOW t=55600ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 0, 741] prb_executed_rbg=[0, 0, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=55600ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=55700ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 57, 741] prb_executed_rbg=[0, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=55700ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=55800ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 57, 741] prb_executed_rbg=[0, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=55800ms prb_requested_pct=[64.15, 1.89, 24.53] prb_executed_rbg=[34, 1, 13] totalRbg=53 pctSum=90.57
+[SqrSim] PRB_WINDOW t=55900ms prb_scheduled_rbg=[0, 0, 702] prb_budget_rbg=[1836, 54, 702] prb_executed_rbg=[34, 1, 13] dl_slots=54 prb_idle_rbg=2160 totalRbg=53
+[SqrSim] ACTION t=55900ms prb_requested_pct=[0.00, 3.77, 35.85] prb_executed_rbg=[0, 2, 19] totalRbg=53 pctSum=39.62
+[SqrSim] PRB_WINDOW t=56000ms prb_scheduled_rbg=[0, 0, 1102] prb_budget_rbg=[0, 116, 1102] prb_executed_rbg=[0, 2, 19] dl_slots=58 prb_idle_rbg=1972 totalRbg=53
+[SqrSim] ACTION t=56000ms prb_requested_pct=[0.00, 0.00, 24.53] prb_executed_rbg=[0, 0, 13] totalRbg=53 pctSum=24.53
+[SqrSim] PRB_WINDOW t=56100ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 0, 741] prb_executed_rbg=[0, 0, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=56100ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=56200ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=56200ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=56300ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 57, 741] prb_executed_rbg=[0, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=56300ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=56400ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=56400ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=56500ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 57, 741] prb_executed_rbg=[0, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=56500ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=56600ms prb_scheduled_rbg=[0, 0, 715] prb_budget_rbg=[0, 55, 715] prb_executed_rbg=[0, 1, 13] dl_slots=55 prb_idle_rbg=2200 totalRbg=53
+[SqrSim] ACTION t=56600ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=56700ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=56700ms prb_requested_pct=[9.43, 1.89, 24.53] prb_executed_rbg=[5, 1, 13] totalRbg=53 pctSum=35.85
+[SqrSim] PRB_WINDOW t=56800ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[290, 58, 754] prb_executed_rbg=[5, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=56800ms prb_requested_pct=[0.00, 0.00, 20.75] prb_executed_rbg=[0, 0, 11] totalRbg=53 pctSum=20.75
+[SqrSim] PRB_WINDOW t=56900ms prb_scheduled_rbg=[0, 0, 616] prb_budget_rbg=[0, 0, 616] prb_executed_rbg=[0, 0, 11] dl_slots=56 prb_idle_rbg=2352 totalRbg=53
+[SqrSim] ACTION t=56900ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=57000ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=57000ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=57100ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=57100ms prb_requested_pct=[18.87, 1.89, 24.53] prb_executed_rbg=[10, 1, 13] totalRbg=53 pctSum=45.28
+[SqrSim] PRB_WINDOW t=57200ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[570, 57, 741] prb_executed_rbg=[10, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=57200ms prb_requested_pct=[0.00, 18.87, 35.85] prb_executed_rbg=[0, 10, 19] totalRbg=53 pctSum=54.72
+[SqrSim] PRB_WINDOW t=57300ms prb_scheduled_rbg=[0, 0, 988] prb_budget_rbg=[0, 520, 988] prb_executed_rbg=[0, 10, 19] dl_slots=52 prb_idle_rbg=1768 totalRbg=53
+[SqrSim] ACTION t=57300ms prb_requested_pct=[1.89, 0.00, 20.75] prb_executed_rbg=[1, 0, 11] totalRbg=53 pctSum=22.64
+[SqrSim] PRB_WINDOW t=57400ms prb_scheduled_rbg=[0, 0, 638] prb_budget_rbg=[58, 0, 638] prb_executed_rbg=[1, 0, 11] dl_slots=58 prb_idle_rbg=2436 totalRbg=53
+[SqrSim] ACTION t=57400ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=57500ms prb_scheduled_rbg=[0, 0, 754] prb_budget_rbg=[0, 58, 754] prb_executed_rbg=[0, 1, 13] dl_slots=58 prb_idle_rbg=2320 totalRbg=53
+[SqrSim] ACTION t=57500ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=57600ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=57600ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=57700ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=57700ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=57800ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 57, 741] prb_executed_rbg=[0, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=57800ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=57900ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=57900ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=58000ms prb_scheduled_rbg=[0, 0, 728] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2240 totalRbg=53
+[SqrSim] ACTION t=58000ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=58100ms prb_scheduled_rbg=[0, 0, 741] prb_budget_rbg=[0, 57, 741] prb_executed_rbg=[0, 1, 13] dl_slots=57 prb_idle_rbg=2280 totalRbg=53
+[SqrSim] ACTION t=58100ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] PRB_WINDOW t=58200ms prb_scheduled_rbg=[0, 0, 702] prb_budget_rbg=[0, 54, 702] prb_executed_rbg=[0, 1, 13] dl_slots=54 prb_idle_rbg=2160 totalRbg=53
+[SqrSim] ACTION t=58200ms prb_requested_pct=[0.00, 1.89, 24.53] prb_executed_rbg=[0, 1, 13] totalRbg=53 pctSum=26.42
+[SqrSim] UE_DEPARTURE ueId=1 slice=2 t=58.236s sessionDrawn=16.334s activeUes=0
+[SqrSim] PRB_WINDOW t=58300ms prb_scheduled_rbg=[0, 0, 260] prb_budget_rbg=[0, 56, 728] prb_executed_rbg=[0, 1, 13] dl_slots=56 prb_idle_rbg=2708 totalRbg=53
+[SqrSim] ACTION t=58300ms prb_requested_pct=[0.00, 1.89, 5.66] prb_executed_rbg=[0, 1, 3] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=58400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[0, 57, 171] prb_executed_rbg=[0, 1, 3] dl_slots=57 prb_idle_rbg=3021 totalRbg=53
+[SqrSim] ACTION t=58400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=58500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[58, 58, 58] prb_executed_rbg=[1, 1, 1] dl_slots=58 prb_idle_rbg=3074 totalRbg=53
+[SqrSim] ACTION t=58500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=58600ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[57, 57, 57] prb_executed_rbg=[1, 1, 1] dl_slots=57 prb_idle_rbg=3021 totalRbg=53
+[SqrSim] ACTION t=58600ms prb_requested_pct=[50.94, 1.89, 1.89] prb_executed_rbg=[27, 1, 1] totalRbg=53 pctSum=54.72
+[SqrSim] PRB_WINDOW t=58700ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[1512, 56, 56] prb_executed_rbg=[27, 1, 1] dl_slots=56 prb_idle_rbg=2968 totalRbg=53
+[SqrSim] ACTION t=58700ms prb_requested_pct=[1.89, 1.89, 3.77] prb_executed_rbg=[1, 1, 2] totalRbg=53 pctSum=7.55
+[SqrSim] PRB_WINDOW t=58800ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[58, 58, 116] prb_executed_rbg=[1, 1, 2] dl_slots=58 prb_idle_rbg=3074 totalRbg=53
+[SqrSim] ACTION t=58800ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=58900ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[58, 58, 58] prb_executed_rbg=[1, 1, 1] dl_slots=58 prb_idle_rbg=3074 totalRbg=53
+[SqrSim] ACTION t=58900ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=59000ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[56, 56, 56] prb_executed_rbg=[1, 1, 1] dl_slots=56 prb_idle_rbg=2968 totalRbg=53
+[SqrSim] ACTION t=59000ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] UE_ARRIVAL ueId=2 slice=1 t=59.052s session=28.467s departure=60.000s port=12002 offered=100.000 Mbps sla=1.000 Mbps activeUes=1
+[SqrSim] UE_ATTACHED ueId=2 rnti=3 slice=1 t=59.065s
+[SqrSim] PRB_WINDOW t=59100ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[57, 57, 57] prb_executed_rbg=[1, 1, 1] dl_slots=57 prb_idle_rbg=3021 totalRbg=53
+[SqrSim] ACTION t=59100ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=59200ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[58, 58, 58] prb_executed_rbg=[1, 1, 1] dl_slots=58 prb_idle_rbg=3074 totalRbg=53
+[SqrSim] ACTION t=59200ms prb_requested_pct=[1.89, 1.89, 64.15] prb_executed_rbg=[1, 1, 34] totalRbg=53 pctSum=67.92
+[SqrSim] PRB_WINDOW t=59300ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[57, 57, 1938] prb_executed_rbg=[1, 1, 34] dl_slots=57 prb_idle_rbg=3021 totalRbg=53
+[SqrSim] ACTION t=59300ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=59400ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[56, 56, 56] prb_executed_rbg=[1, 1, 1] dl_slots=56 prb_idle_rbg=2968 totalRbg=53
+[SqrSim] ACTION t=59400ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=59500ms prb_scheduled_rbg=[0, 0, 0] prb_budget_rbg=[58, 58, 58] prb_executed_rbg=[1, 1, 1] dl_slots=58 prb_idle_rbg=3074 totalRbg=53
+[SqrSim] ACTION t=59500ms prb_requested_pct=[1.89, 1.89, 1.89] prb_executed_rbg=[1, 1, 1] totalRbg=53 pctSum=5.66
+[SqrSim] PRB_WINDOW t=59600ms prb_scheduled_rbg=[0, 16, 0] prb_budget_rbg=[46, 46, 46] prb_executed_rbg=[1, 1, 1] dl_slots=46 prb_idle_rbg=2422 totalRbg=53
+[SqrSim] PRB_WINDOW t=59700ms prb_scheduled_rbg=[0, 49, 0] prb_budget_rbg=[50, 50, 50] prb_executed_rbg=[1, 1, 1] dl_slots=50 prb_idle_rbg=2601 totalRbg=53
+[SqrSim] PRB_WINDOW t=59800ms prb_scheduled_rbg=[0, 56, 0] prb_budget_rbg=[57, 57, 57] prb_executed_rbg=[1, 1, 1] dl_slots=57 prb_idle_rbg=2965 totalRbg=53
+[SqrSim] PRB_WINDOW t=59900ms prb_scheduled_rbg=[0, 47, 0] prb_budget_rbg=[50, 50, 50] prb_executed_rbg=[1, 1, 1] dl_slots=50 prb_idle_rbg=2603 totalRbg=53
+
+========================================
+  SQR RESULTS (per UE)
+========================================
+UE 1 [eMBB2] arrival=41.902s departure=58.236s sla=1.500 Mbps meanThr=0.465 Mbps pdr=0.005
+UE 2 [eMBB1] arrival=59.052s departure=-1.000s sla=1.000 Mbps meanThr=0.055 Mbps pdr=0.001
+========================================
+Arrivals=2 Departures=1 StillActive=1
+Summary CSV: ./results_sqr_network_only/seed=1_run=1/sqr_summary.csv
+[SqrSim] IPC_DEGRADATION action_file_missing_keep_prev_quota=0 action_slice_line_missing_default_33pct=0 (contract §5)
+[SqrSim] IPC semaphores cleaned up.

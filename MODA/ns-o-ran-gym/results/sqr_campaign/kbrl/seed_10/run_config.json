@@ -1,0 +1,12 @@
+{
+  "method": "kbrl",
+  "controller_args": "--controller kbrl",
+  "seed": 10,
+  "simTime": 600,
+  "periodMs": 100,
+  "c_prbs_initial": 52,
+  "warmup_s": 100,
+  "expected_steps": 5995,
+  "started_at": "2026-10-13T11:32:24-03:00",
+  "driver": "run_sqr_campaign.sh"
+}

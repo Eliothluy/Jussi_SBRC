@@ -1,0 +1,9 @@
+{
+  "method": "sqr-g0",
+  "controller_args": "--controller sqr --gamma 0",
+  "seed": 2,
+  "simTime": 600,
+  "expected_steps": 5995,
+  "ns3_exit_code": 0,
+  "done_at": "2026-10-13T09:49:54-03:00"
+}

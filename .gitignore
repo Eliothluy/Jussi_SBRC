@@ -6,3 +6,9 @@ moda-git-backup/
 
 # Clone de referência third-party (re-clonável; ver third_party/README.md)
 MODA/ns-o-ran-gym/third_party/network-slicing/
+
+# Dados brutos da campanha (grandes; figuras/tabelas agregadas são versionadas)
+results/sqr_campaign/sqr-g*/
+results/sqr_campaign/kbrl/
+results/sqr_campaign/equal/
+results/sqr_campaign/*.log

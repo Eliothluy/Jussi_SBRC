@@ -29,6 +29,14 @@ projection Pi, same y_t/Lambda labels (slice-time level) with the UE-time
 violations still logged (register R19).  ``--gamma`` and the R12 virtual
 updates are SQR-only and are ignored for KBRL.
 
+Fase 4: ``--controller equal`` is the static baseline of the campaign
+(ask item 4): a trivial Python controller proposing the FIXED equal split
+of C across the slices (33.33%/slice; ``sqr_dummy_controller.py`` phase-C
+pattern as deterministic integers) — no learning, no observation
+dependence.  The method is registered in the run through the checkpoint
+meta (``controller``) and the constant ``mode == "equal"`` column of
+step_metrics.csv.
+
 NOTE (Fase 2 scope): this script is exercised in CI only against a MOCK of
 the contract (tests/test_sqr_run.py, no ns-3).  The integration with the
 real ``sqr-sim`` is validated in Fase 1/4 by the ns-3 agent.
@@ -73,7 +81,7 @@ from nsoran.sqr.sqr_env import SqrEnv
 #: consumer of the SAME obs/action contract.  ``gamma`` and the R12 virtual
 #: updates apply to SQR only (KBRL is resource-economical structurally and
 #: has no virtual-update mechanism).
-CONTROLLER_CHOICES = ("sqr", "kbrl")
+CONTROLLER_CHOICES = ("sqr", "kbrl", "equal")
 
 DEFAULT_NS3_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "ns-3-dev")
 DEFAULT_OUTPUT = os.path.join(os.path.dirname(__file__), "..", "results", "sqr_run")
@@ -121,7 +129,10 @@ def build_controllers(args) -> dict[int, SqrSliceController]:
     ``args.controller`` selects the method (default "sqr" for backward
     compatibility with older invocations/tests): "sqr" builds the
     hierarchical SQR stack; "kbrl" builds the KBRL baseline port (same
-    obs/action contract; gamma and the SQR-only knobs are ignored).
+    obs/action contract; gamma and the SQR-only knobs are ignored);
+    "equal" builds the Fase 4 static baseline (fixed 33.33%/slice split,
+    ``nsoran.sqr.static_controllers.EqualSplitController`` — no learning,
+    gamma and the SQR-only knobs are ignored).
     """
     slas = parse_slas(args.slas, args.num_slices)
     controller = getattr(args, "controller", "sqr")
@@ -134,6 +145,17 @@ def build_controllers(args) -> dict[int, SqrSliceController]:
                 n_prbs=args.c_prbs,
                 sla_threshold=slas[sid],           # same Lambda as SQR
                 seed=None if args.seed is None else int(args.seed) + 1000 * sid,
+            )
+            for sid in range(args.num_slices)
+        }
+    if controller == "equal":
+        from nsoran.sqr.static_controllers import EqualSplitController
+
+        return {
+            sid: EqualSplitController(
+                slice_id=sid,
+                n_prbs=args.c_prbs,
+                num_slices=args.num_slices,
             )
             for sid in range(args.num_slices)
         }
@@ -405,6 +427,8 @@ def run_episode(
                 y_t = info.get(f"slice_{sid}", {}).get("p5_thr_mbps")
                 if y_t is None:
                     continue  # empty slice: excluded from learning (R19)
+                if not getattr(controllers[sid], "LEARNING", True):
+                    continue  # static baseline (Fase 4 "equal"): nothing to update
                 controllers[sid].observe(states[sid], int(executed[sid]), float(y_t))
                 window_learned.append(sid)
             # R12: virtual negative update at the pre-projection proposal.
@@ -548,7 +572,9 @@ def parse_args(argv=None):
                         choices=CONTROLLER_CHOICES,
                         help="sqr = model-based SQR agent (Fase 2); "
                              "kbrl = KBRL baseline (Alcaraz et al., TWC 2022, "
-                             "Fase 3 port) on the SAME obs/action contract")
+                             "Fase 3 port) on the SAME obs/action contract; "
+                             "equal = static baseline, fixed 33.33%/split of "
+                             "C (Fase 4; dummy-controller pattern)")
     parser.add_argument("--gamma", type=int, default=1, choices=(0, 1),
                         help="0 = quantile only; 1 = quantile minus a/C "
                              "(cost term ONLY; P_penalty active in both). "
