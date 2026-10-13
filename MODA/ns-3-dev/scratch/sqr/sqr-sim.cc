@@ -28,19 +28,37 @@
  *     (a liberação RRC por UE não é exposta publicamente na 5G-LENA v5.2 —
  *     NrGnbRrc::RemoveUe é privado, nr-gnb-rrc.h:1572).
  *  3. SLA POR UE 0,5/1,0/1,5 Mbps (3 slices eMBB, Tabela I), verificada no
- *     Python (y_t = p5 do throughput por UE). Tráfego DL UDP OnOff com oferta
- *     = ueOfferedMult × SLA do slice (modelo aplicativo não publicado no
- *     artigo [ASSUMIDO]; plano Fase 0/1: UDP greedy calibrado em smoke).
+ *     Python (y_t = p5 do throughput por UE). Tráfego DL UDP GREEDY
+ *     FULL-BUFFER (register R04, ratificado 12/10/2026): taxa oferecida por
+ *     UE --ueOfferedMbps com default 100 Mbps — acima do pico absoluto da
+ *     célula (~24 Mbps @10 MHz / ~48 Mbps @20 MHz, μ=0, duty DL 3/7), o que
+ *     mantém a fila RLC sempre não vazia para qualquer UE/cota/SINR.
+ *     Fallback legado: --ueOfferedMbps=0 ⇒ ueOfferedMult × SLA.
+ *     Pacote 1500 B (register R04).
  *  4. Período de decisão 100 ms (--periodMs, default 100; rslaq usa 10).
- *  5. KPM estendido (contrato AGENTS.md §4): colunas novas
- *     windowThroughputMbps (throughput do UE na janela), snrDb (SINR DL
- *     estimado por inversão do CQI wideband nas tabelas do NrAmc — ver
- *     comentário no scheduler copiado) e queueBytes (fila DL RLC/MAC);
- *     colunas originais preservadas.
- *  6. Telemetria de PRB por janela: prb_requested (ação recebida do agente),
- *     prb_executed (pós-conversão percentual→RBG) e prb_scheduled (RBGs
- *     efetivamente agendados, contadores do scheduler copiado), em
- *     sqr_prb_windows.csv e no stdout.
+ *  5. KPM estendido (contrato §4): colunas novas
+ *     windowThroughputMbps (throughput do UE na janela — UEs que entram/saem
+ *     no meio da janela aparecem na janela seguinte com deltas desde a
+ *     ENTRADA e janela throughput dividida pelo tempo ATIVO, não pelo período
+ *     cheio), snrDb (SINR DL estimado por inversão do CQI wideband nas
+ *     tabelas do NrAmc; sentinela de fio -999 = sem CQI, contrato §4/R09) e
+ *     queueBytes (fila DL RLC/MAC); colunas originais preservadas.
+ *     Arquivo do contrato: sqr-kpms.txt (não colide com runs rslaq).
+ *  6. Telemetria de PRB por janela (contrato §3.5), ALINHADA AO MESMO PASSO:
+ *     cada linha do sqr_prb_windows.csv drena a janela que acabou de terminar
+ *     e traz prb_requested (ação vigente nela, %) + prb_executed (COTA efetiva
+ *     em RBGs pós conversão determinística %→RBG) + prb_scheduled (RBGs reais
+ *     do MAC) + prb_budget (cota × slots DL) + prb_idle (totalRbg×dlSlots −
+ *     Σ prb_scheduled). Degradação do contrato §5 com contadores no relatório
+ *     final: CSV ausente/ilegível ⇒ mantém cota anterior; slice sem linha no
+ *     CSV ⇒ default 33,33 %/slice (nunca cota 0 silenciosa).
+ *  7. SCHEDULER SqrMacScheduler (R27, RATIFICADO 12/10/2026): COTA ABSOLUTA
+ *     de RBGs por slice. A ação do agente NÃO é renormalizada: o sqr-sim
+ *     converte % de PRB → cota inteira de RBGs (piso + maiores restos,
+ *     desempate por índice de slice, Σ ≤ totalRbg garantido — ver
+ *     SqrMacScheduler::ComputeRbgQuotas) e o scheduler serve cada slice ATÉ
+ *     sua cota; RBGs excedentes ficam OCIOSOS (sem redistribuição); Σa=0 ⇒
+ *     nada servido (com log — nunca manter a configuração anterior).
  *
  * Topologia: remoteHost -- P2P 100 Gbps -- PGW/EPC -- gNB NR -- UEs NR (dinâmicos)
  * Modos de execução:
@@ -50,7 +68,7 @@
  *   /sem_metrics_<uuid> e /sem_control_<uuid> + rslaq_actions_for_ns3.csv.
  */
 
-#include "rslaq-mac-scheduler.h"
+#include "sqr-mac-scheduler.h"
 
 #include "ns3/antenna-module.h"
 #include "ns3/applications-module.h"
@@ -112,7 +130,7 @@ static std::array<double, NUM_SLICES> g_slaMbps = {0.5, 1.0, 1.5};
 static std::string g_simUuid;           // UUID passado via --simId
 static sem_t* g_semMetricsReady = nullptr;
 static sem_t* g_semControl = nullptr;
-static Ptr<RslaqMacScheduler> g_schedulerPtr = nullptr;
+static Ptr<SqrMacScheduler> g_schedulerPtr = nullptr;
 static Ptr<FlowMonitor> g_monitorPtr = nullptr;
 static Ptr<Ipv4FlowClassifier> g_classifierPtr = nullptr;
 static FlowMonitorHelper* g_flowmonHelper = nullptr;
@@ -137,10 +155,16 @@ struct SqrUe
     Ptr<Application> serverApp;
     Ptr<Application> clientApp;
     double arrivalSec = 0.0;
-    double sessionSec = 0.0;   //!< duração de sessão sorteada (Exp(60 s))
-    double departureSec = 0.0; //!< partida efetiva (limitada por simTime)
-    bool attached = false;     //!< RNTI válido e registrado no scheduler
-    bool active = true;        //!< dentro da sessão
+    double sessionSec = 0.0;      //!< duração de sessão sorteada (Exp(60 s))
+    double departureSec = 0.0;    //!< partida efetiva (limitada por simTime)
+    double trafficStartSec = 0.0; //!< início do tráfego (arrival + grace) — base dos deltas KPM
+    double offeredMbps = 0.0;     //!< taxa ofertada efetiva deste UE (R04)
+    bool attached = false;        //!< RNTI válido e registrado no scheduler
+    bool active = true;           //!< dentro da sessão
+    // Janela parcial (contrato §4): o UE só entra no KPM na PRIMEIRA borda de
+    // janela após o início do tráfego ("aparece na janela seguinte com deltas
+    // desde a entrada") e sai após a primeira borda ≥ partida.
+    bool kpmFinished = false;  //!< linha final (pós-partida) já emitida
 };
 
 static std::map<uint16_t, SqrUe> g_ues;
@@ -157,7 +181,8 @@ static bool g_attachCheckScheduled = false;
 // Configuração dinâmica (CLI)
 static double g_lambdaUesPerMin = 2.0; //!< [ARTIGO] chegadas Poisson 2 UEs/min
 static double g_meanSessionSec = 60.0; //!< [ARTIGO] sessão exponencial média 60 s
-static double g_ueOfferedMult = 4.0;   //!< [ASSUMIDO] oferta por UE = mult × SLA
+static double g_ueOfferedMbps = 100.0; //!< [ASSUMIDO R04] UDP greedy full-buffer por UE
+static double g_ueOfferedMult = 4.0;   //!< fallback legado (usado se --ueOfferedMbps=0)
 static double g_simTimeSec = 120.0;
 static double g_serverDrainSec = 0.2;    //!< drenagem pós-partida do UdpServer
 static double g_attachGraceSec = 0.5;    //!< [ASSUMIDO] margem p/ RRC antes do tráfego
@@ -167,10 +192,20 @@ static double g_ueHeightM = 1.5;         //!< [ASSUMIDO] altura de UE pedestre (
 static double g_slotPeriodSec = 0.001;   //!< duração do slot (1 ms p/ mu=0; setado no main)
 static uint32_t g_patternSlots = 7;      //!< nº de slots do padrão TDD aplicado (setado no main)
 static std::string g_outputDir = ".";
-// Última ação recebida do agente (telemetria prb_requested/prb_executed da janela)
+// Última ação APLICADA ao scheduler (telemetria prb_requested/prb_executed).
+// Alinhamento de janela (contrato §3.5): a ação aplicada na borda de janela t
+// governa a janela (t, t+period]; o dreno de prb_scheduled/budget/idle da
+// janela (t, t+period] acontece na borda t+period e leva ESTES valores — os
+// 4 campos do sqr_prb_windows.csv descrevem o MESMO passo. Sentinela -1/0 =
+// nenhuma ação do agente ainda (ex.: modo network-only). Os valores PERSISTEM
+// entre drenos: timeout/CSV ausente mantêm a config anterior (contrato §5),
+// e a janela drenada de fato correu sob ela.
 static std::array<double, NUM_SLICES> g_lastRequestedPct = {{-1.0, -1.0, -1.0}};
 static std::array<int64_t, NUM_SLICES> g_lastExecutedRbg = {{0, 0, 0}};
-static bool g_actionSeenInWindow = false;
+// Contadores de degradação (contrato §5), exportados no relatório de fim de
+// run (WriteFinalReport) para auditoria contável:
+static uint64_t g_actionFileMissingCount = 0; //!< CSV ausente/ilegível ⇒ mantém cota anterior
+static uint64_t g_sliceLineMissingCount = 0;  //!< slice sem linha no CSV ⇒ default 33,33 %/slice
 static Ptr<NrHelper> g_nrHelper;
 static Ptr<NrPointToPointEpcHelper> g_epcHelper;
 static NetDeviceContainer g_gnbNetDev;
@@ -377,9 +412,14 @@ NormalizeTddPatternForNr(const std::string& requested, bool* applied)
 /**
  * @brief Envia o mapeamento RNTI→slice atual ao scheduler.
  *
- * Chamado a cada attach/detach de UE dinâmico. Nota: SetSliceUeMapping reinicia
- * os contadores SliceAllocationStats e a janela prb_scheduled (comportamento do
- * scheduler; a janela corrente é drenada a cada período pelo KPM callback).
+ * Chamado a cada attach/detach/troca de RNTI de UE dinâmico. Nota: o
+ * SetSliceUeMapping reinicia os contadores SliceAllocationStats e apenas
+ * REDIMENSIONA (sem zerar) os contadores de janela prb_scheduled/prb_budget
+ * (rslaq-mac-scheduler.cc:343-356) — a janela corrente NÃO é mais descartada;
+ * o único reset legítimo é ResetWindowCounters(), na fronteira de janela pelo
+ * dreno do KpmAndControlCallback. O comentário anterior ("reinicia ... a
+ * janela prb_scheduled") descrevia o comportamento antigo e ficou obsoleto
+ * quando o cenário SQR passou a reenviar o mapeamento a cada 5 ms (churn).
  */
 static void
 PushSliceMappingToScheduler()
@@ -542,7 +582,11 @@ UeArrival()
 
     // --- Aplicações DL ---
     const uint16_t port = static_cast<uint16_t>(BASE_DL_PORT + ueId);
-    const double offeredBps = g_ueOfferedMult * g_slaMbps[sliceIdx] * 1e6;
+    // R04 (greedy full-buffer): taxa absoluta por UE (default 100 Mbps > 2× o
+    // pico da célula ⇒ fila sempre não vazia); 0 = fallback legado mult × SLA.
+    const double offeredMbps =
+        (g_ueOfferedMbps > 0.0) ? g_ueOfferedMbps : g_ueOfferedMult * g_slaMbps[sliceIdx];
+    const double offeredBps = offeredMbps * 1e6;
 
     UdpServerHelper serverHelper(port);
     ApplicationContainer serverApps = serverHelper.Install(ueNode);
@@ -571,6 +615,8 @@ UeArrival()
     ue.arrivalSec = nowSec;
     ue.sessionSec = sessionSec;
     ue.departureSec = departureSec;
+    ue.trafficStartSec = nowSec + g_attachGraceSec; // = SetStartTime do OnOff
+    ue.offeredMbps = offeredMbps;
     ue.active = true;
     ue.attached = false;
     ue.imsi = ueDev ? ueDev->GetImsi() : 0;
@@ -588,7 +634,7 @@ UeArrival()
               << " session=" << sessionSec << "s"
               << " departure=" << departureSec << "s"
               << " port=" << port
-              << " offered=" << (offeredBps / 1e6) << " Mbps"
+              << " offered=" << offeredMbps << " Mbps"
               << " sla=" << g_slaMbps[sliceIdx] << " Mbps"
               << " activeUes=" << g_arrivalCount - g_departureCount << "\n";
 
@@ -779,13 +825,18 @@ KpmAndControlCallback()
             k.count++;
         }
 
-        // Escrever rslaq-kpms.txt — KPM ESTENDIDO do contrato SQR (AGENTS.md §4):
-        // colunas originais preservadas + windowThroughputMbps, snrDb, queueBytes.
-        // Apenas UEs ativos (dentro da sessão) geram linhas.
-        // (Telemetria aditiva) sqr_kpm_history.csv acumula as MESMAS linhas de
-        // todas as janelas em outputDir — o arquivo do contrato é reescrito a
-        // cada período (o Python lê só a janela corrente); o histórico serve
-        // para o smoke/gate verificar "throughput>0 em >=1 janela".
+        // Escrever sqr-kpms.txt — KPM ESTENDIDO do contrato SQR §4 (nome novo:
+        // não colide com o rslaq-kpms.txt dos runs rslaq, rastreado no git).
+        // Colunas originais preservadas + windowThroughputMbps, snrDb, queueBytes.
+        //
+        // JANELA PARCIAL (contrato §4): UEs que entram no meio da janela
+        // aparecem na janela SEGUINTE com deltas desde a ENTRADA (1ª borda de
+        // janela após o início do tráfego); UEs que saem no meio geram uma
+        // última linha com delta até a partida. windowThroughputMbps divide o
+        // delta pelo tempo ATIVO do UE na janela (NÃO pelo período cheio — a
+        // divisão pelo período cheio subestimava até ~20× a taxa e distorcia
+        // o p5). A coluna legada throughputMbps mantém a semântica antiga
+        // (delta / período cheio) por compatibilidade (contrato §4 col. 10).
         static std::ofstream kpmHistory;
         if (!kpmHistory.is_open())
         {
@@ -797,20 +848,62 @@ KpmAndControlCallback()
                           "queueBytes\n";
         }
         {
-            std::ofstream kpmFile("rslaq-kpms.txt", std::ios::out | std::ios::trunc);
+            std::ofstream kpmFile("sqr-kpms.txt", std::ios::out | std::ios::trunc);
             kpmFile << "timestamp,ueImsi,sliceId,dTxBytes,dRxBytes,plr,resourceSharePct,"
                        "dLostPackets,throughputMbps,bufferBytes,windowThroughputMbps,snrDb,"
                        "queueBytes\n";
 
             const double periodSec = static_cast<double>(g_indicationPeriodMs) / 1000.0;
+            const double tEndSec = static_cast<double>(nowMs) / 1000.0;
+            const double tWinStartSec = tEndSec - periodSec;
 
-            for (const auto& kv : g_ues)
+            // Cota corrente (R27) para o resourceSharePct do KPM: fração de RBG
+            // da slice no BWP — não mais o peso renormalizado da base.
+            const std::vector<uint32_t> quotaNow =
+                g_schedulerPtr ? g_schedulerPtr->GetSliceQuotaRbg() : std::vector<uint32_t>{};
+            const uint16_t totalRbgNow = g_schedulerPtr ? g_schedulerPtr->GetTotalRbgCount() : 0;
+
+            auto emitRow = [&](std::ofstream& out,
+                               uint64_t ts, uint16_t ueId, uint32_t sliceIdx,
+                               uint64_t dTx, uint64_t dRx, double plr, double rsh,
+                               uint32_t effLost, double thrLegacy, uint32_t buf,
+                               double windowThr, double snr, uint32_t queue) {
+                out << ts << "," << ueId << "," << sliceIdx << ","
+                    << dTx << "," << dRx << ","
+                    << std::fixed << std::setprecision(2) << plr << ","
+                    << std::setprecision(2) << rsh << ","
+                    << effLost << ","
+                    << std::setprecision(4) << thrLegacy << ","
+                    << buf << ","
+                    << std::setprecision(4) << windowThr << ","
+                    << std::setprecision(2) << snr << ","
+                    << queue << "\n";
+            };
+
+            for (auto& kv : g_ues)
             {
-                const SqrUe& ue = kv.second;
-                if (!ue.active)
+                SqrUe& ue = kv.second;
+                if (ue.kpmFinished)
+                {
+                    continue; // linha final pós-partida já emitida
+                }
+
+                // --- Elegibilidade de janela parcial (contrato §4) ---
+                // 1) aparece apenas na 1ª borda de janela APÓS o início do
+                //    tráfego ("janela seguinte", delta desde a entrada);
+                if (!(tEndSec > ue.trafficStartSec + 1e-9))
                 {
                     continue;
                 }
+                // 2) exige sobreposição ativa com a janela; sem ela, sem linha
+                //    (e o UE encerra a emissão se a última janela ativa já
+                //    foi coberta).
+                if (!(ue.departureSec > tWinStartSec + 1e-9))
+                {
+                    ue.kpmFinished = true;
+                    continue;
+                }
+
                 const uint16_t ueId = ue.ueId;
                 const uint32_t sliceIdx = static_cast<uint32_t>(ue.slice);
 
@@ -818,7 +911,9 @@ KpmAndControlCallback()
                 auto itK = ueKpms.find(ueId);
                 const UeKpm& k = (itK != ueKpms.end()) ? itK->second : zero;
 
-                // Get previous values and calculate deltas (verbatim rslaq)
+                // Get previous values and calculate deltas (verbatim rslaq;
+                // prev só é atualizado quando uma linha é emitida — assim o
+                // 1º delta cobre tudo desde a entrada do UE).
                 KpmPrevValues& prev = g_kpmPrevValues[ueId];
                 uint64_t dTxBytes = (k.txBytes >= prev.txBytes) ? (k.txBytes - prev.txBytes) : 0;
                 uint64_t dRxBytes = (k.rxBytes >= prev.rxBytes) ? (k.rxBytes - prev.rxBytes) : 0;
@@ -836,9 +931,11 @@ KpmAndControlCallback()
                 double plr = (dTxPackets > 0)
                                  ? (static_cast<double>(effectiveLost) / dTxPackets * 100.0)
                                  : 0.0;
-                double rsh = (g_schedulerPtr)
-                                 ? g_schedulerPtr->GetPrbWeight(sliceIdx) * 100.0
+                double rsh = (g_schedulerPtr && totalRbgNow > 0 && sliceIdx < quotaNow.size())
+                                 ? (100.0 * static_cast<double>(quotaNow[sliceIdx]) /
+                                    static_cast<double>(totalRbgNow))
                                  : 0.0;
+                // Coluna legada (contrato §4): delta / período cheio.
                 double thrMbps = (periodSec > 0)
                                      ? (static_cast<double>(dRxBytes) * 8.0 / periodSec / 1e6)
                                      : 0.0;
@@ -848,14 +945,19 @@ KpmAndControlCallback()
                                            : 0;
 
                 // --- Colunas novas do contrato SQR ---
-                // windowThroughputMbps: throughput do UE nesta janela de decisão
-                // (delta de bytes recebidos / período — mesma janela do thrMbps,
-                // coluna explícita do contrato).
-                double windowThrMbps = thrMbps;
-                // snrDb: SINR DL estimado (inversão do CQI wideband nas tabelas do
-                // NrAmc; ver comentário "SQR:" no scheduler copiado). -100.0 =
-                // UE ainda sem CQI válido.
-                double snrDb = -100.0;
+                // windowThroughputMbps: delta de bytes da janela ÷ tempo ATIVO
+                // do UE na janela (janela parcial: desde a entrada / até a
+                // saída; janela cheia: o período).
+                const double activeStartSec = std::max(ue.trafficStartSec, tWinStartSec);
+                const double activeEndSec = std::min(ue.departureSec, tEndSec);
+                const double activeSec = std::max(activeEndSec - activeStartSec, 1e-6);
+                double windowThrMbps =
+                    static_cast<double>(dRxBytes) * 8.0 / activeSec / 1e6;
+                // snrDb: SINR DL estimado (inversão do CQI wideband nas tabelas
+                // do NrAmc; ver comentário "SQR" no scheduler). Sentinela do
+                // contrato §4/R09: -999.0 = UE ainda sem CQI válido (não confun-
+                // dir com medição real — clip(−999/30,0,1)=0 era ambíguo).
+                double snrDb = -999.0;
                 if (g_schedulerPtr && g_ueIdToRnti.count(ueId))
                 {
                     snrDb = g_schedulerPtr->GetUeDlSinrDb(g_ueIdToRnti[ueId]);
@@ -863,26 +965,15 @@ KpmAndControlCallback()
                 // queueBytes: fila DL do UE no MAC/RLC (mesma fonte do bufferBytes)
                 uint32_t queueBytes = bufferBytes;
 
-                kpmFile << nowMs << "," << ueId << "," << sliceIdx << ","
-                        << dTxBytes << "," << dRxBytes << ","
-                        << std::fixed << std::setprecision(2) << plr << ","
-                        << std::setprecision(2) << rsh << ","
-                        << effectiveLost << ","
-                        << std::setprecision(4) << thrMbps << ","
-                        << bufferBytes << ","
-                        << std::setprecision(4) << windowThrMbps << ","
-                        << std::setprecision(2) << snrDb << ","
-                        << queueBytes << "\n";
-                kpmHistory << nowMs << "," << ueId << "," << sliceIdx << ","
-                           << dTxBytes << "," << dRxBytes << ","
-                           << std::fixed << std::setprecision(2) << plr << ","
-                           << std::setprecision(2) << rsh << ","
-                           << effectiveLost << ","
-                           << std::setprecision(4) << thrMbps << ","
-                           << bufferBytes << ","
-                           << std::setprecision(4) << windowThrMbps << ","
-                           << std::setprecision(2) << snrDb << ","
-                           << queueBytes << "\n";
+                emitRow(kpmFile, nowMs, ueId, sliceIdx, dTxBytes, dRxBytes, plr, rsh,
+                        effectiveLost, thrMbps, bufferBytes, windowThrMbps, snrDb, queueBytes);
+                emitRow(kpmHistory, nowMs, ueId, sliceIdx, dTxBytes, dRxBytes, plr, rsh,
+                        effectiveLost, thrMbps, bufferBytes, windowThrMbps, snrDb, queueBytes);
+
+                if (ue.departureSec <= tEndSec + 1e-9)
+                {
+                    ue.kpmFinished = true; // última janela ativa emitida
+                }
             }
             kpmFile.flush();
             kpmHistory.flush();
@@ -893,6 +984,94 @@ KpmAndControlCallback()
     if (g_ipcEnabled && g_semMetricsReady)
     {
         sem_post(g_semMetricsReady);
+    }
+
+    // --- Telemetria SQR por janela: prb_scheduled / prb_idle (contrato §3.5) ---
+    // ALINHAMENTO DE JANELA: este dreno roda ANTES da espera pela ação do
+    // agente (que fica logo abaixo). Assim a linha do sqr_prb_windows.csv
+    // escrita na borda t descreve a janela (t−period, t] com os 4 campos do
+    // MESMO passo: prb_scheduled/prb_budget/prb_idle drenam os contadores
+    // acumulados NESSA janela e prb_requested/prb_executed (COTA efetiva em
+    // RBGs) trazem a ação VIGENTE nela — aplicada na borda ANTERIOR (t−period)
+    // e ainda armazenada em g_lastRequestedPct/g_lastExecutedRbg. A ação
+    // recebida abaixo, na borda t, governa a janela (t, t+period] e só entra
+    // no CSV do próximo dreno. Sentinela -1/0 = janela sem ação do agente
+    // (ex.: modo network-only ou 1ª janela). prb_idle = RBGs OCIOSOS da
+    // janela (contrato §3.5, agregação da definição por slot C − Σ
+    // prb_scheduled): totalRbg × dlSlots − Σ prb_scheduled, com dlSlots = nº
+    // de slots DL com chamada de scheduling (m_windowDlSlots; slots sem
+    // nenhum UE ativo não têm chamada e ficam fora da base). Os valores de
+    // g_last* PERSISTEM entre drenos: timeout/CSV ausente mantêm a config
+    // anterior (contrato §5) e a janela drenada de fato correu sob ela.
+    if (g_schedulerPtr)
+    {
+        static std::ofstream prbFile;
+        if (!prbFile.is_open())
+        {
+            std::filesystem::create_directories(g_outputDir);
+            prbFile.open(g_outputDir + "/sqr_prb_windows.csv",
+                         std::ios::out | std::ios::trunc);
+            prbFile << "timestamp_ms,total_rbg,total_prb,dl_slots,"
+                       "prb_requested_pct_0,prb_requested_pct_1,prb_requested_pct_2,"
+                       "prb_executed_rbg_0,prb_executed_rbg_1,prb_executed_rbg_2,"
+                       "prb_scheduled_rbg_0,prb_scheduled_rbg_1,prb_scheduled_rbg_2,"
+                       "prb_budget_rbg_0,prb_budget_rbg_1,prb_budget_rbg_2,"
+                       "prb_idle_rbg\n";
+        }
+
+        const std::vector<uint64_t> sched = g_schedulerPtr->GetWindowScheduledRbg();
+        const std::vector<uint64_t> budget = g_schedulerPtr->GetWindowBudgetRbg();
+        const uint16_t totalRbg = g_schedulerPtr->GetTotalRbgCount();
+        const uint64_t totalPrb = g_schedulerPtr->GetTotalPrbCount();
+        const uint64_t dlSlots = g_schedulerPtr->GetWindowDlSlots();
+
+        uint64_t schedSum = 0;
+        for (uint32_t s = 0; s < NUM_SLICES; s++)
+        {
+            schedSum += (s < sched.size() ? sched[s] : 0);
+        }
+        const uint64_t totalRbgSlots = static_cast<uint64_t>(totalRbg) * dlSlots;
+        const uint64_t prbIdle =
+            (totalRbgSlots > schedSum) ? (totalRbgSlots - schedSum) : 0;
+
+        prbFile << nowMs << "," << totalRbg << "," << totalPrb << "," << dlSlots;
+        for (uint32_t s = 0; s < NUM_SLICES; s++)
+        {
+            prbFile << "," << std::fixed << std::setprecision(2) << g_lastRequestedPct[s];
+        }
+        for (uint32_t s = 0; s < NUM_SLICES; s++)
+        {
+            prbFile << "," << g_lastExecutedRbg[s];
+        }
+        for (uint32_t s = 0; s < NUM_SLICES; s++)
+        {
+            prbFile << "," << (s < sched.size() ? sched[s] : 0);
+        }
+        for (uint32_t s = 0; s < NUM_SLICES; s++)
+        {
+            prbFile << "," << (s < budget.size() ? budget[s] : 0);
+        }
+        prbFile << "," << prbIdle << "\n";
+        prbFile.flush();
+
+        std::cout << std::fixed << std::setprecision(0)
+                  << "[SqrSim] PRB_WINDOW t=" << nowMs << "ms"
+                  << " prb_scheduled_rbg=[" << (sched.size() > 0 ? sched[0] : 0) << ", "
+                  << (sched.size() > 1 ? sched[1] : 0) << ", "
+                  << (sched.size() > 2 ? sched[2] : 0) << "]"
+                  << " prb_budget_rbg=[" << (budget.size() > 0 ? budget[0] : 0) << ", "
+                  << (budget.size() > 1 ? budget[1] : 0) << ", "
+                  << (budget.size() > 2 ? budget[2] : 0) << "]"
+                  << " prb_executed_rbg=[" << g_lastExecutedRbg[0] << ", "
+                  << g_lastExecutedRbg[1] << ", " << g_lastExecutedRbg[2] << "]"
+                  << " dl_slots=" << dlSlots
+                  << " prb_idle_rbg=" << prbIdle
+                  << " totalRbg=" << totalRbg << "\n";
+
+        // Único reset legítimo dos contadores de janela (fronteira de janela).
+        // g_lastRequestedPct/g_lastExecutedRbg NÃO são zerados: eles descrevem
+        // a ação vigente e devem sobreviver até a próxima ação ser aplicada.
+        g_schedulerPtr->ResetWindowCounters();
     }
 
     // Esperar ação do agente (timeout de 50ms; verbatim rslaq)
@@ -909,7 +1088,8 @@ KpmAndControlCallback()
         int ret = sem_timedwait(g_semControl, &ts);
         if (ret == 0)
         {
-            // Ler ação do agente (verbatim rslaq)
+            // Ler ação do agente (formato do contrato §3: timestamp,sliceId,
+            // dedicatedPRB,minPRB,maxPRB[,algorithm]; percentuais 0–100).
             std::ifstream actionFile("rslaq_actions_for_ns3.csv");
             if (actionFile.is_open())
             {
@@ -950,54 +1130,113 @@ KpmAndControlCallback()
                 }
                 actionFile.close();
 
-                double totalDed = dedicatedPrb[0] + dedicatedPrb[1] + dedicatedPrb[2];
-                if (totalDed > 0.0)
+                // ==========================================================
+                // SQR-R27 (RATIFICADO 12/10/2026): COTA ABSOLUTA — NADA de
+                // renormalização. O caminho antigo dividia por totalDed e
+                // renormalizava para soma 1 (o scheduler re-expansibia Σa < C
+                // para partição completa, anulando γ·a/C e a Fig. 4). Agora:
+                // (1) % de PRB → cota inteira de RBGs com a regra determinís-
+                //     tica SqrMacScheduler::ComputeRbgQuotas (piso + maiores
+                //     restos, desempate por índice de slice; Σ quotas ≤
+                //     totalRbg garantido; SEM renormalização);
+                // (2) a cota é aplicada SEMPRE — inclusive Σa = 0 (nada
+                //     servido, com log; NUNCA manter a configuração anterior
+                //     silenciosamente, como o código antigo fazia ao descartar
+                //     totalDed ≤ 0). Timeout do semáforo continua mantendo a
+                //     config anterior (contrato §5 — degradação congelada).
+                // ==========================================================
+                // DEGRADAÇÃO (contrato §5, RATIFICADO 13/10/2026): slice SEM
+                // linha no CSV ⇒ default do caminho vigente 33,33 %/slice
+                // (rslaq-sim.cc:1306) com warning contável — NUNCA cota 0
+                // silenciosa (0 explícito na linha da slice é ação legítima
+                // e continua sendo aplicado como tal, R27).
+                std::array<double, NUM_SLICES> pct = {};
+                std::vector<uint32_t> missingSlices;
+                for (uint32_t s = 0; s < NUM_SLICES; s++)
                 {
-                    std::vector<double> p_final(NUM_SLICES);
-                    for (uint32_t s = 0; s < NUM_SLICES; s++)
+                    if (dedicatedPrb[s] < 0.0)
                     {
-                        p_final[s] = dedicatedPrb[s] / totalDed;
+                        pct[s] = 33.33;
+                        missingSlices.push_back(s);
                     }
-
-                    double sum = p_final[0] + p_final[1] + p_final[2];
-                    if (sum > 0.0)
+                    else
                     {
-                        for (uint32_t s = 0; s < NUM_SLICES; s++)
-                        {
-                            p_final[s] /= sum;
-                        }
+                        pct[s] = dedicatedPrb[s];
                     }
-
-                    g_schedulerPtr->SetSliceConfiguration(p_final, algos);
-
-                    // --- Telemetria SQR: prb_requested / prb_executed ---
-                    // prb_requested = ação recebida (% por slice, pós-projeção no
-                    // Python); prb_executed = conversão percentual→RBG
-                    // (round(p_final × totalRbg)). Consumido pelo CSV da janela
-                    // (sqr_prb_windows.csv) logo abaixo.
-                    const uint16_t totalRbg =
-                        g_schedulerPtr ? g_schedulerPtr->GetTotalRbgCount() : 0;
-                    for (uint32_t s = 0; s < NUM_SLICES; s++)
+                }
+                if (!missingSlices.empty())
+                {
+                    g_sliceLineMissingCount++;
+                    std::ostringstream missList;
+                    for (uint32_t s : missingSlices)
                     {
-                        g_lastRequestedPct[s] = dedicatedPrb[s];
-                        g_lastExecutedRbg[s] = std::llround(p_final[s] * totalRbg);
+                        missList << (missingSlices.front() == s ? "" : ",") << s;
                     }
-                    g_actionSeenInWindow = true;
+                    NS_LOG_WARN("[SqrSim] action CSV without line(s) for slice(s) ["
+                                << missList.str() << "] — applying default 33.33%"
+                                " (degradation #" << g_sliceLineMissingCount << ", contract §5)");
+                    if (g_sliceLineMissingCount == 1)
+                    {
+                        std::cout << "[SqrSim] WARNING: action CSV without line(s) for"
+                                  << " slice(s) [" << missList.str()
+                                  << "] — default 33.33%/slice applied (contract §5,"
+                                  << " countable; see final report)\n";
+                    }
+                }
 
-                    std::cout << std::fixed << std::setprecision(2)
-                              << "[SqrSim] ACTION t=" << nowMs << "ms"
-                              << " prb_requested_pct=[" << dedicatedPrb[0] << ", "
-                              << dedicatedPrb[1] << ", " << dedicatedPrb[2] << "]"
-                              << " prb_executed_rbg=[" << g_lastExecutedRbg[0] << ", "
-                              << g_lastExecutedRbg[1] << ", " << g_lastExecutedRbg[2] << "]"
-                              << " totalRbg=" << totalRbg << "\n";
+                const uint16_t totalRbg = g_schedulerPtr->GetTotalRbgCount();
+                const std::vector<double> pctVec(pct.begin(), pct.end());
+                const std::vector<uint32_t> quotaRbg =
+                    SqrMacScheduler::ComputeRbgQuotas(pctVec, totalRbg, NUM_SLICES);
+                g_schedulerPtr->SetSliceQuotaRbg(quotaRbg, algos);
 
-                    NS_LOG_INFO("[SqrSim] IPC action applied at t=" << nowMs
-                                << "ms: weights=[" << p_final[0] << ", "
-                                << p_final[1] << ", " << p_final[2] << "]"
-                                << " algos=[" << IntraAlgoName(algos[0]) << ", "
-                                << IntraAlgoName(algos[1]) << ", "
-                                << IntraAlgoName(algos[2]) << "]");
+                // --- Telemetria SQR: prb_requested / prb_executed ---
+                // prb_requested = ação aplicada (% por slice; linha ausente ⇒
+                // default 33,33 já substituído acima); prb_executed = COTA
+                // EFETIVA em RBGs entregue ao scheduler (pós-conversão
+                // determinística %→RBG). Ficam em g_last* e são consumidos
+                // pelo dreno da janela que esta ação governa (próxima borda —
+                // ver comentário do dreno acima).
+                double pctSum = 0.0;
+                for (uint32_t s = 0; s < NUM_SLICES; s++)
+                {
+                    g_lastRequestedPct[s] = pct[s];
+                    g_lastExecutedRbg[s] =
+                        (s < quotaRbg.size()) ? static_cast<int64_t>(quotaRbg[s]) : 0;
+                    pctSum += pct[s];
+                }
+
+                std::cout << std::fixed << std::setprecision(2)
+                          << "[SqrSim] ACTION t=" << nowMs << "ms"
+                          << " prb_requested_pct=[" << pct[0] << ", "
+                          << pct[1] << ", " << pct[2] << "]"
+                          << " prb_executed_rbg=[" << g_lastExecutedRbg[0] << ", "
+                          << g_lastExecutedRbg[1] << ", " << g_lastExecutedRbg[2] << "]"
+                          << " totalRbg=" << totalRbg
+                          << " pctSum=" << pctSum
+                          << (pctSum <= 0.0 ? " zero_quota_nothing_served" : "")
+                          << "\n";
+
+                NS_LOG_INFO("[SqrSim] IPC absolute quota applied at t=" << nowMs
+                            << "ms: quota_rbg=[" << g_lastExecutedRbg[0] << ", "
+                            << g_lastExecutedRbg[1] << ", " << g_lastExecutedRbg[2] << "]"
+                            << " algos=[" << IntraAlgoName(algos[0]) << ", "
+                            << IntraAlgoName(algos[1]) << ", "
+                            << IntraAlgoName(algos[2]) << "]");
+            }
+            else
+            {
+                // DEGRADAÇÃO (contrato §5): semáforo liberado mas CSV ausente/
+                // ilegível ⇒ mantém a cota anterior COM warning contável.
+                g_actionFileMissingCount++;
+                NS_LOG_WARN("[SqrSim] control semaphore released but rslaq_actions_for_ns3.csv"
+                            " is missing/unreadable — KEEPING previous quota configuration"
+                            " (degradation #" << g_actionFileMissingCount << ", contract §5)");
+                if (g_actionFileMissingCount == 1)
+                {
+                    std::cout << "[SqrSim] WARNING: rslaq_actions_for_ns3.csv missing/"
+                              << "unreadable after control semaphore — KEEPING previous"
+                              << " quota (contract §5, countable; see final report)\n";
                 }
             }
         }
@@ -1005,67 +1244,6 @@ KpmAndControlCallback()
         {
             NS_LOG_WARN("[SqrSim] sem_timedwait timeout — no action from agent");
         }
-    }
-
-    // --- Telemetria SQR por janela: prb_scheduled (RBGs reais do MAC) ---
-    // Drena os contadores por slice acumulados pelo scheduler desde a última
-    // janela e grava sqr_prb_windows.csv + linha no stdout. prb_requested e
-    // prb_executed trazem a ação recebida nesta janela (-1/0 se não houve ação,
-    // ex.: modo network-only).
-    if (g_schedulerPtr)
-    {
-        static std::ofstream prbFile;
-        if (!prbFile.is_open())
-        {
-            std::filesystem::create_directories(g_outputDir);
-            prbFile.open(g_outputDir + "/sqr_prb_windows.csv",
-                         std::ios::out | std::ios::trunc);
-            prbFile << "timestamp_ms,total_rbg,total_prb,"
-                       "prb_requested_pct_0,prb_requested_pct_1,prb_requested_pct_2,"
-                       "prb_executed_rbg_0,prb_executed_rbg_1,prb_executed_rbg_2,"
-                       "prb_scheduled_rbg_0,prb_scheduled_rbg_1,prb_scheduled_rbg_2,"
-                       "prb_budget_rbg_0,prb_budget_rbg_1,prb_budget_rbg_2\n";
-        }
-
-        const std::vector<uint64_t> sched = g_schedulerPtr->GetWindowScheduledRbg();
-        const std::vector<uint64_t> budget = g_schedulerPtr->GetWindowBudgetRbg();
-        const uint16_t totalRbg = g_schedulerPtr->GetTotalRbgCount();
-        const uint64_t totalPrb = g_schedulerPtr->GetTotalPrbCount();
-
-        prbFile << nowMs << "," << totalRbg << "," << totalPrb;
-        for (uint32_t s = 0; s < NUM_SLICES; s++)
-        {
-            prbFile << "," << std::fixed << std::setprecision(2) << g_lastRequestedPct[s];
-        }
-        for (uint32_t s = 0; s < NUM_SLICES; s++)
-        {
-            prbFile << "," << g_lastExecutedRbg[s];
-        }
-        for (uint32_t s = 0; s < NUM_SLICES; s++)
-        {
-            prbFile << "," << (s < sched.size() ? sched[s] : 0);
-        }
-        for (uint32_t s = 0; s < NUM_SLICES; s++)
-        {
-            prbFile << "," << (s < budget.size() ? budget[s] : 0);
-        }
-        prbFile << "\n";
-        prbFile.flush();
-
-        std::cout << std::fixed << std::setprecision(0)
-                  << "[SqrSim] PRB_WINDOW t=" << nowMs << "ms"
-                  << " prb_scheduled_rbg=[" << (sched.size() > 0 ? sched[0] : 0) << ", "
-                  << (sched.size() > 1 ? sched[1] : 0) << ", "
-                  << (sched.size() > 2 ? sched[2] : 0) << "]"
-                  << " prb_budget_rbg=[" << (budget.size() > 0 ? budget[0] : 0) << ", "
-                  << (budget.size() > 1 ? budget[1] : 0) << ", "
-                  << (budget.size() > 2 ? budget[2] : 0) << "]"
-                  << " totalRbg=" << totalRbg << "\n";
-
-        g_schedulerPtr->ResetWindowCounters();
-        g_actionSeenInWindow = false;
-        g_lastRequestedPct = {{-1.0, -1.0, -1.0}};
-        g_lastExecutedRbg = {{0, 0, 0}};
     }
 
     // Agendar próximo callback
@@ -1128,11 +1306,15 @@ WriteFinalReport(const Ptr<Ipv4FlowClassifier>& classifier)
         const SqrUe& ue = kv.second;
         const uint32_t sliceIdx = static_cast<uint32_t>(ue.slice);
         const double slaMbps = g_slaMbps[sliceIdx];
-        const double offeredMbps = g_ueOfferedMult * slaMbps;
         const double activeSec = std::max(
             (ue.active ? g_simTimeSec : ue.departureSec) - (ue.arrivalSec + g_attachGraceSec),
             0.1);
         const UeTotals& t = totals[ue.ueId];
+        // R04: taxa ofertada efetiva do UE (greedy full-buffer --ueOfferedMbps
+        // ou fallback legado mult × SLA).
+        const double offeredMbps = (ue.offeredMbps > 0.0)
+                                       ? ue.offeredMbps
+                                       : g_ueOfferedMult * slaMbps;
         const double meanThr = t.rxBytes * 8.0 / activeSec / 1e6;
 
         std::cout << std::setprecision(3)
@@ -1158,7 +1340,12 @@ WriteFinalReport(const Ptr<Ipv4FlowClassifier>& classifier)
               << "Arrivals=" << g_arrivalCount
               << " Departures=" << g_departureCount
               << " StillActive=" << (g_arrivalCount - g_departureCount)
-              << "\nSummary CSV: " << csvPath << "\n";
+              << "\nSummary CSV: " << csvPath << "\n"
+              // Degradações do contrato §5 (contáveis; 0 = nenhuma ocorrência):
+              << "[SqrSim] IPC_DEGRADATION action_file_missing_keep_prev_quota="
+              << g_actionFileMissingCount
+              << " action_slice_line_missing_default_33pct=" << g_sliceLineMissingCount
+              << " (contract §5)\n";
 }
 
 // ---------------------------------------------------------------------------
@@ -1218,7 +1405,11 @@ main(int argc, char* argv[])
     cmd.AddValue("lambdaUesPerMin", "Poisson arrival rate (UEs/min) [ARTIGO: 2]", g_lambdaUesPerMin);
     cmd.AddValue("meanSessionSec", "Mean session duration (s, exponential) [ARTIGO: 60]", g_meanSessionSec);
     cmd.AddValue("slaMbps", "Per-slice per-UE SLA in Mbps [ARTIGO: 0.5,1.0,1.5]", slaStr);
-    cmd.AddValue("ueOfferedMult", "Per-UE offered load = mult × SLA (greedy UDP DL)", g_ueOfferedMult);
+    cmd.AddValue("ueOfferedMbps", "Per-UE offered DL UDP rate in Mbps — greedy full-buffer "
+                                  "(default 100 > 2x cell peak; 0 = legacy ueOfferedMult x SLA)",
+                 g_ueOfferedMbps);
+    cmd.AddValue("ueOfferedMult", "Legacy per-UE offered load = mult x SLA (used only if ueOfferedMbps=0)",
+                 g_ueOfferedMult);
     cmd.AddValue("pktSize", "UDP packet size (bytes)", g_pktSize);
     cmd.AddValue("tddPattern", "TDD slot pattern string", tddPattern);
     cmd.AddValue("rlcMode", "RLC mode for data radio bearers: am or um", rlcMode);
@@ -1250,9 +1441,13 @@ main(int argc, char* argv[])
     {
         NS_FATAL_ERROR("periodMs must be positive");
     }
-    if (g_ueOfferedMult <= 0.0)
+    if (g_ueOfferedMbps < 0.0)
     {
-        NS_FATAL_ERROR("ueOfferedMult must be positive");
+        NS_FATAL_ERROR("ueOfferedMbps must be non-negative (0 = legacy mult mode)");
+    }
+    if (g_ueOfferedMbps == 0.0 && g_ueOfferedMult <= 0.0)
+    {
+        NS_FATAL_ERROR("offered load must be positive: set ueOfferedMbps > 0 or ueOfferedMult > 0");
     }
     if (rlcMode != "am" && rlcMode != "um")
     {
@@ -1334,7 +1529,13 @@ main(int argc, char* argv[])
               << "session Exp(" << g_meanSessionSec << " s) [ARTIGO]\n"
               << "Mobility     : RandomWalk2d ~1 m/s [ASSUMIDO]\n"
               << "Slices       : 3x eMBB, SLA/UE = " << slaStr << " Mbps [ARTIGO]\n"
-              << "Offered/UE   : " << g_ueOfferedMult << "x SLA (UDP DL greedy) [ASSUMIDO]\n"
+              << "Offered/UE   : "
+              << (g_ueOfferedMbps > 0.0
+                      ? (std::ostringstream{} << g_ueOfferedMbps << " Mbps UDP greedy full-buffer"
+                                              << " [ASSUMIDO R04]").str()
+                      : (std::ostringstream{} << g_ueOfferedMult << "x SLA (legacy) [ASSUMIDO]").str())
+              << "\n"
+              << "Scheduler    : SqrMacScheduler (cota absoluta de RBGs, R27)\n"
               << "Decision pd  : " << g_indicationPeriodMs << " ms [ARTIGO: 100 TTIs]\n"
               << "RLC mode     : " << ToUpper(rlcMode) << "\n"
               << "TDD pattern  : " << g_appliedTddPattern << (tddApplied ? "" : " (fallback DL-only)")
@@ -1403,7 +1604,8 @@ main(int argc, char* argv[])
     g_epcHelper = CreateObject<NrPointToPointEpcHelper>();
     g_nrHelper = CreateObject<NrHelper>();
     g_nrHelper->SetEpcHelper(g_epcHelper);
-    g_nrHelper->SetSchedulerTypeId(RslaqMacScheduler::GetTypeId());
+    // SQR-R27: scheduler de COTA ABSOLUTA (subclasse de RslaqMacScheduler).
+    g_nrHelper->SetSchedulerTypeId(SqrMacScheduler::GetTypeId());
 
     // UE: antena isotrópica 1x1 (sem beamforming no lado UE)
     g_nrHelper->SetUeAntennaAttribute("NumRows", UintegerValue(1));
@@ -1493,10 +1695,10 @@ main(int argc, char* argv[])
     g_monitorPtr = g_flowmonHelper->Install(remoteHostContainer);
     g_classifierPtr = DynamicCast<Ipv4FlowClassifier>(g_flowmonHelper->GetClassifier());
 
-    // --- Scheduler slice-aware (cópia em scratch/sqr) ---
+    // --- Scheduler SQR de cota absoluta (R27, em scratch/sqr) ---
     Ptr<NrMacScheduler> schedBase = NrHelper::GetScheduler(g_gnbNetDev.Get(0), 0);
-    Ptr<RslaqMacScheduler> scheduler = DynamicCast<RslaqMacScheduler>(schedBase);
-    NS_ASSERT_MSG(scheduler != nullptr, "Failed to cast to RslaqMacScheduler");
+    Ptr<SqrMacScheduler> scheduler = DynamicCast<SqrMacScheduler>(schedBase);
+    NS_ASSERT_MSG(scheduler != nullptr, "Failed to cast to SqrMacScheduler");
     g_schedulerPtr = scheduler;
     scheduler->SetScenarioName("sqr");
     scheduler->SetOutputDir(g_outputDir);
@@ -1504,10 +1706,28 @@ main(int argc, char* argv[])
     scheduler->SetAttribute("MacLoggingPeriodMs", UintegerValue(macLoggingPeriodMs));
     scheduler->SetAttribute("EnableDetailedMacLogging", BooleanValue(true));
 
-    // Mapeamento inicial (vazio) + configuração inicial do SQR/estático
+    // Mapeamento inicial (vazio) + configuração inicial do SQR/estático.
+    // O OVERRIDE de SetSliceConfiguration converte as frações em COTA RBG
+    // (piso + maiores restos, Σ ≤ totalRbg; frações somando 1 ⇒ partição
+    // completa inicial, sem alteração de comportamento no baseline).
     scheduler->SetSliceUeMapping(NUM_SLICES, g_sliceRntis);
     scheduler->SetSliceWeightPolicy(RslaqMacScheduler::SliceWeightPolicy::STATIC);
     scheduler->SetSliceConfiguration(sliceWeights, sliceAlgos);
+
+    std::cout << "[SqrSim] Initial absolute quota (RBG): [";
+    {
+        const std::vector<uint32_t> q0 = scheduler->GetSliceQuotaRbg();
+        for (uint32_t s = 0; s < q0.size(); ++s)
+        {
+            std::cout << (s ? ", " : "") << q0[s];
+        }
+    }
+    std::cout << "] totalRbg=" << scheduler->GetTotalRbgCount()
+              << " totalPrb=" << scheduler->GetTotalPrbCount()
+              << (scheduler->GetTotalPrbCount() == 0
+                      ? " (deferred — quota materialized on first DL slot)"
+                      : "")
+              << "\n";
 
     // --- Agendamentos ---
     // 1) verificador de attach (acorda quando houver chegada pendente;

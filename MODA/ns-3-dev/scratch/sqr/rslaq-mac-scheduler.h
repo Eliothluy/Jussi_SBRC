@@ -14,6 +14,17 @@
  * estimativa de SINR DL por RNTI (inversão do CQI wideband nas tabelas do
  * NrAmc) e contagem de RBGs/PRBs do BWP. Nenhuma mudança na lógica de
  * alocação/agendamento.
+ *
+ * Diferenças adicionais exigidas pela Fase 1/R27 (12/10/2026, Agente A;
+ * ainda restritas a esta CÓPIA — scratch/rslaq permanece intocado):
+ *  1. SetSliceConfiguration declarada VIRTUAL (SqrMacScheduler sobrepõe com
+ *     semântica de cota absoluta — contrato §3.3, register R27);
+ *  2. seção private dos helpers/diagnósticos tornada PROTECTED para a
+ *     subclasse SqrMacScheduler reutilizar a maquinaria de log/alocação;
+ *  3. contador de janela m_windowDlSlots (slots DL com chamada de scheduling
+ *     desde o último reset) + acessor GetWindowDlSlots();
+ *  4. sentinela de SNR -999 dB (contrato §4 / register R09) no lugar de
+ *     -100 dB, no snapshot e no default de GetUeDlSinrDb.
  */
 
 #pragma once
@@ -91,9 +102,12 @@ class RslaqMacScheduler : public NrMacSchedulerOfdmaRR
      * @param algorithms     Vector of N intra-slice algorithms
      *
      * Can be called at any time to update the scheduler policy (e.g., every 10 ms).
+     *
+     * SQR (R27): virtual para permitir a sobrecarga com semântica de COTA
+     * ABSOLUTA em SqrMacScheduler (contrato v1.1 §3.3).
      */
-    void SetSliceConfiguration(const std::vector<double>& prbWeights,
-                               const std::vector<IntraSliceAlgorithm>& algorithms);
+    virtual void SetSliceConfiguration(const std::vector<double>& prbWeights,
+                                       const std::vector<IntraSliceAlgorithm>& algorithms);
 
     /**
      * @brief Map UE RNTIs to slices
@@ -167,9 +181,20 @@ class RslaqMacScheduler : public NrMacSchedulerOfdmaRR
      * Aproximação documentada: inverte o CQI reportado nas tabelas do NrAmc
      * (SE = GetSpectralEfficiencyForCqi(cqi); SINR = GetSinrFromSpectralEfficiency(SE)).
      * @param rnti UE RNTI
-     * @return SINR estimado em dB; -100.0 se o UE ainda não reportou CQI
+     * @return SINR estimado em dB; -999.0 (sentinela do contrato SQR §4/R09)
+     *         se o UE ainda não reportou CQI
      */
     double GetUeDlSinrDb(uint16_t rnti) const;
+
+    /**
+     * @brief Slots DL com chamada de scheduling desde o último reset de janela
+     *
+     * SQR: um contador por janela de decisão (incrementado a cada
+     * AssignDLRBG — 1 beam no cenário SQR ⇒ 1 chamada = 1 slot DL com pelo
+     * menos 1 UE ativo). Base para prb_idle = totalRbg × dlSlots − Σ
+     * prb_scheduled no CSV de janelas.
+     */
+    uint64_t GetWindowDlSlots() const;
 
     struct SliceAllocationStats
     {
@@ -226,7 +251,11 @@ class RslaqMacScheduler : public NrMacSchedulerOfdmaRR
     void BeforeUlSched(const UePtrAndBufferReq& ue,
                        const FTResources& assignableInIteration) const override;
 
-  private:
+  protected:
+    // SQR (R27/Fase 1): seção tornada protected para a subclasse
+    // SqrMacScheduler (scratch/sqr/sqr-mac-scheduler.{h,cc}) reutilizar a
+    // maquinaria de ordenação, logging e contadores de janela. No original
+    // (scratch/rslaq) esta seção é private — nada da lógica mudou.
     /**
      * @brief Sort UEs within a slice by the selected intra-slice algorithm
      */
@@ -320,6 +349,12 @@ class RslaqMacScheduler : public NrMacSchedulerOfdmaRR
     mutable std::vector<uint64_t> m_windowScheduledRbg;
     /** Orçamento de RBGs por slice na janela corrente (reset a cada período SQR). */
     mutable std::vector<uint64_t> m_windowBudgetRbg;
+    /**
+     * SQR (Fase 1/R27): slots DL com chamada de scheduling na janela corrente
+     * (1 chamada de AssignDLRBG = 1 slot DL com ≥1 UE ativo; cenário SQR tem
+     * 1 beam). Reset junto com os contadores acima.
+     */
+    mutable uint64_t m_windowDlSlots{0};
     /** Último SINR DL estimado por RNTI (dB), a partir do CQI wideband. */
     mutable std::map<uint16_t, double> m_lastDlSinrDb;
 

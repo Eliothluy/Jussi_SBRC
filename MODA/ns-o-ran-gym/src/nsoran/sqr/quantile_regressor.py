@@ -19,23 +19,25 @@ the published rules [ARTIGO §III, eq. in PLANO §2.1]:
                                        (< 0, amplified; P_penalty = 2 [ARTIGO])
 
 A critical failure is auto-detected when a ``threshold`` (Lambda) is given;
-it can also be forced explicitly (used by the virtual negative updates
-signaled by the coordinator when a proposal is cut).
+the coordinator's *virtual* negative updates (register R12: a support vector
+at the pre-projection action with alpha = -eta_virt, eta_virt = eta/2 by
+default, ablation {0.025, 0.05, 0.1}) are inserted directly through
+:meth:`KernelQuantileRegressor.insert_support_vector` with an arbitrary
+coefficient — they do NOT go through the pinball rules.
 
-Pruning rule ([ASSUMIDO] — the paper says "adaptive pruning" without giving
-the rule; hypothesis from PLANO_IMPLEMENTACAO_SQR_NORI.md §3-Fase 2):
-when the memory is full, drop the support vector of smallest *influence*
-I_j = |alpha_j| — since k <= 1, |alpha_j| upper-bounds the vector's total
-contribution |alpha_j * k(x, x_j)| to any prediction.  Ties are broken by
-the lowest insertion index (oldest first).  The rule is deterministic and
-uses no random numbers, so two regressors fed the same stream of updates
-always hold identical memories regardless of seed.
+Pruning rule (register R10, assumptions_register.md v1.1 — [ASSUMIDO]; the
+paper says only "adaptive pruning" / "descarta amostras de baixo impacto ou
+redundantes" without giving the rule): when the memory is full, drop the
+support vector of smallest *influence*
 
-Measured property of this rule (tests/test_sqr_quantile.py, coverage tests):
-because subprediction coefficients (+eta*tau) are smaller than overprediction
-ones (eta*(1-tau)), full-memory operation evicts positive vectors faster and
-biases f_tau slightly DOWNWARD — the safe side for a lower quantile, which
-is the conservative direction for the SQR safety filter.
+    I_j = |alpha_j| * k(x_new, x_j)
+
+i.e. the vector whose contribution to predictions AT THE INCOMING POINT is
+smallest — this captures both "low impact" (|alpha_j| small) and "redundant"
+(already covered by x_new).  Ties are broken by the lowest insertion index
+(oldest first).  The rule is deterministic and uses no random numbers, so
+two regressors fed the same stream of updates always hold identical
+memories regardless of seed.
 
 tau is adaptable at runtime (``set_tau``); the SQR controller keeps it
 inside the published range tau in [0.01, 0.05] [ARTIGO].
@@ -67,6 +69,19 @@ class QuantileUpdate:
     alpha: float             # coefficient assigned to the new support vector
     pruned_index: int | None  # index pruned to respect the budget, else None
     pruned_alpha: float | None
+
+
+@dataclass(frozen=True)
+class SupportInsertion:
+    """Record of one direct support-vector insertion (register R12).
+
+    ``alpha`` is the coefficient exactly as inserted (e.g. -0.05 for the
+    coordinator's virtual negative update with eta_virt = 0.05).
+    """
+
+    alpha: float
+    inserted_index: int
+    pruned_index: int | None
 
 
 class KernelQuantileRegressor:
@@ -188,6 +203,22 @@ class KernelQuantileRegressor:
     # Online update
     # ------------------------------------------------------------------
 
+    def _prune_index(self, xp: np.ndarray) -> int:
+        """Index of the support vector with the smallest influence (R10).
+
+        I_j = |alpha_j| * k(x_new, x_j); ties break to the lowest insertion
+        index (oldest first) via ``argmin``'s first-occurrence semantics.
+        """
+        k_new = self.kernel(xp[None, :], self._sx)[0]
+        influence = np.abs(self._alpha) * k_new
+        return int(np.argmin(influence))
+
+    def _drop_index(self, index: int) -> None:
+        keep = np.ones(self._sx.shape[0], dtype=bool)
+        keep[index] = False
+        self._sx = self._sx[keep]
+        self._alpha = self._alpha[keep]
+
     def update(
         self,
         x: np.ndarray,
@@ -208,8 +239,7 @@ class KernelQuantileRegressor:
             (f_tau(x) >= Lambda) while y < Lambda, the critical-failure rule
             applies.
         critical:
-            Force the critical-failure rule regardless of auto-detection
-            (used for the coordinator's virtual negative updates).
+            Force the critical-failure rule regardless of auto-detection.
         """
         xp = _as_points(x, self.dim, "x")
         if xp.shape[0] != 1:
@@ -219,7 +249,14 @@ class KernelQuantileRegressor:
         if not np.isfinite(y):
             raise ValueError(f"y must be finite, got {y}")
 
-        f_before = float(self.predict(xp[None, :])[0])
+        # One kernel row against the pre-update memory serves both the
+        # f_before prediction and (if the memory is full) the R10 influence.
+        if self._sx.shape[0] > 0:
+            k_new = self.kernel(xp[None, :], self._sx)[0]
+            f_before = float(k_new @ self._alpha)
+        else:
+            k_new = np.empty(0, dtype=np.float64)
+            f_before = 0.0
 
         is_critical = bool(critical) or (
             threshold is not None and f_before >= float(threshold) and y < float(threshold)
@@ -237,14 +274,11 @@ class KernelQuantileRegressor:
         pruned_index: int | None = None
         pruned_alpha: float | None = None
         if self._sx.shape[0] >= self.memory_size:
-            # Prune first (deterministic rule in the module docstring), then
-            # insert — the budget is never exceeded.
-            pruned_index = int(np.argmin(np.abs(self._alpha)))  # tie -> oldest
+            # Prune first (R10 rule), then insert — the budget is never
+            # exceeded.  Influences use k(x_new, x_j), already computed.
+            pruned_index = int(np.argmin(np.abs(self._alpha) * k_new))
             pruned_alpha = float(self._alpha[pruned_index])
-            keep = np.ones(self._sx.shape[0], dtype=bool)
-            keep[pruned_index] = False
-            self._sx = self._sx[keep]
-            self._alpha = self._alpha[keep]
+            self._drop_index(pruned_index)
 
         self._sx = np.vstack([self._sx, xp[None, :]])
         self._alpha = np.append(self._alpha, alpha)
@@ -256,6 +290,44 @@ class KernelQuantileRegressor:
             alpha=float(alpha),
             pruned_index=pruned_index,
             pruned_alpha=pruned_alpha,
+        )
+
+    def insert_support_vector(self, x: np.ndarray, alpha: float) -> SupportInsertion:
+        """Insert a support vector with an ARBITRARY coefficient (register R12).
+
+        This is the only sanctioned path for the coordinator's virtual
+        negative update: a support vector at the pre-projection action with
+        alpha = -eta_virt.  It bypasses the pinball rules on purpose — the
+        weight is a knob, not an outcome of the observed error.
+
+        The memory budget still applies: when full, the R10 pruning rule
+        runs before the insertion.
+
+        Returns
+        -------
+        SupportInsertion
+            The coefficient as inserted, the index it now occupies and the
+            pruned index (if any).
+        """
+        xp = _as_points(x, self.dim, "x")
+        if xp.shape[0] != 1:
+            raise ValueError("insert_support_vector accepts exactly one point")
+        xp = xp[0]
+        alpha = float(alpha)
+        if not np.isfinite(alpha):
+            raise ValueError(f"alpha must be finite, got {alpha}")
+
+        pruned_index: int | None = None
+        if self._sx.shape[0] >= self.memory_size:
+            pruned_index = self._prune_index(xp)
+            self._drop_index(pruned_index)
+
+        self._sx = np.vstack([self._sx, xp[None, :]])
+        self._alpha = np.append(self._alpha, alpha)
+        return SupportInsertion(
+            alpha=alpha,
+            inserted_index=int(self._sx.shape[0] - 1),
+            pruned_index=pruned_index,
         )
 
     # ------------------------------------------------------------------
@@ -277,6 +349,42 @@ class KernelQuantileRegressor:
         }
 
     def load_state_dict(self, state: dict) -> None:
+        """Restore a checkpoint, VALIDATING the kernel configuration (R05).
+
+        ``kernel_dim``, ``kernel_nu`` and ``kernel_length_scale`` saved by
+        :meth:`state_dict` must match the kernel this regressor was built
+        with — any mismatch raises an explicit ValueError instead of
+        silently producing wrong f_tau/sigma (a length-scale or nu mismatch
+        changes every kernel evaluation).
+        """
+        saved_dim = int(state["kernel_dim"])
+        if saved_dim != self.kernel.dim:
+            raise ValueError(
+                "kernel_dim mismatch: checkpoint has "
+                f"{saved_dim}, regressor kernel has {self.kernel.dim}"
+            )
+        saved_nu = float(state["kernel_nu"])
+        if saved_nu != self.kernel.nu:
+            raise ValueError(
+                "kernel_nu mismatch: checkpoint has "
+                f"{saved_nu}, regressor kernel has {self.kernel.nu}"
+            )
+        saved_ls = np.asarray(state["kernel_length_scale"], dtype=np.float64).flatten()
+        if saved_ls.shape != self.kernel.length_scale.shape:
+            raise ValueError(
+                "kernel_length_scale shape mismatch: checkpoint has "
+                f"{saved_ls.shape}, regressor kernel has "
+                f"{self.kernel.length_scale.shape}"
+            )
+        if not np.array_equal(saved_ls, self.kernel.length_scale):
+            raise ValueError(
+                "kernel_length_scale mismatch: checkpoint has "
+                f"{saved_ls.tolist()}, regressor kernel has "
+                f"{self.kernel.length_scale.tolist()}"
+            )
+        # Validated: restore (no-op on an exact match, kept for clarity).
+        self.kernel.length_scale = saved_ls.copy()
+
         self.set_memory(state["support_points"], state["alphas"])
         self.set_tau(state["tau"])
         self.eta = float(state["eta"])

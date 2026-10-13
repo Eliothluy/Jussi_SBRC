@@ -1,127 +1,250 @@
 #!/usr/bin/env bash
 # ---------------------------------------------------------------------------
-# Smoke test do cenário SQR (Fase 1) — sqr-sim em modo network-only
-# (sem agente Python; padrão baseline do run_all_scenarios.sh).
+# SMOKE TEST REFORÇADO do cenário SQR (Fase 1) — GATE OFICIAL.
 #
-# Valida (gate Fase 1):
-#   1. exit 0 do ns-3;
-#   2. arquivo de KPMs (rslaq-kpms.txt, contrato CWD do ns-3-dev) gerado com as
-#      colunas novas do contrato SQR no header (windowThroughputMbps, snrDb,
-#      queueBytes);
-#   3. evidência de >= 1 chegada (UE_ARRIVAL) e >= 1 partida (UE_DEPARTURE)
-#      de UE no log;
-#   4. >= 1 attach real no rádio (UE_ATTACHED) — o RNTI pós-RACH foi registrado
-#      no mapeamento RNTI→slice do scheduler;
-#   5. >= 1 janela PRB_WINDOW com prb_scheduled > 0 (o MAC efetivamente
-#      agendou RBGs);
-#   6. >= 1 linha de KPM (histórico sqr_kpm_history.csv) com
-#      windowThroughputMbps > 0 — tráfego entregue ponta a ponta.
+# Modos (o DEFAULT sem argumentos faz TUDO e imprime "SMOKE OK"):
+#   bash scratch/sqr/smoke_test.sh            # all = git + network + ipc + soak
+#   bash scratch/sqr/smoke_test.sh network [simTime] [seed]
+#   bash scratch/sqr/smoke_test.sh ipc     [simTime] [seed]
+#   bash scratch/sqr/smoke_test.sh soak    [simTime] [seeds...]
 #
-# Uso: bash scratch/sqr/smoke_test.sh [simTime=120] [seed=1]
+#   (a) network-only: sqr-sim sem agente (baseline) — KPM do contrato §4
+#       (sqr-kpms.txt, 13 colunas), chegadas/attach, tráfego ponta a ponta,
+#       telemetria prb_* e validação de janela parcial;
+#   (b) IPC com DUMMY CONTROLLER (sqr_dummy_controller.py): caminho completo
+#       KPM → semáforo → ação → aplicação runtime em fases determinísticas
+#       Σa = 0 / 0,5·C / C (λ de chegada elevado para garantir demanda);
+#   (c) validações R27 i–iv (contrato §3.3): prb_scheduled ≈ cota (±1 RBG/slot,
+#       util ≥ 99% com demanda); Σa=0,5·C ⇒ ~metade dos RBGs ociosa e
+#       Σ sched ≤ (0,5·C+L)·slots; nenhum dado em RBG ocioso; log de
+#       prb_requested/executed/scheduled/idle (CSV + linhas ACTION/PRB_WINDOW);
+#   (d) soak: 600 s simulados × 3 seeds sem crash (exit 0, sem NS_FATAL/ASSERT,
+#       ≥1 attach, ≥1 janela com prb_scheduled > 0);
+#   (e) R27-iv: git — scratch/rslaq intocado.
+#
 # Sempre invoca o ns-3 via ns3_gate.sh (Python 3.13; o wrapper ./ns3 quebra
 # com o Python 3.14 do sistema).
 # ---------------------------------------------------------------------------
 set -u
 
 NS3_ROOT="/home/eliothluy/Documentos/Jussi_SBRC/MODA/ns-3-dev"
+MODA_ROOT="/home/eliothluy/Documentos/Jussi_SBRC/MODA"
 SQR_DIR="${NS3_ROOT}/scratch/sqr"
 NS3_GATE="${SQR_DIR}/ns3_gate.sh"
 OUT_DIR="${SQR_DIR}/smoke_out"
-RUN_DIR="${OUT_DIR}/run_$(date +%Y%m%d_%H%M%S)_s${2:-1}"
+VALIDATE="${SQR_DIR}/sqr_smoke_validate.py"
+DUMMY="${SQR_DIR}/sqr_dummy_controller.py"
+PYTHON="${PYTHON:-python3}"
+command -v "${PYTHON}" >/dev/null 2>&1 \
+    || PYTHON="/home/eliothluy/.local/share/uv/python/cpython-3.13-linux-x86_64-gnu/bin/python3.13"
+KPM_FILE="${NS3_ROOT}/sqr-kpms.txt"   # contrato §4 (cwd do ns-3)
+ACTION_FILE="${NS3_ROOT}/rslaq_actions_for_ns3.csv"  # contrato §3 (cwd do ns-3)
+STAGE="${1:-all}"
 
-SIMTIME="${1:-120}"
-SEED="${2:-1}"
-
-mkdir -p "${RUN_DIR}"
-LOG="${RUN_DIR}/sqr-sim.log"
-KPM_FILE="${NS3_ROOT}/rslaq-kpms.txt"
+mkdir -p "${OUT_DIR}"
+STAMP="$(date +%Y%m%d_%H%M%S)"
 
 fail() {
     echo "SMOKE FAILED: $1" >&2
-    echo "Log: ${LOG}" >&2
     exit 1
 }
 
 [[ -x "${NS3_GATE}" ]] || fail "ns3_gate.sh não encontrado em ${NS3_GATE}"
+[[ -f "${VALIDATE}" ]] || fail "validador ausente: ${VALIDATE}"
+[[ -f "${DUMMY}" ]] || fail "dummy controller ausente: ${DUMMY}"
 
-echo "[smoke] Removendo KPMs de runs anteriores: ${KPM_FILE}"
-rm -f "${KPM_FILE}"
+check_no_crash() { # $1 = log
+    grep -qE "NS_FATAL|NS_ASSERT|Segmentation fault|std::terminate|Aborted" "$1" \
+        && fail "crash/assert no log $1"
+    return 0
+}
 
-echo "[smoke] Rodando sqr-sim network-only: simTime=${SIMTIME}s seed=${SEED} (ns3_gate.sh)"
-cd "${NS3_ROOT}" || fail "não foi possível entrar em ${NS3_ROOT}"
-bash "${NS3_GATE}" run sqr-sim -- \
-    --simTime="${SIMTIME}" \
-    --seed="${SEED}" \
-    --run=1 \
-    --periodMs=100 \
-    --outputDir="${RUN_DIR}" > "${LOG}" 2>&1
-RC=$?
-
-echo "[smoke] Exit code: ${RC}"
-if [[ ${RC} -ne 0 ]]; then
-    tail -40 "${LOG}" >&2
-    fail "ns-3 retornou código ${RC} (esperado 0)"
-fi
-
-# --- Check 1: KPM gerado com colunas novas no header ---
-if [[ ! -s "${KPM_FILE}" ]]; then
-    fail "arquivo de KPMs ausente/vazio: ${KPM_FILE}"
-fi
-HEADER="$(head -n1 "${KPM_FILE}")"
-for col in windowThroughputMbps snrDb queueBytes; do
-    if ! grep -q "${col}" <<< "${HEADER}"; then
-        fail "header do KPM não contém a coluna '${col}' (header: ${HEADER})"
+# ---------------------------------------------------------------------------
+# (e) R27-iv: scratch/rslaq intocado (git)
+# ---------------------------------------------------------------------------
+check_git_rslaq() {
+    local out
+    out="$(git -C "${MODA_ROOT}" status --porcelain -- ns-3-dev/scratch/rslaq 2>/dev/null || echo UNTRACKED)"
+    if [[ "${out}" == "UNTRACKED" ]]; then
+        echo "[smoke] WARN: não foi possível consultar o git do MODA (check R27-iv pulado)"
+        return 0
     fi
-done
-KPM_ROWS=$(( $(wc -l < "${KPM_FILE}") - 1 ))
-echo "[smoke] OK: KPM gerado, colunas novas no header, ${KPM_ROWS} linhas de dados"
+    if [[ -n "${out}" ]]; then
+        fail "scratch/rslaq foi MODIFICADO (regra de ouro AGENTS §5.2 / R27-iv):\n${out}"
+    fi
+    echo "[smoke] OK (R27-iv): scratch/rslaq intocado no git"
+}
 
-# --- Check 2: >= 1 chegada e >= 1 partida de UE no log ---
-ARRIVALS=$(grep -c "UE_ARRIVAL" "${LOG}" || true)
-DEPARTURES=$(grep -c "UE_DEPARTURE" "${LOG}" || true)
-if [[ ${ARRIVALS} -lt 1 ]]; then
-    fail "nenhuma chegada de UE (UE_ARRIVAL) no log"
-fi
-if [[ ${DEPARTURES} -lt 1 ]]; then
-    fail "nenhuma partida de UE (UE_DEPARTURE) no log"
-fi
-echo "[smoke] OK: ${ARRIVALS} chegada(s) e ${DEPARTURES} partida(s) de UE"
+# ---------------------------------------------------------------------------
+# (a) network-only
+# ---------------------------------------------------------------------------
+run_network() {
+    local SIMTIME="${1:-120}" SEED="${2:-1}"
+    local RUN_DIR="${OUT_DIR}/net_${STAMP}_s${SEED}"
+    mkdir -p "${RUN_DIR}"
+    local LOG="${RUN_DIR}/sqr-sim.log"
 
-# --- Check 3 (gate Fase 1): >= 1 attach real no rádio (UE_ATTACHED) ---
-ATTACHED=$(grep -c "UE_ATTACHED" "${LOG}" || true)
-if [[ ${ATTACHED} -lt 1 ]]; then
-    fail "nenhum attach no rádio (UE_ATTACHED) — RACH/RRC não completou ou o RNTI não foi registrado no mapeamento slice"
-fi
-echo "[smoke] OK: ${ATTACHED} attach(s) de UE (UE_ATTACHED)"
+    echo "[smoke][network] rodando: simTime=${SIMTIME}s seed=${SEED}"
+    rm -f "${KPM_FILE}"
+    ( cd "${NS3_ROOT}" && bash "${NS3_GATE}" run sqr-sim -- \
+        --simTime="${SIMTIME}" --seed="${SEED}" --run=1 --periodMs=100 \
+        --outputDir="${RUN_DIR}" ) > "${LOG}" 2>&1
+    local RC=$?
+    echo "[smoke][network] exit code: ${RC}"
+    if [[ ${RC} -ne 0 ]]; then
+        tail -40 "${LOG}" >&2
+        fail "network-only: ns-3 retornou ${RC} (esperado 0)"
+    fi
+    check_no_crash "${LOG}"
 
-# --- Check 4 (gate Fase 1): >= 1 janela PRB_WINDOW com prb_scheduled > 0 ---
-PRB_WINDOWS=$(grep -c "PRB_WINDOW" "${LOG}" || true)
-PRB_NONZERO=$(grep "PRB_WINDOW" "${LOG}" | grep -vc "prb_scheduled_rbg=\[0, 0, 0\]" || true)
-if [[ ${PRB_NONZERO} -lt 1 ]]; then
-    fail "nenhuma janela com prb_scheduled > 0 (${PRB_WINDOWS} janelas, todas zeradas — scheduler sem UEs mapeados ou sem demanda)"
-fi
-echo "[smoke] OK: ${PRB_NONZERO}/${PRB_WINDOWS} janelas com prb_scheduled > 0"
+    # KPM do contrato (nome novo + 13 colunas)
+    [[ -s "${KPM_FILE}" ]] || fail "arquivo de KPMs ausente/vazio: ${KPM_FILE}"
+    head -n1 "${KPM_FILE}" | grep -q "windowThroughputMbps,snrDb,queueBytes" \
+        || fail "header do KPM sem as colunas novas (esperado contrato §4)"
+    echo "[smoke][network] OK: sqr-kpms.txt com header do contrato §4"
 
-# --- Check 5 (gate Fase 1): >= 1 linha de KPM com throughput entregue > 0 ---
-KPM_HIST="${RUN_DIR}/results_sqr_network_only/seed=${SEED}_run=1/sqr_kpm_history.csv"
-if [[ ! -s "${KPM_HIST}" ]]; then
-    fail "histórico de KPMs ausente/vazio: ${KPM_HIST}"
-fi
-KPM_HIST_ROWS=$(( $(wc -l < "${KPM_HIST}") - 1 ))
-# windowThroughputMbps é a 11ª coluna do CSV
-KPM_THR_POS=$(awk -F, 'NR>1 && $11+0 > 0' "${KPM_HIST}" | wc -l)
-if [[ ${KPM_THR_POS} -lt 1 ]]; then
-    fail "nenhuma linha de KPM com windowThroughputMbps > 0 em ${KPM_HIST_ROWS} janelas — nenhum byte entregue ponta a ponta"
-fi
-echo "[smoke] OK: ${KPM_THR_POS}/${KPM_HIST_ROWS} linhas de KPM com throughput > 0"
+    for pat in UE_ARRIVAL UE_DEPARTURE UE_ATTACHED; do
+        local n; n=$(grep -c "${pat}" "${LOG}" || true)
+        [[ ${n} -ge 1 ]] || fail "nenhum ${pat} no log"
+        echo "[smoke][network] OK: ${n}x ${pat}"
+    done
 
-# --- Evidências para inspeção ---
-cp "${KPM_FILE}" "${RUN_DIR}/rslaq-kpms.txt"
-[[ -f "${RUN_DIR}/results_sqr_network_only/seed=${SEED}_run=1/sqr_prb_windows.csv" ]] && \
-    echo "[smoke] prb CSV: ${RUN_DIR}/results_sqr_network_only/seed=${SEED}_run=1/sqr_prb_windows.csv"
-echo "[smoke] kpm histórico: ${KPM_HIST}"
-echo "[smoke] Log completo: ${LOG}"
-echo "[smoke] KPM copiado:  ${RUN_DIR}/rslaq-kpms.txt"
+    local PRB_NONZERO
+    PRB_NONZERO=$(grep "PRB_WINDOW" "${LOG}" | grep -vc "prb_scheduled_rbg=\[0, 0, 0\]" || true)
+    [[ ${PRB_NONZERO} -ge 1 ]] || fail "nenhuma janela com prb_scheduled > 0"
+    echo "[smoke][network] OK: ${PRB_NONZERO} janelas com prb_scheduled > 0"
+
+    # Telemetria R27-iv no stdout: PRB_WINDOW com prb_idle e dl_slots
+    grep -q "PRB_WINDOW.*prb_idle_rbg=" "${LOG}" \
+        || fail "PRB_WINDOW sem prb_idle_rbg (log de ociosos ausente)"
+    echo "[smoke][network] OK: PRB_WINDOW loga prb_idle_rbg e dl_slots (R27-iv)"
+
+    local RES_DIR="${RUN_DIR}/results_sqr_network_only/seed=${SEED}_run=1"
+    local PRB_CSV="${RES_DIR}/sqr_prb_windows.csv"
+    local KPM_HIST="${RES_DIR}/sqr_kpm_history.csv"
+    [[ -s "${PRB_CSV}" ]] || fail "ausente: ${PRB_CSV}"
+    [[ -s "${KPM_HIST}" ]] || fail "ausente: ${KPM_HIST}"
+
+    ${PYTHON} "${VALIDATE}" prb "${PRB_CSV}" || fail "validação prb (network) falhou"
+    ${PYTHON} "${VALIDATE}" kpm "${KPM_HIST}" "${LOG}" --period-ms 100 || fail "validação kpm (network) falhou"
+    echo "[smoke][network] PASS — evidências em ${RUN_DIR}"
+}
+
+# ---------------------------------------------------------------------------
+# (b)+(c) IPC com dummy controller + validações R27 i–iv
+# ---------------------------------------------------------------------------
+run_ipc() {
+    local SIMTIME="${1:-30}" SEED="${2:-1}"
+    local RUN_DIR="${OUT_DIR}/ipc_${STAMP}_s${SEED}"
+    mkdir -p "${RUN_DIR}"
+    local LOG="${RUN_DIR}/sqr-sim.log"
+    local UUID="smoke${STAMP}_s${SEED}"
+
+    # λ=30 UEs/min (TESTE): garante UEs/demanda em todas as fases dentro de
+    # 30 s — não é o cenário do artigo (o soak usa os defaults fiéis).
+    local LAMBDA=30
+
+    echo "[smoke][ipc] rodando: simTime=${SIMTIME}s seed=${SEED} lambda=${LAMBDA}/min fases Σa=0/50%/100%"
+    rm -f "${KPM_FILE}" "${ACTION_FILE}"
+
+    ( cd "${NS3_ROOT}" \
+      && ${PYTHON} "${DUMMY}" --simId "${UUID}" --phases 0,50,100 \
+             --windows-per-phase 100 --timeout 120 \
+             --log "${RUN_DIR}/dummy_controller_log.csv" \
+      ) > "${RUN_DIR}/dummy.log" 2>&1 &
+    local DUMMY_PID=$!
+
+    # Espera o dummy criar os semáforos (pré-launch)
+    for _ in $(seq 1 50); do
+        grep -q "\[dummy\] ready" "${RUN_DIR}/dummy.log" 2>/dev/null && break
+        sleep 0.2
+    done
+    grep -q "\[dummy\] ready" "${RUN_DIR}/dummy.log" || fail "dummy controller não iniciou"
+
+    ( cd "${NS3_ROOT}" && bash "${NS3_GATE}" run sqr-sim -- \
+        --simTime="${SIMTIME}" --seed="${SEED}" --run=1 --periodMs=100 \
+        --lambdaUesPerMin=${LAMBDA} \
+        --outputDir="${RUN_DIR}" --simId="${UUID}" ) > "${LOG}" 2>&1
+    local RC=$?
+    echo "[smoke][ipc] exit code: ${RC}"
+    kill "${DUMMY_PID}" 2>/dev/null
+    wait "${DUMMY_PID}" 2>/dev/null
+
+    if [[ ${RC} -ne 0 ]]; then
+        tail -40 "${LOG}" >&2
+        tail -20 "${RUN_DIR}/dummy.log" >&2
+        fail "ipc: ns-3 retornou ${RC} (esperado 0)"
+    fi
+    check_no_crash "${LOG}"
+
+    # Caminho IPC completo: dummy respondeu, ação escrita, ACTION aplicado
+    local RESP; RESP=$(grep -c "action written" "${RUN_DIR}/dummy.log" || true)
+    [[ ${RESP} -ge 50 ]] || fail "dummy respondeu só ${RESP} janelas (<50) — IPC degenerado"
+    echo "[smoke][ipc] OK: dummy respondeu ${RESP} janelas (KPM→semáforo→ação)"
+
+    grep -q "prb_requested_pct" "${LOG}" || fail "nenhuma linha ACTION no log (ação não aplicada)"
+    grep -q "zero_quota_nothing_served" "${LOG}" \
+        || fail "nenhuma ACTION com zero_quota_nothing_served (fase Σa=0 não aplicada — R27 exige aplicar, não manter config anterior)"
+    grep -qE "PRB_WINDOW.*prb_idle_rbg=" "${LOG}" || fail "PRB_WINDOW sem prb_idle_rbg"
+    echo "[smoke][ipc] OK: ACTION com prb_requested/executed, zero_quota e PRB_WINDOW com prb_idle (R27-iv)"
+
+    local RES_DIR="${RUN_DIR}/results_sqr_network_only/seed=${SEED}_run=1"
+    local PRB_CSV="${RES_DIR}/sqr_prb_windows.csv"
+    local KPM_HIST="${RES_DIR}/sqr_kpm_history.csv"
+    [[ -s "${PRB_CSV}" ]] || fail "ausente: ${PRB_CSV}"
+    [[ -s "${KPM_HIST}" ]] || fail "ausente: ${KPM_HIST}"
+
+    ${PYTHON} "${VALIDATE}" prb "${PRB_CSV}" --ipc || fail "validações R27 (i-iii) falharam"
+    ${PYTHON} "${VALIDATE}" kpm "${KPM_HIST}" "${LOG}" --period-ms 100 || fail "validação kpm (ipc) falhou"
+    echo "[smoke][ipc] PASS — evidências em ${RUN_DIR}"
+}
+
+# ---------------------------------------------------------------------------
+# (d) soak: 600 s simulados × seeds, sem crash
+# ---------------------------------------------------------------------------
+run_soak() {
+    local SIMTIME="${1:-600}"
+    shift || true
+    local SEEDS=("$@")
+    [[ ${#SEEDS[@]} -eq 0 ]] && SEEDS=(1 2 3)
+    for SEED in "${SEEDS[@]}"; do
+        local RUN_DIR="${OUT_DIR}/soak_${STAMP}_s${SEED}"
+        mkdir -p "${RUN_DIR}"
+        local LOG="${RUN_DIR}/sqr-sim.log"
+        echo "[smoke][soak] rodando: simTime=${SIMTIME}s seed=${SEED}"
+        rm -f "${KPM_FILE}"
+        ( cd "${NS3_ROOT}" && bash "${NS3_GATE}" run sqr-sim -- \
+            --simTime="${SIMTIME}" --seed="${SEED}" --run=1 --periodMs=100 \
+            --outputDir="${RUN_DIR}" ) > "${LOG}" 2>&1
+        local RC=$?
+        echo "[smoke][soak] seed=${SEED} exit code: ${RC}"
+        if [[ ${RC} -ne 0 ]]; then
+            tail -40 "${LOG}" >&2
+            fail "soak seed=${SEED}: ns-3 retornou ${RC}"
+        fi
+        check_no_crash "${LOG}"
+        local ATT; ATT=$(grep -c "UE_ATTACHED" "${LOG}" || true)
+        [[ ${ATT} -ge 1 ]] || fail "soak seed=${SEED}: nenhum attach"
+        local PRB_NONZERO
+        PRB_NONZERO=$(grep "PRB_WINDOW" "${LOG}" | grep -vc "prb_scheduled_rbg=\[0, 0, 0\]" || true)
+        [[ ${PRB_NONZERO} -ge 1 ]] || fail "soak seed=${SEED}: nenhuma janela com prb_scheduled > 0"
+        local RES="${RUN_DIR}/results_sqr_network_only/seed=${SEED}_run=1/sqr_prb_windows.csv"
+        [[ -s "${RES}" ]] || fail "soak seed=${SEED}: ausente ${RES}"
+        echo "[smoke][soak] OK: seed=${SEED} sem crash, ${ATT} attach(s), ${PRB_NONZERO} janelas com agendamento"
+    done
+    echo "[smoke][soak] PASS: ${SIMTIME}s × ${#SEEDS[@]} seeds sem crash"
+}
+
+# ---------------------------------------------------------------------------
+# Orquestração
+# ---------------------------------------------------------------------------
+case "${STAGE}" in
+    network) check_git_rslaq; run_network "${2:-120}" "${3:-1}" ;;
+    ipc)     check_git_rslaq; run_ipc "${2:-30}" "${3:-1}" ;;
+    soak)    check_git_rslaq; run_soak "${2:-600}" "${3:-1}" "${4:-2}" "${5:-3}" ;;
+    all)     check_git_rslaq; run_network 120 1; run_ipc 30 1; run_soak 600 1 2 3 ;;
+    *) fail "modo inválido: ${STAGE} (use all|network|ipc|soak)" ;;
+esac
 
 echo "SMOKE OK"
 exit 0

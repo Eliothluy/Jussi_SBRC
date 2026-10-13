@@ -13,7 +13,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 import numpy as np
 
-from nsoran.sqr.coordinator import VirtualUpdate, project_prbs
+from nsoran.sqr.coordinator import (
+    DEFAULT_VIRTUAL_ALPHA,
+    VirtualUpdate,
+    apply_virtual_updates,
+    project_prbs,
+)
+from nsoran.sqr.sqr_controller import SqrSliceController
+from nsoran.sqr.kernel import MaternKernel
 
 
 # ── Feasible proposals pass through unchanged ───────────────────────
@@ -156,6 +163,81 @@ def test_updates_match_cut_mask_and_deficits():
             assert u.allocated == int(res.allocated[u.slice_id])
 
 
+# ── R12: virtual negative updates with the exact frozen weight ──────
+
+def _controllers(n=3, c=52):
+    return {
+        sid: SqrSliceController(
+            state_dim=2, n_prbs=c, sla_threshold=0.5,
+            kernel=MaternKernel(dim=3, length_scale=0.05, nu=1.5),
+        )
+        for sid in range(n)
+    }
+
+
+def test_default_virtual_alpha_is_frozen():
+    """Register R12 (congelado): eta_virt = 0.05 = eta/2; ablation
+    {0.025, 0.05, 0.1} goes through the same knob."""
+    assert DEFAULT_VIRTUAL_ALPHA == 0.05
+
+
+def test_apply_virtual_updates_inserts_exact_weight():
+    """Every cut slice gets ONE support vector at (z, a_pre-projection)
+    with alpha = -0.05 EXACTLY (not the pinball critical -0.19)."""
+    res = project_prbs([40, 40, 40], total_prbs=52)
+    ctls = _controllers()
+    zs = [np.array([0.1, 0.2]), np.array([0.3, 0.4]), np.array([0.5, 0.6])]
+    applied = apply_virtual_updates(res, zs, ctls, alpha=DEFAULT_VIRTUAL_ALPHA)
+
+    assert len(applied) == 3
+    for sid in range(3):
+        rec = applied[sid]
+        assert rec.alpha == -0.05          # the exact frozen weight
+        x = np.concatenate([zs[sid], [40.0 / 52.0]])
+        idx = rec.inserted_index
+        np.testing.assert_array_equal(
+            ctls[sid].regressor.support_points[idx], x
+        )
+        assert float(ctls[sid].regressor.alphas[idx]) == -0.05
+        # Sanity: the pinball critical rule would have produced -0.19.
+        assert abs(-0.05 - (0.1 * (0.05 - 1.0) * 2.0)) > 0.1
+
+
+def test_apply_virtual_updates_ablation_weights():
+    res = project_prbs([40, 40, 40], total_prbs=52)
+    for alpha in (0.025, 0.05, 0.1):
+        ctls = _controllers()
+        applied = apply_virtual_updates(res, [np.zeros(2)] * 3, ctls, alpha=alpha)
+        assert all(rec.alpha == -alpha for rec in applied)
+
+
+def test_apply_virtual_updates_zero_disables_mechanism():
+    res = project_prbs([40, 40, 40], total_prbs=52)
+    ctls = _controllers()
+    applied = apply_virtual_updates(res, [np.zeros(2)] * 3, ctls, alpha=0.0)
+    assert applied == []
+    assert all(c.regressor.n_support == 0 for c in ctls.values())
+
+
+def test_apply_virtual_updates_noop_when_feasible():
+    res = project_prbs([5, 5, 5], total_prbs=52)
+    ctls = _controllers()
+    applied = apply_virtual_updates(res, [np.zeros(2)] * 3, ctls)
+    assert applied == []
+    assert all(c.regressor.n_support == 0 for c in ctls.values())
+
+
+def test_apply_virtual_updates_negative_alpha_rejected():
+    res = project_prbs([40, 40, 40], total_prbs=52)
+    ctls = _controllers()
+    try:
+        apply_virtual_updates(res, [np.zeros(2)] * 3, ctls, alpha=-0.05)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("negative alpha must raise (sign is applied internally)")
+
+
 # ── Input validation ────────────────────────────────────────────────
 
 def test_fractional_proposals_rejected():
@@ -221,6 +303,12 @@ if __name__ == "__main__":
     test_no_virtual_update_for_uncut_slices()
     test_no_virtual_updates_when_feasible()
     test_updates_match_cut_mask_and_deficits()
+    test_default_virtual_alpha_is_frozen()
+    test_apply_virtual_updates_inserts_exact_weight()
+    test_apply_virtual_updates_ablation_weights()
+    test_apply_virtual_updates_zero_disables_mechanism()
+    test_apply_virtual_updates_noop_when_feasible()
+    test_apply_virtual_updates_negative_alpha_rejected()
     test_fractional_proposals_rejected()
     test_negative_proposals_rejected()
     test_empty_and_2d_proposals_rejected()

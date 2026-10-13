@@ -16,6 +16,12 @@
  * 3. GetTotalRbgCount()/GetTotalPrbCount() para a conversão percentual→RBG/PRB
  *    do controle SQR.
  * Nenhuma mudança na lógica de alocação/agendamento.
+ *
+ * Fase 1/R27 (12/10/2026): (a) sentinela de SNR -100.0 → -999.0 dB (contrato
+ * SQR §4 / register R09); (b) contador de janela m_windowDlSlots (slots DL com
+ * chamada de scheduling), resetado em SetSliceUeMapping/ResetWindowCounters e
+ * exposto por GetWindowDlSlots(); (c) SetSliceConfiguration virtual e seção
+ * private → protected para a subclasse SqrMacScheduler (cota absoluta).
  */
 
 #include "rslaq-mac-scheduler.h"
@@ -336,11 +342,18 @@ RslaqMacScheduler::SetSliceUeMapping(uint32_t numSlices,
     m_intraAlgorithms.resize(m_numSlices, IntraSliceAlgorithm::RR);
     m_sliceAllocationStats.assign(m_numSlices, SliceAllocationStats());
 
-    // SQR: (re)dimensiona contadores de janela; o mapeamento é reenviado a cada
-    // chegada/partida de UE dinâmico no cenário SQR, o que reinicia a janela —
-    // comportamento aceitável, pois o sqr-sim drena os contadores a cada período.
-    m_windowScheduledRbg.assign(m_numSlices, 0);
-    m_windowBudgetRbg.assign(m_numSlices, 0);
+    // SQR: (re)dimensiona contadores de janela SEM zerá-los. O comentário
+    // antigo ("o mapeamento reinicia a janela — comportamento aceitável")
+    // assumia remapeamento raro (UEs estáticos do rslaq). No cenário SQR o
+    // AttachCheck (loop de 5 ms) reenvia o mapeamento a cada attach, partida
+    // e troca de RNTI (reestabelecimento RLF) — com churn dinâmico isso zerava
+    // a janela CORRENTE INTEIRA (todas as slices), subestimando prb_scheduled
+    // /prb_budget/prb_idle do contrato §3.5 e quebrando a concordância
+    // prb_scheduled ≈ cota (critério R27). O ÚNICO reset legítimo continua
+    // sendo ResetWindowCounters(), na fronteira de janela (dreno do
+    // KpmAndControlCallback no sqr-sim).
+    m_windowScheduledRbg.resize(m_numSlices, 0);
+    m_windowBudgetRbg.resize(m_numSlices, 0);
 
     for (uint32_t s = 0; s < m_numSlices; s++)
     {
@@ -1049,10 +1062,10 @@ RslaqMacScheduler::AssignDLRBG(uint32_t symAvail, const ActiveUeMap& activeDl) c
             //  SINR = NrAmc::GetSinrFromSpectralEfficiency(SE), mapeamento
             //  TS 38.214). É o SINR que produziu o CQI reportado — não é uma
             //  medição instantânea por slot. CQI 0 (sem relatório válido)
-            //  vira o sentinel -100.0 dB.
+            //  vira o sentinela -999 dB (contrato SQR §4 / register R09).
             {
                 uint8_t wbCqi = ue.first->m_dlCqi.m_wbCqi;
-                double sinrDb = -100.0;
+                double sinrDb = -999.0;
                 if (wbCqi > 0 && GetDlAmc())
                 {
                     double se = GetDlAmc()->GetSpectralEfficiencyForCqi(wbCqi);
@@ -1576,6 +1589,13 @@ RslaqMacScheduler::ResetWindowCounters() const
 {
     std::fill(m_windowScheduledRbg.begin(), m_windowScheduledRbg.end(), 0);
     std::fill(m_windowBudgetRbg.begin(), m_windowBudgetRbg.end(), 0);
+    m_windowDlSlots = 0;
+}
+
+uint64_t
+RslaqMacScheduler::GetWindowDlSlots() const
+{
+    return m_windowDlSlots;
 }
 
 uint16_t
@@ -1594,7 +1614,8 @@ double
 RslaqMacScheduler::GetUeDlSinrDb(uint16_t rnti) const
 {
     auto it = m_lastDlSinrDb.find(rnti);
-    return (it != m_lastDlSinrDb.end()) ? it->second : -100.0;
+    // Sentinela do contrato SQR §4 / register R09: -999 = "nunca houve CQI".
+    return (it != m_lastDlSinrDb.end()) ? it->second : -999.0;
 }
 
 } // namespace ns3

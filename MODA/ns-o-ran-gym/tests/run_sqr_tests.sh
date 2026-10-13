@@ -40,11 +40,16 @@ echo "[run_sqr_tests] interpretador: ${PYTHON}"
 }
 
 # ---------------------------------------------------------------------
-# Gate: somente os testes sintéticos do SQR
+# Gate: somente os testes sintéticos do SQR (+ baseline KBRL, Fase 3)
 # ---------------------------------------------------------------------
 exec "${PYTHON}" -m pytest \
     tests/test_sqr_kernel.py \
     tests/test_sqr_quantile.py \
     tests/test_sqr_controller.py \
     tests/test_sqr_coordinator.py \
+    tests/test_sqr_kpms.py \
+    tests/test_sqr_env.py \
+    tests/test_sqr_checkpoint.py \
+    tests/test_sqr_run.py \
+    tests/test_sqr_kbrl.py \
     "$@"

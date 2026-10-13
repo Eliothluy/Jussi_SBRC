@@ -10,8 +10,8 @@ proposta original" — PLANO_IMPLEMENTACAO_SQR_NORI.md §2.1].
 
 Algorithm (deterministic largest-remainder, exact integer arithmetic):
   1. If sum(proposals) <= C, the proposals are feasible: pass through
-     unchanged (the cell may under-use resources; ns-3 renormalizes the
-     weights anyway).
+     unchanged (the cell may under-use resources; idle RBGs stay idle —
+     absolute-quote semantics, register R27).
   2. Otherwise, with s = C / sum(p): base_i = floor(p_i * C / total) using
      integer division (no float error), then distribute the
      R = C - sum(base) remaining units one at a time to the slices with the
@@ -21,9 +21,18 @@ Algorithm (deterministic largest-remainder, exact integer arithmetic):
 
 The rule uses no random numbers, so the output depends only on the inputs.
 The virtual-update signal carries (slice, proposed, allocated, deficit);
-the training loop applies it to the slice's regressor as a punitive
-observation (weight of the virtual update is an ablation knob [ASSUMIDO],
-PLANO §3-Fase 2).
+:func:`apply_virtual_updates` turns each signal into ONE support vector at
+(z, a_pre-projection) with alpha = -alpha_virtual in the slice's regressor
+(register R12). The frozen default weight is eta_virt = 0.05 = eta/2
+(ablation {0.025, 0.05, 0.1}; 0 disables the mechanism).
+
+**C is dynamic (register R01 as amended):** ``total_prbs`` is a parameter,
+never a module constant — the env reads the effective cell capacity from
+the ns-3 telemetry (``sqr_prb_windows.csv:total_prb``, 53 on the primary
+scenario) and passes it here at every decision.  The projection is also
+what makes a mid-run C transition safe: proposals carried over in the old
+capacity's scale (<= old C) remain feasible under a larger C and are cut
+by Pi under a smaller one, always honoring Σ <= C.
 
 Dependencies: NumPy only (no torch).
 """
@@ -31,8 +40,13 @@ Dependencies: NumPy only (no torch).
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Sequence
 
 import numpy as np
+
+#: Register R12: virtual negative-update weight eta_virt [ASSUMIDO, ablation
+#: {0.025, 0.05, 0.1}]; the sign is applied by the controller (-eta_virt).
+DEFAULT_VIRTUAL_ALPHA = 0.05
 
 
 @dataclass(frozen=True)
@@ -150,3 +164,49 @@ def project_prbs(proposals, total_prbs: int) -> ProjectionResult:
         if cut[i]
     )
     return ProjectionResult(alloc, p.copy(), c, cut, updates)
+
+
+def apply_virtual_updates(
+    result: ProjectionResult,
+    z_by_slice: Sequence,
+    controllers: Sequence,
+    alpha: float = DEFAULT_VIRTUAL_ALPHA,
+) -> list:
+    """Apply the R12 virtual negative update for every cut slice.
+
+    For each :class:`VirtualUpdate` in ``result``, inserts ONE support
+    vector at (z_i, a_proposed_i) with alpha = -alpha in the regressor of
+    the cut slice via ``controllers[i].insert_virtual_support`` (exact
+    weight; NOT a pinball observation — the only path that produces it).
+
+    Parameters
+    ----------
+    result:
+        Output of :func:`project_prbs` for the current decision.
+    z_by_slice:
+        Per-slice local states (index = slice id), as used for the decisions.
+    controllers:
+        Per-slice controllers (index = slice id).
+    alpha:
+        Positive magnitude eta_virt (frozen default 0.05 = eta/2; ablation
+        {0.025, 0.05, 0.1}). ``alpha == 0`` disables the mechanism (ablation
+        baseline) and returns an empty list without touching the regressors.
+
+    Returns
+    -------
+    list[nsoran.sqr.quantile_regressor.SupportInsertion]
+        One record per applied virtual update, in ``virtual_updates`` order.
+    """
+    alpha = float(alpha)
+    if alpha < 0.0:
+        raise ValueError(f"alpha must be non-negative, got {alpha}")
+    if alpha == 0.0:
+        return []
+    applied = []
+    for u in result.virtual_updates:
+        applied.append(
+            controllers[u.slice_id].insert_virtual_support(
+                z_by_slice[u.slice_id], u.proposed, alpha
+            )
+        )
+    return applied

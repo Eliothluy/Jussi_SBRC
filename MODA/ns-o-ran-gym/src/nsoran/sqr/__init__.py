@@ -15,7 +15,14 @@ Modules
                            tau/M adaptation heuristic.
 - ``coordinator``        : deterministic integer proportional projection of the
                            per-slice PRB proposals onto sum(a) <= C, with the
-                           virtual-update signal for cut slices.
+                           virtual-update signal (exact weight, register R12)
+                           for cut slices.
+- ``sqr_kpis``           : KPM wrapper for sqr-kpms.txt (sentinel-aware SNR
+                           imputation, register R09; per-slice lowest/p5/UE
+                           count derivations).
+- ``sqr_env``            : Gymnasium environment over the IPC contract
+                           (obs per slice + globals; integer-PRB actions).
+- ``checkpoint``         : file round-trip helpers for controller state.
 
 Traceability convention (GUIA_IMPLEMENTACAO_SQR_O_RAN_PYTHON_NS3.md):
 values tagged ``[ARTIGO]`` appear in the paper (section cited); values tagged
@@ -33,14 +40,17 @@ from nsoran.sqr.kernel import MaternKernel
 from nsoran.sqr.quantile_regressor import (
     KernelQuantileRegressor,
     QuantileUpdate,
+    SupportInsertion,
 )
 from nsoran.sqr.sqr_controller import (
     SqrDecision,
     SqrSliceController,
 )
 from nsoran.sqr.coordinator import (
+    DEFAULT_VIRTUAL_ALPHA,
     ProjectionResult,
     VirtualUpdate,
+    apply_virtual_updates,
     project_prbs,
 )
 
@@ -48,9 +58,12 @@ __all__ = [
     "MaternKernel",
     "KernelQuantileRegressor",
     "QuantileUpdate",
+    "SupportInsertion",
     "SqrDecision",
     "SqrSliceController",
+    "DEFAULT_VIRTUAL_ALPHA",
     "ProjectionResult",
     "VirtualUpdate",
+    "apply_virtual_updates",
     "project_prbs",
 ]

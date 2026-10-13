@@ -1,9 +1,10 @@
 # Contrato de Interface ns-3 ↔ Python — Cenário SQR (Fase 0, CONGELADO)
 
-> **Versão:** 1.1 (congelamento revisado) — 11/10/2026 · **Responsáveis:** Agente B (redator) + Agente A (validador C++ — aceite da Fase 0, `PLANO_IMPLEMENTACAO_SQR_NORI.md` §3-Fase 0).
+> **Versão:** 1.2 (consolidação Fase 1) — 13/10/2026 · **Responsáveis:** Agente B (redator) + Agente A (validador C++ — aceite da Fase 0, `PLANO_IMPLEMENTACAO_SQR_NORI.md` §3-Fase 0).
 > **Base:** `AGENTS.md` §4 (formatos vigentes, L97–107) — este documento **congela** o contrato vigente e suas **extensões** para o cenário SQR. Nada aqui modifica `scratch/rslaq` nem o core do ns-o-ran-gym; o cenário novo (`scratch/sqr/sqr-sim.cc`) e o scheduler novo (`scratch/sqr/`, ver §3.3) clonam/estendem o mecanismo.
 > **Mudanças pós-congelamento** exigem aprovação do orquestrador e bump de versão deste arquivo (AGENTS §7.1).
 > **v1.1:** correção crítica da semântica de execução da cota (§3.3) — o caminho vigente renormaliza e tornaria a economia de RBs do artigo inobservável; tratamento de missing do SNR congelado (§4); referências cruzadas ao register R24–R27.
+> **v1.2 (13/10/2026, emendas RATIFICADAS pelo orquestrador — register v1.3):** §3.2 — C = **C EFETIVO alinhado a RBG lido da telemetria** (`total_prb`; 53 @ 10 MHz μ=0, 104 @ 20 MHz — R01); §4 — `windowThroughputMbps` = delta ÷ **tempo ATIVO na janela** (não período cheio); alinhamento de janela do log de ações (`prb_requested/prb_executed` descrevem a janela drenada — implementação `sqr-sim.cc`, dreno antes da espera IPC) e degradação §5 com contadores exportados no fim do run (slice sem linha ⇒ 33,33 %/slice com warning; CSV ausente ⇒ mantém cota anterior).
 
 ---
 
@@ -62,7 +63,7 @@ timestamp,sliceId,dedicatedPRB,minPRB,maxPRB[,algorithm]
 
 1. O agente SQR decide inteiros **a_i ∈ {0,…,C}**, com **Σ_i a_i ≤ C** garantido **no Python**, ANTES de escrever o CSV (projeção proporcional inteira Π — forma exata congelada no **register R24**: piso + maiores restos fracionários, desempate por índice de slice).
 2. Conversão por linha de slice: **`dedicatedPRB_i = 100 · a_i / C`** (float, 0–100).
-   - Com C=52 (R01): `dedicatedPRB_i = 100·a_i/52`; com C=106: `100·a_i/106`. O CSV continua agnóstico a C.
+   - **C é o C EFETIVO alinhado a RBG, lido da telemetria** (emenda v1.2, RATIFICADA 13/10/2026 — register R01): `total_prb` do `sqr_prb_windows.csv` (= `totalRbg × PRBs/RBG`); **53 @ 10 MHz μ=0** (medido no smoke de 12/10/2026) e **104 @ 20 MHz** na variante. O Python NÃO deve hardcodar C: lê `total_prb` da telemetria. O CSV continua agnóstico a C.
 
 ### 3.3 Semântica de execução da cota no MAC (NOVO em v1.1 — apontamento crítico do revisor; register R27)
 
@@ -96,7 +97,7 @@ timestamp,ueImsi,sliceId,dTxBytes,dRxBytes,plr,resourceSharePct,dLostPackets,thr
 
 | Col. | Nome | Unidade | Definição congelada |
 |---|---|---|---|
-| 11 | `windowThroughputMbps` | Mbps | Throughput do UE **na janela de 100 ms**: `dRxBytes_da_janela × 8 / 0,1 s / 10^6` (equivalente a `throughputMbps` correto para o período de 100 ms; a coluna 10 mantém a semântica legada para compatibilidade de ferramentas) |
+| 11 | `windowThroughputMbps` | Mbps | Throughput do UE **na janela**: `dRxBytes_da_janela × 8 / tempo_ativo_na_janela / 10^6` (**emenda v1.2, RATIFICADA 13/10/2026** — o denominador é o tempo ATIVO do UE na janela, não o período cheio: janela parcial = desde a entrada (`trafficStart`) ou até a saída do UE; janela cheia = período de 100 ms; implementado no `sqr-sim`). A coluna 10 (`throughputMbps`) mantém a semântica legada (delta ÷ período cheio) por compatibilidade de ferramentas |
 | 12 | `snrDb` | dB | Último SNR wideband (do PHY/gNB) do UE na janela; se indisponível no fim da janela, o mais recente conhecido. **Sentinela de fio: `-999`** quando não há valor algum. **Tratamento do missing congelado (register R09):** o Python NUNCA alimenta o estado com o sentinela — imputação determinística: último `snrDb` válido do UE; se nenhum, mediana da célula na janela anterior; se nenhum, **15 dB** (centro da escala). O valor imputado entra em `snr_norm = clip(snr/30, 0, 1)` e cada imputação é logada (taxa por janela). (Correção v1.1: clip(−999/30,0,1)=0 seria indistinguível de SNR real de 0 dB.) |
 | 13 | `queueBytes` | bytes | Backlog total do UE (buffers RLC UM + PDCP/SDU pendentes) amostrado ao **fim** da janela |
 
@@ -125,4 +126,4 @@ timestamp,ueImsi,sliceId,dTxBytes,dRxBytes,plr,resourceSharePct,dLostPackets,thr
 C (R01), banda (R02), numerologia/duplex (R03), período 100 ms (§2), SLAs por UE 0,5/1,0/1,5 Mbps `[ARTIGO, Tabela I]`, δ=1% `[ARTIGO, Seção III-C]`, semântica da cota no MAC (R27), forma de Π (R24), tratamento de missing de SNR (R09) — valores em `assumptions_register.md`; fontes publicadas em `source_traceability.md`.
 
 ---
-*Histórico: v1.0 (11/10/2026, Agente B) — congelamento na Fase 0; formatos-base copiados verbatim de AGENTS.md §4 (L97–103); extensões conforme AGENTS.md §4 (L105–107) e PLANO §3-Fase 0 item 3. **v1.1 (11/10/2026, Agente B)** — apontamentos do revisor: (CRÍTICO) nova §3.3 com semântica de cota ABSOLUTA e scheduler novo em `scratch/sqr/`, com as renormalizações do caminho vigente documentadas por arquivo:linha e critérios de validação + fallback ao orquestrador (register R27); (BAIXO-MÉDIO) sentinela −999 + imputação determinística de SNR congelados em §4 (register R09); (MÉDIO) referências a R24 (Π), R25 (γ=0), R26 (agregação), R22 (atualização real com a_final).*
+*Histórico: v1.0 (11/10/2026, Agente B) — congelamento na Fase 0; formatos-base copiados verbatim de AGENTS.md §4 (L97–103); extensões conforme AGENTS.md §4 (L105–107) e PLANO §3-Fase 0 item 3. **v1.1 (11/10/2026, Agente B)** — apontamentos do revisor: (CRÍTICO) nova §3.3 com semântica de cota ABSOLUTA e scheduler novo em `scratch/sqr/`, com as renormalizações do caminho vigente documentadas por arquivo:linha e critérios de validação + fallback ao orquestrador (register R27); (BAIXO-MÉDIO) sentinela −999 + imputação determinística de SNR congelados em §4 (register R09); (MÉDIO) referências a R24 (Π), R25 (γ=0), R26 (agregação), R22 (atualização real com a_final). **v1.2 (13/10/2026, Agente A — consolidação da Fase 1, emendas RATIFICADAS pelo orquestrador):** §3.2 C efetivo por telemetria (R01: 53/104); §4 `windowThroughputMbps` por tempo ativo; nota de implementação sobre alinhamento de janela (dreno ANTES da espera IPC no `KpmAndControlCallback`) e degradação §5 contável (33,33 %/slice p/ linha ausente; mantém cota p/ CSV ausente) com contadores `IPC_DEGRADATION` no log de fim de run.*

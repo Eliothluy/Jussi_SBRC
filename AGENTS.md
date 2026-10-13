@@ -37,7 +37,7 @@ Violations via Model-Based Reinforcement Learning.pdf` | Artigo original (**aten
 └── MODA/                                      ← repo git próprio (commit único 3d18f43)
     ├── ns-3-dev/                              ← ns-3.46-dev + 5G-LENA v5.2-dev — JÁ COMPILADO
     │   ├── contrib/nr/                        ← 5G-LENA v5.2-dev (RELEASE_NOTES: "NR-v5.2 under development")
-    │   │   └── ⚠️ contém 3 PATCHES DEFENSIVOS locais (ver §3.1)
+    │   │   └── ⚠️ contém 4 PATCHES DEFENSIVOS locais (ver §3.1)
     │   ├── scratch/rslaq/                     ← cenário + scheduler slice-aware atuais (NÃO MODIFICAR)
     │   │   ├── rslaq-sim.cc                   ← cenário RSLAQ (3,55 GHz, UEs estáticos, eMBB/URLLC/MTC, 10 ms)
     │   │   └── rslaq-mac-scheduler.{h,cc}     ← RslaqMacScheduler (partição de RBGs por slice, runtime)
@@ -58,7 +58,7 @@ Violations via Model-Based Reinforcement Learning.pdf` | Artigo original (**aten
 ### 3.1 Estado do ns-3-dev (auditoria 11/10/2026)
 
 - **Versão**: ns-3.46-dev (`VERSION`); árvore oficial `nsnam/ns-3-dev` copiada (sem `.git` próprio) dentro do repo MODA.
-- **5G-LENA**: v5.2-dev em `contrib/nr`; **não rastreado pelo git** e recebeu **3 patches defensivos** (`nr-pdcp.cc`, `nr-rlc-um.cc`, `nr-net-device.cc` — convertem `NS_ASSERT` em warn/drop para perdas pesadas de RLC-UM não abortarem a simulação; backups em `MODA/docs/patches_nr/`). **Nunca reverter/Atualizar contrib/nr sem preservar esses patches.**
+- **5G-LENA**: v5.2-dev em `contrib/nr`; rastreado apenas pelo repo **Jussi_SBRC** (fork local — o repo `Eliothluy/MODA` permanece intocado) e recebeu **4 patches defensivos**: `nr-pdcp.cc`, `nr-rlc-um.cc`, `nr-net-device.cc` (convertem `NS_ASSERT` em warn/drop para perdas pesadas de RLC-UM não abortarem a simulação) e `nr-qos-rule-classifier.cc` (dedup de regras QoS idênticas reenviadas pelo MME a cada reestabelecimento RLF — sem ele, runs longos crasham no assert ≤64; autorizado pelo orquestrador em 12/10/2026). Backups em `MODA/docs/patches_nr/`. **Nunca reverter/atualizar contrib/nr sem preservar esses patches.**
 - **Build íntegro**: `build/lib/` completo (incl. `libns3.46-nr-default.so`); executáveis `ns3.46-rslaq-sim-default` e `ns3.46-GreenRan-slice-default` prontos.
 - **⚠️ Atenção Python (descoberto 11/10/2026)**: o wrapper `./ns3` **quebra com o Python 3.14 do sistema** (`argparse` do 3.14 rejeita `store_true` em argumento posicional — ValueError no `parse_args`). Sempre invoque o ns-3 via `bash MODA/ns-3-dev/scratch/sqr/ns3_gate.sh <args>` (wrapper que usa o **Python 3.13 do uv** em `~/.local/share/uv/python/cpython-3.13-*/bin/python3.13`; também há 3.11 disponível). Interpreters uv são a alternativa quando o 3.14 do sistema causar problemas.
 - **Sem** módulo opengym (`contrib/` só tem `nr`) — os schedulers RL `nr-mac-scheduler-*-ai` do 5G-LENA existem no código mas ficam descompilados sem `contrib/opengym`. **Sem** ZMQ, **sem** E2/RIC (hoje).
@@ -108,7 +108,7 @@ Python (ns-o-ran-gym, RslaqEnv.step)
 
 ## 5. Regras de ouro (obrigatórias para todo agente)
 
-1. **Não modificar `contrib/nr`** (patches defensivos lá dentro, fora do git). Exceção única: adicionar `contrib/nori` novo na Fase 5 (não sobrescreve nada).
+1. **Não modificar `contrib/nr`** (patches defensivos lá dentro; hoje rastreado pelo fork Jussi_SBRC). Exceções: adicionar `contrib/nori` novo na Fase 5 (não sobrescreve nada) e **novos patches defensivos** — somente com autorização explícita do orquestrador, backup em `MODA/docs/patches_nr/` e registro da divergência em `MODA/docs/sqr/` (precedente: 4º patch `nr-qos-rule-classifier.cc`, 12/10/2026).
 2. **Código novo isolado**: C++ em `MODA/ns-3-dev/scratch/sqr/`; Python em `MODA/ns-o-ran-gym/src/nsoran/sqr/` + `examples/sqr_*.py`. **Não alterar** `scratch/rslaq`, `scratch/our_paper` nem o core do ns-o-ran-gym (`rslaq_env`, `rslaq_reward`, `rslaq_kpis`, `action_controller`) sem registrar o motivo.
 3. **Rastreabilidade de premissas** (regra do GUIA): todo valor não publicado pelo artigo entra em `MODA/docs/sqr/assumptions_register.md` marcado `[ASSUMIDO]` com justificativa; `[ARTIGO]` exige citação de seção/tabela. **Nunca apresentar valor assumido como publicado.**
 4. **`NS3_DIR`**: `run_all_scenarios.sh` aponta para caminho antigo (`/home/eliothluy/Documentos/artigo_jussi/ns-3-dev`) — sempre sobrescrever: `NS3_DIR=/home/eliothluy/Documentos/Jussi_SBRC/MODA/ns-3-dev`.
