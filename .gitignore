@@ -4,11 +4,25 @@
 # Backup do git original do fork MODA (repo Eliothluy/MODA intocado)
 moda-git-backup/
 
-# Clone de referência third-party (re-clonável; ver third_party/README.md)
+# Clones de referência third-party (re-clonáveis)
 MODA/ns-o-ran-gym/third_party/network-slicing/
+
+# Fase 5 (NORI/E2): clones re-clonáveis + artefatos de build do e2sim
+MODA/third_party/nori/
+MODA/third_party/e2sim/
+MODA/third_party/e2sim/*.deb
 
 # Dados brutos da campanha (grandes; figuras/tabelas agregadas são versionadas)
 results/sqr_campaign/sqr-g*/
 results/sqr_campaign/kbrl/
 results/sqr_campaign/equal/
 results/sqr_campaign/*.log
+
+# Artefatos de execução na raiz do ns-3-dev (KPMs, ações, traces de PHY/MAC)
+MODA/ns-3-dev/rslaq-kpms.txt
+MODA/ns-3-dev/sqr-kpms.txt
+MODA/ns-3-dev/rslaq_actions_for_ns3.csv
+MODA/ns-3-dev/RslaqActions.txt
+MODA/ns-3-dev/Dl*.txt
+MODA/ns-3-dev/Ul*.txt
+MODA/ns-3-dev/Nr*.txt

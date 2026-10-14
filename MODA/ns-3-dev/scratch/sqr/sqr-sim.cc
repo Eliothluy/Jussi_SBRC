@@ -59,15 +59,32 @@
  *     SqrMacScheduler::ComputeRbgQuotas) e o scheduler serve cada slice ATÉ
  *     sua cota; RBGs excedentes ficam OCIOSOS (sem redistribuição); Σa=0 ⇒
  *     nada servido (com log — nunca manter a configuração anterior).
+ *  8. CAMINHO DE CONTROLE (Fase 5.3) --controlPath={ipc,e2}, default ipc:
+ *     - ipc (fallback permanente): idêntico ao rslaq — semáforos POSIX
+ *       /sem_metrics_<uuid>/sem_control_<uuid> + rslaq_actions_for_ns3.csv;
+ *     - e2: as cotas chegam como RIC Control do contrib/nori (estilo RAN
+ *       slicing do E2SM-RC/equivalente CCC) e os KPMs saem como E2SM-KPM
+ *       indications pela E2-interface — SEM semáforos nem CSV de ação. A
+ *       aplicação da cota é a MESMA função do caminho IPC (ApplyQuotaAction,
+ *       R27). No build DEGRADED (e2sim ausente, MODA-PORT.md §1) um loopback
+ *       em-processo (SqrE2LoopbackTerm, "E2Term simulado no próprio cenário",
+ *       mesmas mensagens estruturadas da API nori) devolve as ações com o
+ *       controlador dummy equal-split (equivalente ao sqr_dummy_controller.py
+ *       — fases Σa=0/0,5C/C); o caminho de código do adaptador é idêntico ao
+ *       FULL (ver sqr-e2-adapter.h). O simId é ignorado no modo e2.
  *
  * Topologia: remoteHost -- P2P 100 Gbps -- PGW/EPC -- gNB NR -- UEs NR (dinâmicos)
  * Modos de execução:
  * - network-only (default, sem --simId): KPMs + telemetria de PRB gerados sem
  *   agente Python (padrão baseline do run_all_scenarios.sh).
- * - IPC com Python (--simId=<uuid>): idêntico ao rslaq — semáforos
- *   /sem_metrics_<uuid> e /sem_control_<uuid> + rslaq_actions_for_ns3.csv.
+ * - IPC com Python (--simId=<uuid>, --controlPath=ipc): idêntico ao rslaq —
+ *   semáforos /sem_metrics_<uuid> e /sem_control_<uuid> +
+ *   rslaq_actions_for_ns3.csv.
+ * - E2 com loopback (--controlPath=e2): RIC Control + E2SM-KPM indications
+ *   via contrib/nori, controlador dummy in-process (Fase 5.3).
  */
 
+#include "sqr-e2-adapter.h"
 #include "sqr-mac-scheduler.h"
 
 #include "ns3/antenna-module.h"
@@ -139,6 +156,41 @@ static std::map<uint16_t, SliceType> g_ueToSlice;
 static std::map<uint16_t, uint16_t> g_ueIdToRnti;
 static uint32_t g_indicationPeriodMs = 100; // SQR: default 100 ms (artigo: 100 TTIs)
 static bool g_ipcEnabled = false;
+
+// ---------------------------------------------------------------------------
+// Caminho de controle (Fase 5.3): --controlPath={ipc,e2}
+// ---------------------------------------------------------------------------
+
+enum class ControlPath : uint8_t
+{
+    IPC = 0, //!< semáforos POSIX + rslaq_actions_for_ns3.csv (fallback permanente)
+    E2 = 1   //!< RIC Control (contrib/nori) + E2SM-KPM indications — Fase 5.3
+};
+static ControlPath g_controlPath = ControlPath::IPC;
+static Ptr<SqrE2Adapter> g_e2Adapter;         //!< adaptador RIC Control → cota
+static Ptr<SqrE2LoopbackTerm> g_e2Loopback;   //!< E2Term/RIC simulado (DEGRADED)
+static std::vector<long> g_e2Phases = {0, 50, 100}; //!< fases do dummy equal-split
+static uint32_t g_e2WindowsPerPhase = 100;
+static std::string g_e2RicAddress = "127.0.0.1"; // A10 (MODA-PORT.md)
+static uint16_t g_e2RicPort = 36422;
+// Fase 5.4: endpoint do caminho E2 — loopback (dummy Fase 5.3, default) ou
+// ponte UDP local para o xApp SQR em Python (examples/xapp_sqr.py). No modo
+// xapp o E2Term simulado não decide: transporta indication → xApp e RIC
+// Control ← xApp (DEGRADED; em FULL o transporte é o e2sim/SCTP).
+static bool g_e2EndpointXapp = false;
+static uint16_t g_e2XappPort = 5560;
+static int g_e2XappTimeoutMs = 50;  //!< budget wall do contrato §5 (= IPC)
+static int g_e2XappRetries = 1;     //!< reenvios do mesmo seq (xApp deduplica)
+static uint64_t g_e2XappTimeoutCount = 0; //!< degradações §5 da ponte (relatório)
+// Algoritmos intra-slice correntes: o RIC Control (estilo RAN slicing) não
+// carrega algoritmo — o algoritmo está FORA do espaço de ação SQR (PLANO
+// Fase 1); no modo e2 ele permanece no valor inicial (--intraAlgo, default PF).
+static std::vector<RslaqMacScheduler::IntraSliceAlgorithm> g_currentSliceAlgos;
+// Contadores E2 (relatório final, análogos aos de degradação §5 do IPC):
+static uint64_t g_e2IndicationsSent = 0;
+static uint64_t g_e2ControlsApplied = 0;
+static uint64_t g_e2ControlsIgnored = 0;
+static uint64_t g_e2SliceLineMissingCount = 0;
 
 // ---------------------------------------------------------------------------
 // Estado dos UEs dinâmicos
@@ -770,9 +822,90 @@ AttachCheck()
 }
 
 // ---------------------------------------------------------------------------
-// Callback IPC: KPMs estendidos + ação do agente (adaptado de rslaq-sim.cc;
-// mecanismo de semáforos/CSV preservado verbatim)
+// Callback de controle: KPMs estendidos + ação do agente (adaptado de
+// rslaq-sim.cc; mecanismo de semáforos/CSV do IPC preservado verbatim;
+// Fase 5.3 acrescenta o caminho E2 com a MESMA aplicação de cota)
 // ---------------------------------------------------------------------------
+
+/**
+ * @brief Aplicação ÚNICA da ação do agente (R27) — usada pelos DOIS caminhos
+ * de controle (IPC e E2): % de PRB → cota absoluta de RBGs via
+ * SqrMacScheduler::ComputeRbgQuotas (piso + maiores restos, SEM
+ * renormalização) → SetSliceQuotaRbg + telemetria prb_requested/prb_executed
+ * + log ACTION (com zero_quota_nothing_served quando Σa=0 — a ação é SEMPRE
+ * aplicada, inclusive cota zero).
+ *
+ * @param pct      % de PRB por slice (0–100); degradações §5 (linha ausente)
+ *                 já resolvidas pelo chamador (default 33,33 + contador)
+ * @param algos    algoritmos intra-slice (IPC: col. 5 do CSV; E2: correntes)
+ * @param nowMs    borda de janela da ação (governa a janela SEGUINTE)
+ * @param source   "ipc" | "e2" (marca do log ACTION)
+ */
+static void
+ApplyQuotaAction(const std::array<double, NUM_SLICES>& pct,
+                 const std::vector<RslaqMacScheduler::IntraSliceAlgorithm>& algos,
+                 uint64_t nowMs,
+                 const char* source)
+{
+    if (!g_schedulerPtr)
+    {
+        return;
+    }
+
+    // ==========================================================
+    // SQR-R27 (RATIFICADO 12/10/2026): COTA ABSOLUTA — NADA de
+    // renormalização. O caminho antigo dividia por totalDed e
+    // renormalizava para soma 1 (o scheduler re-expansibia Σa < C
+    // para partição completa, anulando γ·a/C e a Fig. 4). Agora:
+    // (1) % de PRB → cota inteira de RBGs com a regra determinís-
+    //     tica SqrMacScheduler::ComputeRbgQuotas (piso + maiores
+    //     restos, desempate por índice de slice; Σ quotas ≤
+    //     totalRbg garantido; SEM renormalização);
+    // (2) a cota é aplicada SEMPRE — inclusive Σa = 0 (nada
+    //     servido, com log; NUNCA manter a configuração anterior
+    //     silenciosamente, como o código antigo fazia ao descartar
+    //     totalDed ≤ 0). Timeout do semáforo continua mantendo a
+    //     config anterior (contrato §5 — degradação congelada).
+    // ==========================================================
+    const uint16_t totalRbg = g_schedulerPtr->GetTotalRbgCount();
+    const std::vector<double> pctVec(pct.begin(), pct.end());
+    const std::vector<uint32_t> quotaRbg =
+        SqrMacScheduler::ComputeRbgQuotas(pctVec, totalRbg, NUM_SLICES);
+    g_schedulerPtr->SetSliceQuotaRbg(quotaRbg, algos);
+
+    // --- Telemetria SQR: prb_requested / prb_executed ---
+    // prb_requested = ação aplicada (% por slice); prb_executed = COTA
+    // EFETIVA em RBGs entregue ao scheduler (pós-conversão determinística
+    // %→RBG). Ficam em g_last* e são consumidos pelo dreno da janela que
+    // esta ação governa (próxima borda — ver comentário do dreno).
+    double pctSum = 0.0;
+    for (uint32_t s = 0; s < NUM_SLICES; s++)
+    {
+        g_lastRequestedPct[s] = pct[s];
+        g_lastExecutedRbg[s] =
+            (s < quotaRbg.size()) ? static_cast<int64_t>(quotaRbg[s]) : 0;
+        pctSum += pct[s];
+    }
+
+    std::cout << std::fixed << std::setprecision(2)
+              << "[SqrSim] ACTION path=" << source << " t=" << nowMs << "ms"
+              << " prb_requested_pct=[" << pct[0] << ", "
+              << pct[1] << ", " << pct[2] << "]"
+              << " prb_executed_rbg=[" << g_lastExecutedRbg[0] << ", "
+              << g_lastExecutedRbg[1] << ", " << g_lastExecutedRbg[2] << "]"
+              << " totalRbg=" << totalRbg
+              << " pctSum=" << pctSum
+              << (pctSum <= 0.0 ? " zero_quota_nothing_served" : "")
+              << "\n";
+
+    NS_LOG_INFO("[SqrSim] " << source << " absolute quota applied at t=" << nowMs
+                            << "ms: quota_rbg=[" << g_lastExecutedRbg[0] << ", "
+                            << g_lastExecutedRbg[1] << ", " << g_lastExecutedRbg[2]
+                            << "]"
+                            << " algos=[" << IntraAlgoName(algos[0]) << ", "
+                            << IntraAlgoName(algos[1]) << ", "
+                            << IntraAlgoName(algos[2]) << "]");
+}
 
 static void
 KpmAndControlCallback()
@@ -781,6 +914,13 @@ KpmAndControlCallback()
     // para exportar os KPMs estendidos e a telemetria prb_* (contrato SQR);
     // as partes de IPC (semáforo/ação) permanecem gated por g_ipcEnabled.
     uint64_t nowMs = static_cast<uint64_t>(Simulator::Now().GetMilliSeconds());
+
+    // Fase 5.3 (modo e2): registros UE da E2SM-KPM indication desta janela —
+    // MESMOS valores emitidos nas colunas do contrato §4 (paridade semântica
+    // com o caminho IPC, PLANO §3-Fase 5.3). Preenchidos no laço de UEs
+    // abaixo e consumidos pelo envio da indication após o dreno de telemetria.
+    std::vector<SqrE2KpmUeRecord> e2KpmRecords;
+    std::array<uint32_t, NUM_SLICES> e2UesPerSlice{};
 
     // Coletar métricas do FlowMonitor (verbatim rslaq)
     if (g_monitorPtr && g_classifierPtr)
@@ -970,6 +1110,26 @@ KpmAndControlCallback()
                 emitRow(kpmHistory, nowMs, ueId, sliceIdx, dTxBytes, dRxBytes, plr, rsh,
                         effectiveLost, thrMbps, bufferBytes, windowThrMbps, snrDb, queueBytes);
 
+                if (g_controlPath == ControlPath::E2)
+                {
+                    SqrE2KpmUeRecord rec;
+                    rec.imsi = ue.imsi;
+                    rec.rnti = g_ueIdToRnti.count(ueId) ? g_ueIdToRnti[ueId] : 0;
+                    rec.sliceId = sliceIdx;
+                    rec.dTxBytes = dTxBytes;
+                    rec.dRxBytes = dRxBytes;
+                    rec.plrPct = plr;
+                    rec.resourceSharePct = rsh;
+                    rec.dLostPackets = effectiveLost;
+                    rec.throughputMbps = thrMbps;
+                    rec.bufferBytes = bufferBytes;
+                    rec.windowThroughputMbps = windowThrMbps;
+                    rec.snrDb = snrDb;
+                    rec.queueBytes = queueBytes;
+                    e2KpmRecords.push_back(rec);
+                    e2UesPerSlice[sliceIdx]++;
+                }
+
                 if (ue.departureSec <= tEndSec + 1e-9)
                 {
                     ue.kpmFinished = true; // última janela ativa emitida
@@ -1072,6 +1232,42 @@ KpmAndControlCallback()
         // g_lastRequestedPct/g_lastExecutedRbg NÃO são zerados: eles descrevem
         // a ação vigente e devem sobreviver até a próxima ação ser aplicada.
         g_schedulerPtr->ResetWindowCounters();
+    }
+
+    // --- Fase 5.3: caminho E2 — E2SM-KPM indication + RIC Control ---
+    // ORDEM idêntica à do IPC (dreno de telemetria ACIMA já executado): a
+    // ação que o RIC devolve como resposta à indication desta janela governa
+    // a janela SEGUINTE e só entra no CSV no dreno da próxima borda
+    // (alinhamento contrato §3.5; 1ª janela com sentinela -1). SEM semáforos
+    // nem rslaq_actions_for_ns3.csv. No DEGRADED a resposta chega
+    // sincronamente do loopback em-processo; no FULL, a indication é
+    // codificada (E2AP/E2SM-KPM) e enviada ao RIC real pelo mesmo ponto
+    // (SendKpmIndication) — ver sqr-e2-adapter.h.
+    if (g_controlPath == ControlPath::E2 && g_e2Adapter)
+    {
+        SqrE2KpmIndicationMessage ind;
+        ind.timestampMs = nowMs;
+        ind.periodMs = g_indicationPeriodMs;
+        ind.nUes = e2UesPerSlice;
+        if (g_schedulerPtr)
+        {
+            ind.totalRbg = g_schedulerPtr->GetTotalRbgCount();
+            const std::vector<uint32_t> quotaNow = g_schedulerPtr->GetSliceQuotaRbg();
+            for (uint32_t s = 0; s < NUM_SLICES && s < quotaNow.size(); s++)
+            {
+                ind.quotaRbg[s] = quotaNow[s];
+            }
+        }
+        auto gnbDev = DynamicCast<NrGnbNetDevice>(g_gnbNetDev.Get(0));
+        ind.cellId = gnbDev ? gnbDev->GetCellId() : 0;
+        ind.plmnId = "00101";
+        ind.gnbId = std::to_string(ind.cellId);
+        ind.ueRecords = std::move(e2KpmRecords);
+        g_e2Adapter->SendKpmIndication(ind);
+        g_e2IndicationsSent = g_e2Adapter->GetIndicationsSent();
+        g_e2ControlsApplied = g_e2Adapter->GetControlsApplied();
+        g_e2ControlsIgnored = g_e2Adapter->GetControlsIgnored();
+        g_e2SliceLineMissingCount = g_e2Adapter->GetSliceLineMissingCount();
     }
 
     // Esperar ação do agente (timeout de 50ms; verbatim rslaq)
@@ -1184,45 +1380,9 @@ KpmAndControlCallback()
                     }
                 }
 
-                const uint16_t totalRbg = g_schedulerPtr->GetTotalRbgCount();
-                const std::vector<double> pctVec(pct.begin(), pct.end());
-                const std::vector<uint32_t> quotaRbg =
-                    SqrMacScheduler::ComputeRbgQuotas(pctVec, totalRbg, NUM_SLICES);
-                g_schedulerPtr->SetSliceQuotaRbg(quotaRbg, algos);
-
-                // --- Telemetria SQR: prb_requested / prb_executed ---
-                // prb_requested = ação aplicada (% por slice; linha ausente ⇒
-                // default 33,33 já substituído acima); prb_executed = COTA
-                // EFETIVA em RBGs entregue ao scheduler (pós-conversão
-                // determinística %→RBG). Ficam em g_last* e são consumidos
-                // pelo dreno da janela que esta ação governa (próxima borda —
-                // ver comentário do dreno acima).
-                double pctSum = 0.0;
-                for (uint32_t s = 0; s < NUM_SLICES; s++)
-                {
-                    g_lastRequestedPct[s] = pct[s];
-                    g_lastExecutedRbg[s] =
-                        (s < quotaRbg.size()) ? static_cast<int64_t>(quotaRbg[s]) : 0;
-                    pctSum += pct[s];
-                }
-
-                std::cout << std::fixed << std::setprecision(2)
-                          << "[SqrSim] ACTION t=" << nowMs << "ms"
-                          << " prb_requested_pct=[" << pct[0] << ", "
-                          << pct[1] << ", " << pct[2] << "]"
-                          << " prb_executed_rbg=[" << g_lastExecutedRbg[0] << ", "
-                          << g_lastExecutedRbg[1] << ", " << g_lastExecutedRbg[2] << "]"
-                          << " totalRbg=" << totalRbg
-                          << " pctSum=" << pctSum
-                          << (pctSum <= 0.0 ? " zero_quota_nothing_served" : "")
-                          << "\n";
-
-                NS_LOG_INFO("[SqrSim] IPC absolute quota applied at t=" << nowMs
-                            << "ms: quota_rbg=[" << g_lastExecutedRbg[0] << ", "
-                            << g_lastExecutedRbg[1] << ", " << g_lastExecutedRbg[2] << "]"
-                            << " algos=[" << IntraAlgoName(algos[0]) << ", "
-                            << IntraAlgoName(algos[1]) << ", "
-                            << IntraAlgoName(algos[2]) << "]");
+                // Aplicação da cota (R27) — caminho ÚNICO, compartilhado com o
+                // modo e2 (ApplyQuotaAction acima).
+                ApplyQuotaAction(pct, algos, nowMs, "ipc");
             }
             else
             {
@@ -1346,6 +1506,32 @@ WriteFinalReport(const Ptr<Ipv4FlowClassifier>& classifier)
               << g_actionFileMissingCount
               << " action_slice_line_missing_default_33pct=" << g_sliceLineMissingCount
               << " (contract §5)\n";
+
+    if (g_controlPath == ControlPath::E2)
+    {
+        // Telemetria do caminho E2 (Fase 5.3): indicações enviadas e RIC
+        // Controls aplicados devem coincidir com o nº de janelas; 1 aplicação
+        // por janela menos a 1ª (sentinela -1 do alinhamento §3.5).
+        // Fase 5.4: no endpoint xapp, xapp_timeouts são as janelas sem resposta
+        // do xApp dentro do budget wall (degradação §5 da ponte — análogo ao
+        // sem_timedwait timeout do IPC).
+        if (g_e2Loopback)
+        {
+            g_e2XappTimeoutCount = g_e2Loopback->GetXappTimeouts();
+        }
+        std::cout << "[SqrSim] E2_CONTROL indications_sent=" << g_e2IndicationsSent
+                  << " controls_applied=" << g_e2ControlsApplied
+                  << " controls_ignored=" << g_e2ControlsIgnored
+                  << " slice_line_missing_default_33pct=" << g_e2SliceLineMissingCount
+                  << " endpoint=" << (g_e2EndpointXapp ? "xapp-udp" : "loopback")
+                  << " xapp_timeouts=" << g_e2XappTimeoutCount
+                  << " phases=";
+        for (size_t i = 0; i < g_e2Phases.size(); ++i)
+        {
+            std::cout << (i ? "," : "") << g_e2Phases[i];
+        }
+        std::cout << " (loopback csv: " << g_outputDir << "/sqr_e2_ric_loopback.csv)\n";
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -1384,6 +1570,9 @@ main(int argc, char* argv[])
     std::string rlcMode = "um";
     bool logAllMacSlots = false;
     uint32_t macLoggingPeriodMs = 97;
+    std::string controlPathStr = "ipc"; // Fase 5.3: {ipc,e2}
+    std::string e2PhasesStr = "0,50,100";
+    std::string e2EndpointStr = "loopback"; // Fase 5.4: {loopback,xapp}
 
     CommandLine cmd(__FILE__);
     cmd.AddValue("simTime", "Total sim time (s)", g_simTimeSec);
@@ -1418,6 +1607,34 @@ main(int argc, char* argv[])
     cmd.AddValue("LogAllMacSlots", "Log every MAC scheduling call (large files)", logAllMacSlots);
     cmd.AddValue("MacLoggingPeriodMs", "MAC logging period in ms", macLoggingPeriodMs);
     cmd.AddValue("simId", "Simulation UUID for IPC semaphores (empty = network-only)", simId);
+    cmd.AddValue("controlPath", "Control path: ipc (semaphores+CSV, fallback) or e2 "
+                                "(RIC Control + E2SM-KPM indications via contrib/nori; "
+                                "DEGRADED: in-process loopback, Fase 5.3)",
+                 controlPathStr);
+    cmd.AddValue("e2Phases", "E2 loopback dummy phases: sums of dedicated % "
+                             "(subset of 0,50,100; default 0,50,100)",
+                 e2PhasesStr);
+    cmd.AddValue("e2WindowsPerPhase", "E2 loopback windows (indications) per phase "
+                                      "(default 100, as sqr_dummy_controller.py)",
+                 g_e2WindowsPerPhase);
+    cmd.AddValue("e2RicAddress", "RIC address of the E2 termination (default 127.0.0.1)",
+                 g_e2RicAddress);
+    cmd.AddValue("e2RicPort", "RIC SCTP port of the E2 termination (default 36422)",
+                 g_e2RicPort);
+    cmd.AddValue("e2Endpoint", "E2 RIC endpoint (Fase 5.4): loopback = in-process "
+                               "dummy equal-split (Fase 5.3 smoke); xapp = local UDP "
+                               "bridge to the SQR xApp process (examples/xapp_sqr.py; "
+                               "DEGRADED local transport — FULL swaps in e2sim/SCTP)",
+                 e2EndpointStr);
+    cmd.AddValue("e2XappPort", "UDP port of the SQR xApp bridge endpoint (default 5560)",
+                 g_e2XappPort);
+    cmd.AddValue("e2XappTimeoutMs", "Wall budget per bridge attempt for the xApp RIC "
+                                    "Control reply in ms (contract §5; default 50 = the "
+                                    "IPC sem_timedwait budget)",
+                 g_e2XappTimeoutMs);
+    cmd.AddValue("e2XappRetries", "Extra bridge attempts with the SAME seq (the xApp "
+                                  "deduplicates by seq; default 1)",
+                 g_e2XappRetries);
     cmd.Parse(argc, argv);
 
     // --- Validações ---
@@ -1455,6 +1672,75 @@ main(int argc, char* argv[])
     }
     rlcMode = ToLower(rlcMode);
 
+    // --- Caminho de controle (Fase 5.3) ---
+    {
+        const std::string cp = ToLower(controlPathStr);
+        if (cp == "ipc")
+        {
+            g_controlPath = ControlPath::IPC;
+        }
+        else if (cp == "e2")
+        {
+            g_controlPath = ControlPath::E2;
+        }
+        else
+        {
+            NS_FATAL_ERROR("controlPath must be 'ipc' or 'e2' (got " << controlPathStr << ")");
+        }
+        // Fases do dummy equal-split do loopback (mesmo domínio do
+        // sqr_dummy_controller.py: {0, 50, 100}).
+        std::stringstream ss(e2PhasesStr);
+        std::string token;
+        g_e2Phases.clear();
+        while (std::getline(ss, token, ','))
+        {
+            const long p = std::stol(token);
+            if (p != 0 && p != 50 && p != 100)
+            {
+                NS_FATAL_ERROR("e2Phases accepts only 0, 50, 100 (got " << token << ")");
+            }
+            g_e2Phases.push_back(p);
+        }
+        if (g_e2Phases.empty())
+        {
+            NS_FATAL_ERROR("e2Phases must list at least one phase (0, 50 or 100)");
+        }
+        if (g_e2WindowsPerPhase == 0)
+        {
+            NS_FATAL_ERROR("e2WindowsPerPhase must be positive");
+        }
+        // Fase 5.4: endpoint do caminho E2.
+        {
+            const std::string ep = ToLower(e2EndpointStr);
+            if (ep == "loopback")
+            {
+                g_e2EndpointXapp = false;
+            }
+            else if (ep == "xapp")
+            {
+                g_e2EndpointXapp = true;
+            }
+            else
+            {
+                NS_FATAL_ERROR("e2Endpoint must be 'loopback' or 'xapp' (got "
+                               << e2EndpointStr << ")");
+            }
+            if (g_e2XappTimeoutMs <= 0)
+            {
+                NS_FATAL_ERROR("e2XappTimeoutMs must be positive");
+            }
+            if (g_e2XappRetries < 0)
+            {
+                NS_FATAL_ERROR("e2XappRetries must be non-negative");
+            }
+        }
+        if (g_controlPath == ControlPath::E2 && !simId.empty())
+        {
+            std::cout << "[SqrSim] WARNING: --simId is IPC-only; ignored with"
+                      << " --controlPath=e2 (no semaphores/CSV in the E2 path)\n";
+        }
+    }
+
     g_slaMbps = ParseSla(slaStr);
     g_outputDir = (std::filesystem::path(outputDirBase) / "results_sqr_network_only" /
                    ("seed=" + std::to_string(seed) + "_run=" + std::to_string(run)))
@@ -1482,6 +1768,10 @@ main(int argc, char* argv[])
 
     RslaqMacScheduler::IntraSliceAlgorithm parsedIntraAlgo = ParseIntraAlgo(intraAlgo);
     std::vector<RslaqMacScheduler::IntraSliceAlgorithm> sliceAlgos(NUM_SLICES, parsedIntraAlgo);
+    // Fase 5.3: algoritmos intra-slice correntes (usados pelo caminho E2 — o
+    // RIC Control de RAN slicing não carrega algoritmo; fora do espaço de
+    // ação SQR, PLANO Fase 1).
+    g_currentSliceAlgos = sliceAlgos;
 
     bool tddApplied = false;
     g_appliedTddPattern = NormalizeTddPatternForNr(tddPattern, &tddApplied);
@@ -1542,14 +1832,24 @@ main(int argc, char* argv[])
               << "\n"
               << "IntraAlgo    : " << IntraAlgoName(parsedIntraAlgo) << "\n"
               << "Seed/Run     : " << seed << "/" << run << "\n"
-              << "IPC enabled  : " << (simId.empty() ? "NO (network-only)" : "YES") << "\n"
+              << "Control path : "
+              << (g_controlPath == ControlPath::E2
+                      ? (g_e2EndpointXapp
+                             ? "E2 (RIC Control + E2SM-KPM via contrib/nori, Fase 5.3;"
+                               " Fase 5.4 endpoint: xApp UDP bridge)"
+                             : "E2 (RIC Control + E2SM-KPM via contrib/nori, Fase 5.3;"
+                               " DEGRADED: in-process loopback)")
+                      : (simId.empty() ? "none (network-only; IPC idle)"
+                                       : "IPC (semaphores + action CSV)"))
+              << "\n"
               << "OutputDir    : " << g_outputDir << "\n\n";
 
     RngSeedManager::SetSeed(seed);
     RngSeedManager::SetRun(run);
 
-    // --- IPC: semáforos (verbatim de rslaq-sim.cc) ---
-    if (!simId.empty())
+    // --- IPC: semáforos (verbatim de rslaq-sim.cc) — SOMENTE no caminho IPC
+    // (Fase 5.3: o modo e2 não cria semáforos nem usa CSV de ação) ---
+    if (g_controlPath == ControlPath::IPC && !simId.empty())
     {
         g_simUuid = simId;
         g_ipcEnabled = true;
@@ -1728,6 +2028,57 @@ main(int argc, char* argv[])
                       ? " (deferred — quota materialized on first DL slot)"
                       : "")
               << "\n";
+
+    // --- Fase 5.3: caminho de controle E2 (adaptador + loopback DEGRADED) ---
+    // O adaptador cria a superfície E2 do contrib/nori (E2Interface +
+    // E2Termination + function descriptions) e injeta como endpoint RIC o
+    // loopback em-processo com o controlador dummy equal-split. O caminho de
+    // código (SendKpmIndication → RIC → OnRicControlMessage →
+    // ApplyQuotaAction) é o mesmo do modo FULL — ver sqr-e2-adapter.h.
+    if (g_controlPath == ControlPath::E2)
+    {
+        g_e2Loopback = CreateObject<SqrE2LoopbackTerm>();
+        if (g_e2EndpointXapp)
+        {
+            // Fase 5.4: ponte de transporte local (UDP JSON, localhost) para o
+            // xApp SQR (examples/xapp_sqr.py) — o xApp faz bind ANTES do sim
+            // arrancar. Budget wall do contrato §5 igual ao do IPC (50 ms);
+            // timeout = degradação contável (mantém a cota anterior).
+            if (!g_e2Loopback->ConfigureXappUdp(g_e2RicAddress,
+                                                g_e2XappPort,
+                                                g_e2XappTimeoutMs,
+                                                g_e2XappRetries,
+                                                g_outputDir +
+                                                    "/sqr_e2_xapp_bridge.csv"))
+            {
+                NS_FATAL_ERROR("Failed to create the xApp UDP bridge socket");
+            }
+        }
+        else
+        {
+            g_e2Loopback->Configure(g_e2RicAddress,
+                                    g_e2RicPort,
+                                    g_e2Phases,
+                                    g_e2WindowsPerPhase,
+                                    g_outputDir + "/sqr_e2_ric_loopback.csv");
+        }
+        g_e2Adapter = CreateObject<SqrE2Adapter>();
+        g_e2Adapter->Install(
+            g_gnbNetDev.Get(0),
+            scheduler,
+            g_e2Loopback,
+            [](const std::array<double, 3>& pct, bool sliceMissing) {
+                if (sliceMissing)
+                {
+                    NS_LOG_WARN("[SqrSim] RIC Control without line(s) for some"
+                                " slice(s) — default 33.33%/slice applied"
+                                " (contract §5, countable in final report)");
+                }
+                ApplyQuotaAction(pct, g_currentSliceAlgos,
+                                 static_cast<uint64_t>(Simulator::Now().GetMilliSeconds()),
+                                 "e2");
+            });
+    }
 
     // --- Agendamentos ---
     // 1) verificador de attach (acorda quando houver chegada pendente;

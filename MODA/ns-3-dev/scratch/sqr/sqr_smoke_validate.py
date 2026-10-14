@@ -14,6 +14,11 @@ Critérios R27 (contrato_interface.md §3.3 + register R27, RATIFICADO 12/10/202
   (iv)  log de prb_requested/prb_executed/prb_scheduled/prb_idle presente
         (header do CSV + linhas ACTION/PRB_WINDOW conferidas no smoke_test.sh).
 
+Fase 5.3: os mesmos critérios R27 i–iii por fases servem ao caminho
+--controlPath=e2 (flag --phased, alias de --ipc — o alinhamento de janela e as
+fases do dummy são idênticos; a origem da ação muda de CSV/semáforo para RIC
+Control).
+
 Janela parcial (contrato §4): a 1ª linha de cada UE aparece na janela seguinte
 à entrada (ts ∈ (trafficStart, trafficStart+period]) e o windowThroughputMbps
 divide o delta pelo tempo ATIVO (confere implied_active == ts1 − trafficStart).
@@ -102,26 +107,23 @@ def validate_prb(path, ipc):
         return
 
     # --- Alinhamento (janela × ação no mesmo passo) ---
-    # A 1ª janela do modo IPC necessariamente correu SEM ação do agente: a
-    # ação só chega na borda que a inicia e entra no CSV no dreno seguinte.
-    # Se nenhuma linha tem a sentinela -1, o log da ação voltou a ser aplicado
-    # ANTES do dreno (regressão do alinhamento — ação de uma janela rotulando
-    # os contadores da anterior).
+    # A 1ª janela dos modos com fases (IPC e E2 — Fase 5.3) necessariamente
+    # correu SEM ação do agente: a ação só chega na borda que a inicia e entra
+    # no CSV no dreno seguinte. Se nenhuma linha tem a sentinela -1, o log da
+    # ação voltou a ser aplicado ANTES do dreno (regressão do alinhamento —
+    # ação de uma janela rotulando os contadores da anterior).
     if len(phases["PRE"]) < 1:
-        fail("modo IPC: nenhuma janela com sentinela prb_requested_pct=-1 — o log "
-             "da ação não está defasado para a janela que governa (alinhamento)")
+        fail("modo com fases (IPC/E2): nenhuma janela com sentinela "
+             "prb_requested_pct=-1 — o log da ação não está defasado para a "
+             "janela que governa (alinhamento)")
     print(f"OK: alinhamento de janela: {len(phases['PRE'])} janela(s) inicial(is) com "
           f"sentinela -1 (ação recebida na borda t só aparece no CSV do dreno da "
           f"janela que governa)")
 
-    print(f"OK: {n_rows} linhas de janelas consistentes (prb_idle e teto de cota)")
-
-    if not ipc:
-        return
-
     # --- Fase A (Σa=0): nada servido, tudo ocioso ---
     if len(phases["A"]) < 5:
-        fail(f"modo IPC: só {len(phases['A'])} janelas na fase A (Σa=0) — fases do dummy insuficientes")
+        fail(f"modo com fases (IPC/E2): só {len(phases['A'])} janelas na fase A "
+             f"(Σa=0) — fases do dummy insuficientes")
     for r in phases["A"]:
         slots = int(r["dl_slots"])
         total = int(r["total_rbg"])
@@ -137,7 +139,8 @@ def validate_prb(path, ipc):
 
     # --- Fase B (Σa=0,5·C): ~metade ociosa, teto do critério (ii) ---
     if len(phases["B"]) < 5:
-        fail(f"modo IPC: só {len(phases['B'])} janelas na fase B (Σa=0,5·C)")
+        fail(f"modo com fases (IPC/E2): só {len(phases['B'])} janelas na fase B "
+             f"(Σa=0,5·C)")
     idle_fracs = []
     for r in phases["B"]:
         slots = int(r["dl_slots"])
@@ -164,7 +167,8 @@ def validate_prb(path, ipc):
 
     # --- Fase C (partição completa): cota servida até o teto ---
     if len(phases["C"]) < 5:
-        fail(f"modo IPC: só {len(phases['C'])} janelas na fase C (Σa=C)")
+        fail(f"modo com fases (IPC/E2): só {len(phases['C'])} janelas na fase C "
+             f"(Σa=C)")
     max_util = [0.0] * L_SLICES
     for r in phases["C"]:
         slots = int(r["dl_slots"])
@@ -267,7 +271,11 @@ def main():
     sub = ap.add_subparsers(dest="mode", required=True)
     p1 = sub.add_parser("prb")
     p1.add_argument("csv")
-    p1.add_argument("--ipc", action="store_true")
+    p1.add_argument("--ipc", action="store_true",
+                    help="fases determinísticas do dummy (caminho IPC, Fase 1)")
+    p1.add_argument("--phased", action="store_true",
+                    help="idêntico a --ipc: critérios R27 i–iii por fases "
+                         "(usado pela fase E2 do smoke, Fase 5.3)")
     p2 = sub.add_parser("kpm")
     p2.add_argument("csv")
     p2.add_argument("log")
@@ -275,7 +283,7 @@ def main():
     p2.add_argument("--attach-grace", type=float, default=0.5)
     args = ap.parse_args()
     if args.mode == "prb":
-        validate_prb(args.csv, args.ipc)
+        validate_prb(args.csv, args.ipc or args.phased)
     else:
         validate_kpm(args.csv, args.log, args.period_ms, args.attach_grace)
     return 0

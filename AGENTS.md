@@ -167,16 +167,22 @@ cd /home/eliothluy/Documentos/Jussi_SBRC/MODA/ns-o-ran-gym && ./run_training.sh
   - Cenário demonstra aplicação **real** de cota de PRB no MAC (log `prb_scheduled` por slice ≈ cota) antes da campanha.
   - Campanha IPC completa (Fase 4) antes da Fase 5.4 (xApp E2).
 
-## 8. Estado atual — checklist das fases
+## 8. Estado atual — checklist das fases (atualizado 14/10/2026)
 
 | Fase | Escopo | Status |
 |---|---|---|
-| 0 | Contrato de interface + `assumptions_register.md` + `source_traceability.md` | ⬜ Pendente |
-| 1 | `scratch/sqr/sqr-sim.cc` (cenário fiel) + KPMs estendidos + smoke | ⬜ Pendente |
-| 2 | `src/nsoran/sqr/` (agente SQR completo) + `tests/test_sqr_*` + `examples/sqr_run.py` | ⬜ Pendente |
-| 3 | Adaptador KBRL + baselines estáticos | ⬜ Pendente |
-| 4 | Campanha multi-seed + Figs. 2–4 equivalentes + sensibilidade | ⬜ Pendente |
-| 5 | NORI: infra RIC → port do módulo → adaptador controle → SQR como xApp → IPC vs E2 | ⬜ Pendente |
+| 0 | Contrato de interface + `assumptions_register.md` + `source_traceability.md` | ✅ (contrato v1.2 / register v1.3) |
+| 1 | `scratch/sqr/sqr-sim.cc` (cenário fiel) + KPMs estendidos + smoke | ✅ (R27 cota absoluta validada i–iv; soak 3 seeds) |
+| 2 | `src/nsoran/sqr/` (agente SQR completo) + testes + `examples/sqr_run.py` | ✅ (190 testes; checkpoint; C dinâmico=53) |
+| 3 | Adaptador KBRL + baseline estático `equal` | ✅ (port fiel commit 65a3891; integração OK) |
+| 4 | Campanha multi-seed + Figs. 2–4 + sensibilidade | ✅ 40 runs (4 métodos × 10 seeds) — **achado: SLA do artigo inviável a 2 km/30 dBm (violação 84–90% p/ todos; sweep de raio: 0% @300 m → 88% @2000 m; causa: RLF de borda, ~25–30 dB de déficit vs macro real)**; ⬜ matriz de calibração realista (8×8/43 dBm/LOS) pendente de go |
+| 5 | NORI: RIC → port → adaptador → xApp | ✅ **5.1–5.4 em modo DEGRADED**: e2sim construído via Docker oficial (E2AP v3.01; **não usar o fork lasseufpa/e2sim nem o e2sim v1 do host**); `contrib/nori` portado (55 arquivos, FULL/DEGRADED, docs em `contrib/nori/docs/MODA-PORT.md`); `sqr-sim --controlPath={ipc,e2}` (IPC = fallback permanente); `xapp_sqr.py` + paridade IPC×E2 bit-a-bit (3585/3585 decisões; latência E2 p50 2,39/p95 9,28 ms); ⬜ RIC real (kind/kubectl — decisão do usuário; passos em `MODA/third_party/nori_infra/preflight.md`) e modo FULL/SCTP |
+
+**Fatos operacionais novos (14/10/2026):**
+- 4º patch defensivo em `contrib/nr` (`nr-qos-rule-classifier.cc`, dedup QoS p/ churn RLF; autorizado 12/10).
+- Ferramentas de gate: `scratch/sqr/run_e2_smoke.sh`, `ns-o-ran-gym/examples/run_sqr_{integration,integration_kbrl,campaign,analysis,e2_parity}.sh`, `tests/run_sqr_tests.sh` (190) / `run_full_tests.sh` (312) — venv `.venv` 3.13.
+- Clones third-party gitignored: `MODA/third_party/{nori,e2sim,network-slicing}` + `nori_infra/`.
+- Contexto científico e gaps G1–G8 p/ artigo novo: [`README.md`](README.md) (§3–4).
 
 Detalhes, critérios de aceite e estimativas de cada fase: [`PLANO_IMPLEMENTACAO_SQR_NORI.md`](PLANO_IMPLEMENTACAO_SQR_NORI.md).
 

@@ -210,7 +210,7 @@ SqrMacScheduler::SetSliceQuotaRbg(const std::vector<uint32_t>& quotaRbg,
 {
     NS_LOG_FUNCTION(this);
     // A ação do agente SUPERSEDE a configuração estática inicial: descarta
-    // qualquer cota pendente de materialização (o main() configura a partição
+    // qualquer cota pendente de materialização (o `main` configura a partição
     // estática antes do Run, mas a 1ª slot DL pode ocorrer DEPOIS da primeira
     // ação — materializá-la aí sobrescreveria a cota já aplicada pelo agente).
     m_pendingQuotaPct.clear();
@@ -248,7 +248,7 @@ SqrMacScheduler::SetSliceConfiguration(const std::vector<double>& prbWeights,
     const uint32_t totalRbg = GetBandwidthInRbg();
     if (totalRbg == 0)
     {
-        // Chamada do main() ANTES do Simulator::Run: o SAP user do MAC ainda
+        // Chamada do `main` ANTES do Simulator::Run: o SAP user do MAC ainda
         // não existe e o total de RBGs do BWP é desconhecido. Guarda o pct e
         // materializa a cota na 1ª chamada de AssignDLRBG.
         m_pendingQuotaPct = pct;
@@ -286,7 +286,7 @@ SqrMacScheduler::AssignDLRBG(uint32_t symAvail, const ActiveUeMap& activeDl) con
     NS_LOG_FUNCTION(this << symAvail);
 
     // SQR-R27: materializa a cota da configuração estática inicial na 1ª
-    // chamada (no main() o total de RBGs do BWP ainda era desconhecido).
+    // chamada (no `main` o total de RBGs do BWP ainda era desconhecido).
     // Escreve apenas estado mutable (AssignDLRBG é const; os algoritmos
     // intra-slice já foram guardados pelo caminho pendente de
     // SetSliceConfiguration).
