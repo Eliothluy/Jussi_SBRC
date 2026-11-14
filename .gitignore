@@ -26,3 +26,35 @@ MODA/ns-3-dev/RslaqActions.txt
 MODA/ns-3-dev/Dl*.txt
 MODA/ns-3-dev/Ul*.txt
 MODA/ns-3-dev/Nr*.txt
+
+# ── Cadeia SQR-JC (D0–D3, 13/11): runs brutos grandes fora; agregados, relatórios,
+#    planos/manifests e figuras ficam versionados
+MODA/ns-o-ran-gym/results/sqr_jc_decision/d1_runs*/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/d2_v2_replays/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/d2_v2_t2064_full/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/d2v2_pre_audit_pause/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/d3_replays/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/d0b_aa/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/d1_smoke/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/a1*/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/a2a*/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/a3a*/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/quarentena*/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/*.nohup
+MODA/ns-o-ran-gym/results/sqr_jc_decision/projection_events.pkl
+MODA/ns-3-dev/results_sqr_network_only/
+MODA/ns-o-ran-gym/d2_v2_replays/
+*.nohup
+# caracterização: runs brutos fora; agregados do nível raiz (csv/md/png) ficam
+MODA/ns-o-ran-gym/results/sqr_characterization/*/
+MODA/ns-o-ran-gym/results/sqr_characterization_round2/*/
+# calibração: manifest e agregados de nível raiz ficam; runs brutos fora
+results/sqr_jc_final/03_calibration/*/
+results/sqr_jc_final/03_calibration/*.log
+results/sqr_jc_final/02_radio_sanity/*/
+results/sqr_jc_final/02_radio_sanity/*.log
+# literatura: PDFs raw re-obtinníveis fora; notas/figuras ficam
+docs/literature/tools/raw/
+# logs temporários de agentes
+avaliacao4.txt
+MODA/ns-o-ran-gym/results/sqr_jc_decision/d1_delayed_feedback_test/*/

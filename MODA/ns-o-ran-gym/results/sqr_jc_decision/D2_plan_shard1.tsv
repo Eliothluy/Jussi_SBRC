@@ -1,0 +1,131 @@
+S1_lam2_s2101_t1009	het_lam2_s2101	2	2101	1009	0	0-27-26	a_B0:parity	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	0	8-43-2	a_B0:parity	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	1	10-41-2	paired:(0, 1):2:hi	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	2	10-43-0	paired:(0, 2):4:hi	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	3	8-45-0	paired:(1, 2):8:hi	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	4	0-51-2	paired:(0, 1):16:lo	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	5	9-42-2	nbh:P1:+1:hi	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	6	9-43-1	nbh:P2:+1:hi	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	7	8-42-3	nbh:P3:-1:lo	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	8	13-18-14	rnd:1:sha1(het_lam2_s2103|1288)	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	9	30-13-2	rnd:2:sha1(het_lam2_s2103|1288)	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	10	1-6-4	rnd:3:sha1(het_lam2_s2103|1288)	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	11	8-5-32	rnd:4:sha1(het_lam2_s2103|1288)	0
+S1_lam2_s2103_t1288	het_lam2_s2103	2	2103	1288	12	18-17-18	ref:equal	0
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	0	15-0-38	a_B0:parity	0
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	1	13-2-38	sub-nbh:P2:-2:lo	1
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	2	16-8-7	sub-rnd:1	1
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	3	7-0-46	paired:(0, 2):8:hi	0
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	4	15-16-22	paired:(1, 2):16:lo	0
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	5	9-7-2	sub-rnd:2	1
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	6	8-9-3	sub-rnd:3	1
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	7	16-0-37	nbh:P3:-1:lo	0
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	8	1-35-11	rnd:1:sha1(het_lam5_s2102|1985)	0
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	9	13-22-8	rnd:2:sha1(het_lam5_s2102|1985)	0
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	10	11-8-20	rnd:3:sha1(het_lam5_s2102|1985)	0
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	11	16-26-2	rnd:4:sha1(het_lam5_s2102|1985)	0
+S1_lam5_s2102_t1985	het_lam5_s2102	5	2102	1985	12	18-17-18	ref:equal	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	0	22-30-1	a_B0:parity	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	1	24-28-1	paired:(0, 1):2:hi	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	2	22-26-5	paired:(1, 2):4:hi	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	3	23-30-0	paired:(0, 2):8:hi	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	4	6-46-1	paired:(0, 1):16:lo	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	5	23-29-1	nbh:P1:+1:hi	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	6	22-29-2	nbh:P2:+1:hi	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	7	21-30-2	nbh:P3:-1:lo	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	8	6-15-15	rnd:1:sha1(het_lam5_s2102|2488)	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	9	13-9-10	rnd:2:sha1(het_lam5_s2102|2488)	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	10	1-10-40	rnd:3:sha1(het_lam5_s2102|2488)	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	11	3-14-21	rnd:4:sha1(het_lam5_s2102|2488)	0
+S1_lam5_s2102_t2488	het_lam5_s2102	5	2102	2488	12	18-17-18	ref:equal	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	0	48-2-3	a_B0:parity	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	1	48-0-5	paired:(1, 2):2:hi	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	2	44-2-7	paired:(0, 2):4:hi	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	3	50-0-3	paired:(0, 1):8:hi	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	4	48-5-0	paired:(1, 2):16:lo	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	5	48-1-4	nbh:P1:+1:hi	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	6	47-2-4	nbh:P2:+1:hi	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	7	47-3-3	nbh:P3:-1:lo	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	8	8-31-11	rnd:1:sha1(het_lam6_s2102|2211)	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	9	10-30-7	rnd:2:sha1(het_lam6_s2102|2211)	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	10	2-6-16	rnd:3:sha1(het_lam6_s2102|2211)	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	11	13-1-14	rnd:4:sha1(het_lam6_s2102|2211)	0
+S1_lam6_s2102_t2211	het_lam6_s2102	6	2102	2211	12	18-17-18	ref:equal	0
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	0	7-1-26	a_B0:parity	0
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	1	8-0-26	paired:(0, 1):2:hi	0
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	2	11-1-22	paired:(0, 2):4:hi	0
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	3	7-9-18	paired:(1, 2):8:hi	0
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	4	0-8-26	paired:(0, 1):16:lo	0
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	5	8-1-25	sub-paired:P2:1:hi	1
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	6	33-1-0	sub-paired:P2:32:hi	1
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	7	7-0-27	nbh:P3:-1:lo	0
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	8	16-14-6	rnd:1:sha1(het_lam2_s2102|2474)	0
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	9	32-0-12	rnd:2:sha1(het_lam2_s2102|2474)	0
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	10	1-7-36	rnd:3:sha1(het_lam2_s2102|2474)	0
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	11	30-4-5	rnd:4:sha1(het_lam2_s2102|2474)	0
+S2_lam2_s2102_t2474	het_lam2_s2102	2	2102	2474	12	18-17-18	ref:equal	0
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	0	18-0-0	a_B0:parity	0
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	1	16-2-0	sub-nbh:P2:-2:lo	1
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	2	1-9-21	sub-rnd:1	1
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	3	10-0-8	paired:(0, 2):8:hi	0
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	4	12-12-23	sub-rnd:2	1
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	5	10-11-6	sub-rnd:3	1
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	6	11-9-28	sub-rnd:4	1
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	7	6-20-13	sub-rnd:5	1
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	8	6-30-12	rnd:1:sha1(het_lam5_s2102|2290)	0
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	9	4-20-27	rnd:2:sha1(het_lam5_s2102|2290)	0
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	10	9-26-18	rnd:3:sha1(het_lam5_s2102|2290)	0
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	11	21-13-2	rnd:4:sha1(het_lam5_s2102|2290)	0
+S2_lam5_s2102_t2290	het_lam5_s2102	5	2102	2290	12	18-17-18	ref:equal	0
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	0	20-0-10	a_B0:parity	0
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	1	21-0-9	sub-paired:P2:1:hi	1
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	2	24-0-6	paired:(0, 2):4:hi	0
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	3	20-8-2	paired:(1, 2):8:hi	0
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	4	4-16-10	paired:(0, 1):16:lo	0
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	5	30-0-0	sub-paired:P2:32:hi	1
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	6	18-0-12	sub-nbh:P2:-2:lo	1
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	7	9-4-24	sub-rnd:1	1
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	8	41-3-4	rnd:1:sha1(het_lam6_s2102|2522)	0
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	9	7-9-1	rnd:2:sha1(het_lam6_s2102|2522)	0
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	10	17-0-34	rnd:3:sha1(het_lam6_s2102|2522)	0
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	11	27-9-11	rnd:4:sha1(het_lam6_s2102|2522)	0
+S2_lam6_s2102_t2522	het_lam6_s2102	6	2102	2522	12	18-17-18	ref:equal	0
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	0	8-44-1	a_B0:parity	0
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	1	10-42-1	paired:(0, 1):2:hi	0
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	2	9-44-0	paired:(0, 2):4:hi	0
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	3	8-45-0	paired:(1, 2):8:hi	0
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	4	0-52-1	paired:(0, 1):16:lo	0
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	5	9-43-1	nbh:P1:+1:hi	0
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	6	40-12-1	sub-paired:P1:32:hi	1
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	7	8-43-2	nbh:P3:-1:lo	0
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	8	7-26-10	rnd:1:sha1(het_lam2_s2102|2412)	0
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	9	10-31-2	rnd:2:sha1(het_lam2_s2102|2412)	0
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	10	25-14-4	rnd:3:sha1(het_lam2_s2102|2412)	0
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	11	0-33-9	rnd:4:sha1(het_lam2_s2102|2412)	0
+S3_lam2_s2102_t2412	het_lam2_s2102	2	2102	2412	12	18-17-18	ref:equal	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	0	30-14-9	a_B0:parity	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	1	30-12-11	paired:(1, 2):2:hi	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	2	34-10-9	paired:(0, 1):4:hi	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	3	22-14-17	paired:(0, 2):8:hi	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	4	30-23-0	paired:(1, 2):16:lo	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	5	30-13-10	nbh:P1:+1:hi	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	6	31-13-9	nbh:P2:+1:hi	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	7	31-14-8	nbh:P3:-1:lo	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	8	23-14-1	rnd:1:sha1(het_lam6_s2102|1420)	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	9	4-21-21	rnd:2:sha1(het_lam6_s2102|1420)	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	10	31-2-5	rnd:3:sha1(het_lam6_s2102|1420)	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	11	32-4-0	rnd:4:sha1(het_lam6_s2102|1420)	0
+S3_lam6_s2102_t1420	het_lam6_s2102	6	2102	1420	12	18-17-18	ref:equal	0
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	0	17-0-0	a_B0:parity	0
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	1	15-0-2	sub-nbh:P2:-2:lo	1
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	2	2-23-9	sub-rnd:1	1
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	3	15-18-7	sub-rnd:2	1
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	4	1-16-0	paired:(0, 1):16:lo	0
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	5	12-25-5	sub-rnd:3	1
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	6	18-26-7	sub-rnd:4	1
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	7	14-22-0	sub-rnd:5	1
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	8	8-3-26	rnd:1:sha1(het_lam5_s2102|2844)	0
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	9	23-7-4	rnd:2:sha1(het_lam5_s2102|2844)	0
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	10	25-3-19	rnd:3:sha1(het_lam5_s2102|2844)	0
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	11	1-3-16	rnd:4:sha1(het_lam5_s2102|2844)	0
+S4_lam5_s2102_t2844	het_lam5_s2102	5	2102	2844	12	18-17-18	ref:equal	0

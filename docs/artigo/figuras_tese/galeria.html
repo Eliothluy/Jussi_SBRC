@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Figuras da tese — SBRC 2027</title>
+<style>
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; margin: 24px auto; max-width: 1000px; color: #212121; background: #fafafa; }
+  h1 { font-size: 1.4em; } h2 { font-size: 1.05em; margin: 40px 0 4px; border-bottom: 2px solid #1565c0; padding-bottom: 4px; }
+  p.claim { color: #1565c0; font-weight: 600; margin: 4px 0 8px; }
+  p.fonte { font-size: 0.78em; color: #616161; margin: 4px 0 0; }
+  img { width: 100%; border: 1px solid #e0e0e0; border-radius: 6px; background: white; }
+  .tag { display: inline-block; background: #e3f2fd; color: #0d47a1; border-radius: 4px; padding: 1px 8px; font-size: 0.75em; margin-right: 6px; }
+</style>
+</head>
+<body>
+> <strong>[ERRATA D0-A 08/11]</strong> A linha A1 (37,13,3) da Fig. 2 estava errada ("0/5" era artefato de métrica do stage1) — ver <code>audit_v2/fig2_evitabilidade_AUDITADA.png</code>: correto é 3/5 congelado. Rótulo "λ2 ~100%" corrigido para 85,6%.
+<h1>Figuras que defendem a tese — caracterização + adjudicação executável + limites do aprendizado seguro</h1>
+<p>Geradas em 04/11/2026 a partir dos artefatos congelados (script: <code>gera_figuras_tese.py</code>). Cada figura cita a fonte nosrodapé.</p>
+
+<h2>Figura 1 — Fronteira de viabilidade <span class="tag">pilar ii</span></h2>
+<p class="claim">A inviabilidade cresce monotonicamente com a demanda (P_I 0,17→0,72) e a incerteza fica concentrada na fronteira (MARGINAL 13–22%).</p>
+<img src="fig1_fronteira_viabilidade.png">
+
+<h2>Figura 2 — Achado central: evitabilidade × espaço de ações <span class="tag">pilar iii</span></h2>
+<p class="claim">Os mesmos 5 estados violados: a ação in-suporte (37,13,3) — que respeita os pisos estáticos — não recupera o SLA conjunto (0/5); a ação fora-de-piso (48,5,0) recupera (5/5). Pisos conservadores convertem violações evitáveis em inevitáveis-por-desenho.</p>
+<img src="fig2_evitabilidade_espaco_acoes.png">
+
+<h2>Figura 3 — Cauda URLLC causal <span class="tag">pilar iv</span></h2>
+<p class="claim">Override executado de a_u 13→35 (com a_e compensatório) não muda o deadline miss (~5–5,5%, colado no alvo de 5%): a cauda é scheduler/TDD-dominada, não recurso-escalável.</p>
+<img src="fig3_cauda_urllc_causal.png">
+
+<h2>Figura 4 — O piso do aprendizado seguro (G4→G4-A→G4-B) <span class="tag">pilar iv</span></h2>
+<p class="claim">Com gates pré-registrados: FIR −74% (curado com dados de alta carga) e FFR −48% (rolling 1 s) — mas o FFR para em 11,1%, acima do gate de 10%: a cauda rasa da URLLC é imprevisível pela representação estado-ação.</p>
+<img src="fig4_piso_aprendizado.png">
+
+<h2>Figura 5 — O detector ordena e decide <span class="tag">pilar iv</span></h2>
+<p class="claim">P(all-OK|FEASIBLE) &gt; P(all-OK|MARGINAL) &gt; P(all-OK|INFEASIBLE) estrita nas duas configurações; com rolling 1 s o MARGINAL cai de 4.617 para 1.491 janelas (detector 3× mais decidido).</p>
+<img src="fig5_ordenacao_decidibilidade.png">
+
+<h2>Figura 6 — R19: contabilidade de vacuous <span class="tag">pilar i — advertência metodológica</span></h2>
+<p class="claim">51% das janelas da validação são vacuous/insuficientes: contá-las como “SLA satisfeito” (prática padrão) infla a segurança reportada de qualquer controlador.</p>
+<img src="fig6_vacuous_r19.png">
+
+<h2>Figura 7 — Estresse por demanda com rádio sadio <span class="tag">pilar ii — validade</p></h2>
+<p class="claim">Utilização sobe 26→88% com RLF=0 e SNR estável (violadores ≈ não-violadores): a fronteira da Fig. 1 mede demanda/espaço de ações, não colapso de SINR.</p>
+<img src="fig7_radio_sadio_demanda.png">
+
+<h2>Figura 8 — Por que a fronteira é conjunta (equal × prop) <span class="tag">pilar ii — motivação</span></h2>
+<p class="claim">O equal deixa a célula ociosa e viola eMBB 23–85%; o prop recupera eMBB mas piora a cauda URLLC sob pressão — nenhum braço estático domina ⇒ a pergunta certa é evitável×inevitável.</p>
+<img src="fig8_coordenacao_equal_prop.png">
+
+</body>
+</html>

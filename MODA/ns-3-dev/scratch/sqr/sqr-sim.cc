@@ -43,6 +43,13 @@
  *     cheio), snrDb (SINR DL estimado por inversão do CQI wideband nas
  *     tabelas do NrAmc; sentinela de fio -999 = sem CQI, contrato §4/R09) e
  *     queueBytes (fila DL RLC/MAC); colunas originais preservadas.
+ *     Contrato v1.3: colunas 14–17 ADITIVAS ao fim da linha (dTxPackets,
+ *     dRxPackets, dDelaySumSec — deltas por janela — e cqiWideband, o CQI
+ *     wideband CRU, sentinela -1) em sqr-kpms.txt E sqr_kpm_history.csv;
+ *     além de sqr_packet_delays.csv (latência POR PACOTE: ByteTag com o
+ *     tempo de TX no remoteHost — trace Ipv4L3Protocol::SendOutgoing, pós-
+ *     cópia do UdpSocketImpl — e Rx no UdpServer do UE; drenado junto com o
+ *     KPM periódico).
  *     Arquivo do contrato: sqr-kpms.txt (não colide com runs rslaq).
  *  6. Telemetria de PRB por janela (contrato §3.5), ALINHADA AO MESMO PASSO:
  *     cada linha do sqr_prb_windows.csv drena a janela que acabou de terminar
@@ -72,6 +79,22 @@
  *       controlador dummy equal-split (equivalente ao sqr_dummy_controller.py
  *       — fases Σa=0/0,5C/C); o caminho de código do adaptador é idêntico ao
  *       FULL (ver sqr-e2-adapter.h). O simId é ignorado no modo e2.
+ *  9. SLICES HETEROGÊNEOS (Rodada 2, Etapa 2.1 — contrato §4.2):
+ *     - --sliceLambdas="a,b,c": processos de Poisson INDEPENDENTES por slice
+ *       (a chegada pertence ao processo da própria slice — não há mais sorteio
+ *       uniforme global). Default vazio ⇒ λ/3 por slice, cuja superposição é
+ *       estatisticamente IDÊNTICA ao comportamento pré-2.1 (processo total
+ *       Poisson(λ) com slice uniforme — register R34; λ literal por slice
+ *       triplicaria a carga da campanha existente).
+ *     - --sliceApps="greedy,urllc,mmtc" (default "greedy,greedy,greedy"):
+ *       greedy = UDP full-buffer R04 (comportamento pré-2.1); urllc = pacotes
+ *       pequenos periódicos (--urllcPktBytes 32 B a cada --urllcIntervalMs 1 ms;
+ *       deadline de ANÁLISE --urllcDeadlineMs 10 ms — o escalonador não é
+ *       deadline-aware; a deadline vai como METADADO no header do run, escolha
+ *       registrada no contrato §4.2); mmtc = pacotes pequenos esparsos
+ *       (--mmtcPktBytes 200 B a cada --mmtcIntervalMs 1000 ms). Parâmetros
+ *       [ASSUMIDO] register R35. Todos os perfis alimentam as 13+4 colunas do
+ *       KPM e o sqr_packet_delays.csv sem distinção.
  *
  * Topologia: remoteHost -- P2P 100 Gbps -- PGW/EPC -- gNB NR -- UEs NR (dinâmicos)
  * Modos de execução:
@@ -139,6 +162,39 @@ static const uint16_t BASE_DL_PORT = 12000;
 
 // [ARTIGO Tabela I]: SLA por UE por slice (Mbps).
 static std::array<double, NUM_SLICES> g_slaMbps = {0.5, 1.0, 1.5};
+
+// ---------------------------------------------------------------------------
+// Slices heterogêneos (Rodada 2, Etapa 2.1 — contrato §4.2, register R34/R35)
+// ---------------------------------------------------------------------------
+
+// Perfis de tráfego por slice: greedy = UDP full-buffer R04 (comportamento
+// pré-2.1, taxa --ueOfferedMbps/pacote --pktSize); urllc = pacotes pequenos
+// periódicos (deadline é propriedade de ANÁLISE no Python — o escalonador não
+// é deadline-aware); mmtc = pacotes pequenos esparsos. Default retrocompatível
+// = greedy nos 3 slices.
+enum class SliceApp : uint8_t
+{
+    GREEDY = 0,
+    URLLC = 1,
+    MMTC = 2
+};
+
+static std::array<SliceApp, NUM_SLICES> g_sliceApps = {
+    SliceApp::GREEDY, SliceApp::GREEDY, SliceApp::GREEDY};
+// Chegadas por slice (UEs/min), processos de Poisson INDEPENDENTES. Sentinela
+// -1 = flag --sliceLambdas ausente/vazia ⇒ λ/3 por slice (superposição de 3
+// Poisson(λ/3) = Poisson(λ) total com marca uniforme — estatisticamente
+// idêntico ao pré-2.1; λ literal em cada slice triplicaria a carga, R34).
+static std::array<double, NUM_SLICES> g_sliceLambdasPerMin = {{-1.0, -1.0, -1.0}};
+static bool g_sliceLambdasExplicit = false;
+
+// [ASSUMIDO R35] parâmetros dos perfis URLLC/mMTC (não publicados no artigo
+// SQR; valores convencionais de mini-slot-sized URLLC e report mMTC).
+static uint32_t g_urllcPktBytes = 32;    //!< payload UDP por pacote URLLC (B)
+static double g_urllcIntervalMs = 1.0;   //!< período entre pacotes URLLC (ms)
+static double g_urllcDeadlineMs = 10.0;  //!< deadline de ANÁLISE (metadata do run)
+static uint32_t g_mmtcPktBytes = 200;    //!< payload UDP por pacote mMTC (B)
+static double g_mmtcIntervalMs = 1000.0; //!< período entre pacotes mMTC (ms)
 
 // ---------------------------------------------------------------------------
 // Constantes IPC (verbatim de rslaq-sim.cc)
@@ -273,8 +329,182 @@ struct KpmPrevValues
     uint32_t txPackets = 0;
     uint32_t rxPackets = 0;
     uint32_t lostPackets = 0;
+    double delaySumSec = 0.0; //!< contrato v1.3 (col. 16): delta do delaySum acumulado
 };
 static std::map<uint16_t, KpmPrevValues> g_kpmPrevValues;
+
+// ---------------------------------------------------------------------------
+// Latência POR PACOTE (contrato SQR v1.3): sqr_packet_delays.csv
+// ---------------------------------------------------------------------------
+// Mecanismo: uma Tag de INTERVALO DE BYTES (ByteTag) carrega o instante de TX;
+// o callback de Rx no UdpServer de cada UE mede delay = agora − txSec e
+// bufferiza o registro, drenado junto com o KPM periódico (sem I/O por
+// pacote). Latência média e PDR por UE-janela derivam no Python
+// (dDelaySumSec/dRxPackets e dRxPackets/dTxPackets das colunas 14–17 do KPM).
+//
+// Por que ByteTag e não PacketTag: a reassemblagem RLC-UM reconstrói o PDCP
+// PDU via Packet::AddAtEnd (contrib/nr/model/nr-rlc-um.cc:406), que NÃO funda
+// packet tags — com segmentação RLC (UEs de borda a 2 km são segmentados) a
+// tag se perderia. Byte tags SÃO fundidas por AddAtEnd com ajuste de offset
+// (src/network/model/packet.cc) e sobrevivem também aos p->Copy() do caminho
+// UDP/IP/EPC (Packet::Copy copia as duas listas de tags). Ponto de
+// tagueamento: trace "SendOutgoing" do Ipv4L3Protocol do remoteHost — dispara
+// DEPOIS da cópia do UdpSocketImpl (udp-socket-impl.cc:602 m_udp->Send(p->
+// Copy(),...): o pacote traceado É o objeto que viaja) e ANTES do
+// packet->Copy() de SendRealOut (ipv4-l3-protocol.cc:784); o callback é
+// síncrono, logo a tag entra no objeto antes da cópia. O tempo de TX é a
+// saída do socket IP do remote host: latência E2E app-a-app (inclui backhaul
+// P2P + encapsulamento GTP-U + fila/fase rádio) — [ASSUMIDO] register R28.
+class SqrTxTimestampTag : public Tag
+{
+  public:
+    static TypeId
+    GetTypeId()
+    {
+        static TypeId tid = TypeId("ns3::SqrTxTimestampTag")
+                                .SetParent<Tag>()
+                                .SetGroupName("Sqr")
+                                .AddConstructor<SqrTxTimestampTag>();
+        return tid;
+    }
+
+    TypeId
+    GetInstanceTypeId() const override
+    {
+        return GetTypeId();
+    }
+
+    uint32_t
+    GetSerializedSize() const override
+    {
+        return 8;
+    }
+
+    void
+    Serialize(TagBuffer buf) const override
+    {
+        buf.WriteU64(m_txNs);
+    }
+
+    void
+    Deserialize(TagBuffer buf) override
+    {
+        m_txNs = buf.ReadU64();
+    }
+
+    void
+    Print(std::ostream& os) const override
+    {
+        os << "txNs=" << m_txNs;
+    }
+
+    void
+    SetTx(Time t)
+    {
+        m_txNs = static_cast<uint64_t>(t.GetNanoSeconds());
+    }
+
+    Time
+    GetTx() const
+    {
+        return NanoSeconds(static_cast<int64_t>(m_txNs));
+    }
+
+  private:
+    uint64_t m_txNs = 0;
+};
+
+/// Registro de um pacote ENTREGUE (Rx no app do UE), drenado junto ao KPM.
+struct SqrPacketDelayRecord
+{
+    uint64_t imsi = 0;
+    uint32_t sliceIdx = 0;
+    double txSec = 0.0;
+    double delaySec = 0.0;
+};
+static std::vector<SqrPacketDelayRecord> g_packetDelayBuffer;
+static uint64_t g_packetDelayDelivered = 0;  //!< Rx com tag (linhas do CSV)
+static uint64_t g_packetDelayTagMissing = 0; //!< Rx sem tag (auditoria)
+static std::map<Ipv4Address, uint16_t> g_ueIpv4ToUeId; //!< filtro do trace TX
+
+/// Trace "SendOutgoing" do Ipv4 do remoteHost — só tráfego local (os apps DL
+/// OnOff são os únicos geradores neste nó). Tagueia pacotes destinados a um
+/// UE registrado; AddByteTag é const (a lista de byte tags é mutável), então
+/// não há const_cast. Pacote já tagueado (retransmissão do m_unsentPacket do
+/// OnOff após Send falho) mantém o 1º instante — determinístico.
+static void
+SqrIpv4SendOutgoingTrace(const Ipv4Header& header, Ptr<const Packet> packet, uint32_t /*iface*/)
+{
+    if (g_ueIpv4ToUeId.find(header.GetDestination()) == g_ueIpv4ToUeId.end())
+    {
+        return;
+    }
+    SqrTxTimestampTag existing;
+    if (packet->FindFirstMatchingByteTag(existing))
+    {
+        return;
+    }
+    SqrTxTimestampTag tag;
+    tag.SetTx(Simulator::Now());
+    packet->AddByteTag(tag);
+}
+
+/// Trace "Rx" do UdpServer de um UE (pacote ENTREGUE no app): mede o delay e
+/// bufferiza para o dreno junto com o KPM periódico. Assinatura do trace
+/// m_rxTrace = ns3::Packet::TracedCallback = (Ptr<const Packet>) — sem
+/// Address (udp-server.cc:51).
+static void
+SqrUdpServerRxCb(uint16_t ueId, Ptr<const Packet> packet)
+{
+    auto itUe = g_ues.find(ueId);
+    if (itUe == g_ues.end() || packet == nullptr)
+    {
+        return;
+    }
+    const SqrUe& ue = itUe->second;
+    SqrTxTimestampTag tag;
+    if (!packet->FindFirstMatchingByteTag(tag))
+    {
+        g_packetDelayTagMissing++;
+        return;
+    }
+    SqrPacketDelayRecord rec;
+    // Chave = MESMO identificador da col. 2 do KPM ("ueImsi", que desde a
+    // Fase 1 carrega o ueId sequencial — emitRow). Gravar o IMSI real aqui
+    // quebraria o join sqr_packet_delays × sqr_kpm_history na análise.
+    rec.imsi = ue.ueId;
+    rec.sliceIdx = static_cast<uint32_t>(ue.slice);
+    rec.txSec = tag.GetTx().GetSeconds();
+    rec.delaySec = std::max(Simulator::Now().GetSeconds() - rec.txSec, 0.0);
+    g_packetDelayDelivered++;
+    g_packetDelayBuffer.push_back(rec);
+}
+
+/// Dreno do buffer de delays por pacote — junto com o KPM periódico e no fim
+/// do run (cauda da última janela).
+static void
+FlushPacketDelays()
+{
+    if (g_packetDelayBuffer.empty())
+    {
+        return;
+    }
+    static std::ofstream pktDelaysFile;
+    if (!pktDelaysFile.is_open())
+    {
+        std::filesystem::create_directories(g_outputDir);
+        pktDelaysFile.open(g_outputDir + "/sqr_packet_delays.csv",
+                           std::ios::out | std::ios::trunc);
+        pktDelaysFile << "ueImsi,sliceId,txSec,delaySec\n";
+    }
+    for (const auto& r : g_packetDelayBuffer)
+    {
+        pktDelaysFile << r.imsi << "," << r.sliceIdx << "," << std::fixed
+                      << std::setprecision(6) << r.txSec << "," << r.delaySec << "\n";
+    }
+    g_packetDelayBuffer.clear();
+    pktDelaysFile.flush();
+}
 
 // ---------------------------------------------------------------------------
 // Helpers (copiados de rslaq-sim.cc quando idênticos)
@@ -353,6 +583,105 @@ ParseWeights(const std::string& str)
         w.push_back(std::stod(token));
     }
     return w;
+}
+
+/**
+ * @brief Parseia as taxas de chegada POR SLICE (UEs/min), ex. "6,6,6".
+ *
+ * Etapa 2.1: exatamente 3 valores não-negativos; chamado só quando a flag
+ * --sliceLambdas é não-vazia (o default λ/3 por slice é resolvido no main).
+ */
+static std::array<double, NUM_SLICES>
+ParseSliceLambdas(const std::string& str)
+{
+    std::array<double, NUM_SLICES> out = {0.0, 0.0, 0.0};
+    std::stringstream ss(str);
+    std::string token;
+    uint32_t i = 0;
+    while (std::getline(ss, token, ',') && i < NUM_SLICES)
+    {
+        out[i++] = std::stod(token);
+    }
+    if (i != NUM_SLICES)
+    {
+        NS_FATAL_ERROR("--sliceLambdas must have exactly " << NUM_SLICES
+                                                           << " values (got " << i << ")");
+    }
+    for (double v : out)
+    {
+        if (v < 0.0)
+        {
+            NS_FATAL_ERROR("--sliceLambdas values must be non-negative");
+        }
+    }
+    if (out[0] + out[1] + out[2] <= 0.0)
+    {
+        NS_FATAL_ERROR("--sliceLambdas sum must be positive (no UE would ever arrive)");
+    }
+    return out;
+}
+
+static std::string
+SliceAppName(SliceApp a)
+{
+    switch (a)
+    {
+    case SliceApp::GREEDY:
+        return "greedy";
+    case SliceApp::URLLC:
+        return "urllc";
+    case SliceApp::MMTC:
+        return "mmtc";
+    }
+    return "?";
+}
+
+static SliceApp
+ParseSliceApp(const std::string& token)
+{
+    const std::string t = ToLower(token);
+    if (t == "greedy")
+    {
+        return SliceApp::GREEDY;
+    }
+    if (t == "urllc")
+    {
+        return SliceApp::URLLC;
+    }
+    if (t == "mmtc")
+    {
+        return SliceApp::MMTC;
+    }
+    NS_FATAL_ERROR("Invalid slice app profile: " << token
+                                                 << " (valid: greedy|urllc|mmtc)");
+}
+
+/**
+ * @brief Parseia os perfis de tráfego por slice, ex. "greedy,urllc,mmtc"
+ * (Etapa 2.1, contrato §4.2). Default vazio = greedy nos 3 (retrocompatível).
+ */
+static std::array<SliceApp, NUM_SLICES>
+ParseSliceApps(const std::string& str)
+{
+    std::array<SliceApp, NUM_SLICES> out = {
+        SliceApp::GREEDY, SliceApp::GREEDY, SliceApp::GREEDY};
+    if (str.empty())
+    {
+        return out;
+    }
+    std::stringstream ss(str);
+    std::string token;
+    uint32_t i = 0;
+    while (std::getline(ss, token, ',') && i < NUM_SLICES)
+    {
+        out[i++] = ParseSliceApp(token);
+    }
+    if (i != NUM_SLICES)
+    {
+        NS_FATAL_ERROR("--sliceApps must have exactly " << NUM_SLICES
+                                                        << " values (got " << i << ")");
+    }
+    return out;
 }
 
 static RslaqMacScheduler::IntraSliceAlgorithm
@@ -487,26 +816,31 @@ PushSliceMappingToScheduler()
 // Ciclo de vida dos UEs dinâmicos
 // ---------------------------------------------------------------------------
 
-static void ScheduleNextArrival();
-static void UeArrival();
+static void ScheduleNextArrival(uint32_t sliceIdx);
+static void UeArrival(uint32_t sliceIdx);
 static void UeDeparture(uint16_t ueId);
 static void AttachCheck();
 
 /**
- * @brief Agenda a próxima chegada: processo de Poisson (inter-chegada Exp).
+ * @brief Agenda a próxima chegada do processo de Poisson da slice @p sliceIdx.
  *
- * [ARTIGO] lambda = 2 UEs/min global. ChPs: o processo é homogêneo do t=0.
+ * Etapa 2.1 (contrato §4.2, register R34): UM processo independente por slice
+ * (superposição de processos de Poisson). Default (flag --sliceLambdas vazia):
+ * taxa λ/3 por slice ⇒ processo total Poisson(λ) com slice uniforme —
+ * estatisticamente idêntico ao comportamento pré-2.1 (processo único + sorteio
+ * uniforme). [ARTIGO] λ global = 2 UEs/min, processo homogêneo do t=0.
  */
 static void
-ScheduleNextArrival()
+ScheduleNextArrival(uint32_t sliceIdx)
 {
-    if (g_lambdaUesPerMin <= 0.0)
+    const double lambda = g_sliceLambdasPerMin[sliceIdx];
+    if (lambda <= 0.0)
     {
-        return;
+        return; // slice sem chegadas (λ=0 explícito ou flag ausente jamais deve cair aqui)
     }
     // Inter-chegada exponencial (Poisson homogêneo), média 60/lambda segundos
     Ptr<ExponentialRandomVariable> interArrival = CreateObject<ExponentialRandomVariable>();
-    interArrival->SetAttribute("Mean", DoubleValue(60.0 / g_lambdaUesPerMin));
+    interArrival->SetAttribute("Mean", DoubleValue(60.0 / lambda));
     double dt = interArrival->GetValue();
     if (!(dt > 0.0))
     {
@@ -541,33 +875,29 @@ ScheduleNextArrival()
     const double nextSec = alignedNs / 1e9;
     if (nextSec <= g_simTimeSec - g_serverDrainSec)
     {
-        Simulator::Schedule(NanoSeconds(alignedNs - nowNs), &UeArrival);
+        Simulator::Schedule(NanoSeconds(alignedNs - nowNs), &UeArrival, sliceIdx);
     }
 }
 
 /**
  * @brief Chegada de um UE: cria nó, dispositivo NR, apps e agenda a partida.
  *
- * A partida (sessão) também é sorteada aqui — Exp(60 s) [ARTIGO] — e limitada
+ * A slice é fixada pelo ÍNDICE DO PROCESSO de Poisson que gerou a chegada
+ * (Etapa 2.1, contrato §4.2 — não há mais sorteio uniforme). A partida
+ * (sessão) também é sorteada aqui — Exp(60 s) [ARTIGO] — e limitada
  * por simTime. Como Application::SetStartTime/SetStopTime são RELATIVOS ao
  * tempo de instalação (src/network/model/application.cc:88-91 tratam o Time
  * como delay; ver application.h:64), todos os tempos abaixo são delays a
  * partir do instante de chegada.
  */
 static void
-UeArrival()
+UeArrival(uint32_t sliceIdx)
 {
     g_arrivalCount++;
     g_nextUeId += 1;
     const uint16_t ueId = g_nextUeId;
     const double nowSec = Simulator::Now().GetSeconds();
-
-    // Slice uniforme entre os 3 eMBB [ARTIGO]. IMPORTANTE: RandomVariableStream
-    // NÃO pode ser alocado na stack — o RngStream só é criado pela construção
-    // de atributos (SetStream via Object::Construct); stack → m_rng nulo →
-    // SIGSEGV em RandU01.
-    Ptr<UniformRandomVariable> uni = CreateObject<UniformRandomVariable>();
-    const uint32_t sliceIdx = static_cast<uint32_t>(uni->GetInteger(0, NUM_SLICES - 1));
+    NS_ABORT_MSG_IF(sliceIdx >= NUM_SLICES, "UeArrival: invalid slice index");
     const SliceType slice = static_cast<SliceType>(sliceIdx);
 
     // Sessão exponencial média 60 s [ARTIGO]
@@ -618,6 +948,10 @@ UeArrival()
     g_nrHelper->GetUePhy(ueDev, 0)->SetPattern(g_appliedTddPattern);
 
     Ipv4InterfaceContainer ueIpIfaces = g_epcHelper->AssignUeIpv4Address(ueDevContainer);
+    // Contrato v1.3: registra o IPv4 do UE para o filtro do trace de TX dos
+    // delays por pacote (o trace SendOutgoing do remoteHost entrega o header
+    // IP; destino = IPv4 do UE).
+    g_ueIpv4ToUeId[ueIpIfaces.GetAddress(0)] = ueId;
     Ipv4StaticRoutingHelper ipv4RoutingHelper;
     Ptr<Ipv4StaticRouting> ueStatic =
         ipv4RoutingHelper.GetStaticRouting(ueNode->GetObject<Ipv4>());
@@ -634,21 +968,50 @@ UeArrival()
 
     // --- Aplicações DL ---
     const uint16_t port = static_cast<uint16_t>(BASE_DL_PORT + ueId);
-    // R04 (greedy full-buffer): taxa absoluta por UE (default 100 Mbps > 2× o
-    // pico da célula ⇒ fila sempre não vazia); 0 = fallback legado mult × SLA.
-    const double offeredMbps =
-        (g_ueOfferedMbps > 0.0) ? g_ueOfferedMbps : g_ueOfferedMult * g_slaMbps[sliceIdx];
+    // Etapa 2.1 (contrato §4.2): taxa oferecida e tamanho de pacote POR PERFIL.
+    // greedy (R04): taxa absoluta por UE (default 100 Mbps > 2× o pico da
+    //   célula ⇒ fila sempre não vazia); 0 = fallback legado mult × SLA.
+    // urllc/mmtc [ASSUMIDO R35]: cadência determinística pkt/intervalo (payload
+    //   UDP; headers IP/UDP/GTP entram por baixo) — a taxa oferecida DERIVA dos
+    //   parâmetros do perfil (ueOfferedMbps não se aplica).
+    uint32_t pktSize = g_pktSize;
+    double offeredMbps = 0.0;
+    switch (g_sliceApps[sliceIdx])
+    {
+    case SliceApp::GREEDY:
+        offeredMbps = (g_ueOfferedMbps > 0.0) ? g_ueOfferedMbps
+                                              : g_ueOfferedMult * g_slaMbps[sliceIdx];
+        pktSize = g_pktSize;
+        break;
+    case SliceApp::URLLC:
+        pktSize = g_urllcPktBytes;
+        offeredMbps = g_urllcPktBytes * 8.0 / (g_urllcIntervalMs / 1000.0) / 1e6;
+        break;
+    case SliceApp::MMTC:
+        pktSize = g_mmtcPktBytes;
+        offeredMbps = g_mmtcPktBytes * 8.0 / (g_mmtcIntervalMs / 1000.0) / 1e6;
+        break;
+    }
     const double offeredBps = offeredMbps * 1e6;
 
     UdpServerHelper serverHelper(port);
     ApplicationContainer serverApps = serverHelper.Install(ueNode);
     Ptr<Application> serverApp = serverApps.Get(0);
+    // Contrato v1.3: callback de Rx no app receptor p/ latência POR PACOTE
+    // (sqr_packet_delays.csv). O trace "Rx" do UdpServer entrega o pacote
+    // ENTREGUE (pós-UDP/IP); a ByteTag de TX sobrevive ao caminho EPC+rádio
+    // (segmentação RLC-UM incluída — ver bloco da tag).
+    if (Ptr<UdpServer> srv = DynamicCast<UdpServer>(serverApp))
+    {
+        srv->TraceConnectWithoutContext("Rx",
+                                        MakeBoundCallback(&SqrUdpServerRxCb, ueId));
+    }
     // Delays relativos à chegada (semântica SetStartTime/SetStopTime)
     serverApp->SetStartTime(Seconds(0.0));
     serverApp->SetStopTime(Seconds(std::min(departureSec + g_serverDrainSec, g_simTimeSec + g_serverDrainSec) - nowSec));
 
     OnOffHelper onOff("ns3::UdpSocketFactory", InetSocketAddress(ueIpIfaces.GetAddress(0), port));
-    onOff.SetConstantRate(DataRate(offeredBps), g_pktSize);
+    onOff.SetConstantRate(DataRate(offeredBps), pktSize);
     ApplicationContainer clientApps = onOff.Install(g_remoteHostNode);
     Ptr<Application> clientApp = clientApps.Get(0);
     // Tráfego só após a margem de conexão RRC [ASSUMIDO] e até a partida
@@ -682,19 +1045,25 @@ UeArrival()
     std::cout << std::fixed << std::setprecision(3)
               << "[SqrSim] UE_ARRIVAL ueId=" << ueId
               << " slice=" << sliceIdx
+              << " profile=" << SliceAppName(g_sliceApps[sliceIdx])
               << " t=" << nowSec << "s"
               << " session=" << sessionSec << "s"
               << " departure=" << departureSec << "s"
               << " port=" << port
               << " offered=" << offeredMbps << " Mbps"
+              << " pkt=" << pktSize << " B"
+              << (g_sliceApps[sliceIdx] == SliceApp::URLLC
+                      ? " urllc_deadline_ms=" + std::to_string(
+                            static_cast<int>(g_urllcDeadlineMs))
+                      : "")
               << " sla=" << g_slaMbps[sliceIdx] << " Mbps"
               << " activeUes=" << g_arrivalCount - g_departureCount << "\n";
 
     // --- Partida da sessão ---
     Simulator::Schedule(Seconds(departureSec - nowSec), &UeDeparture, ueId);
 
-    // --- Próxima chegada (Poisson) ---
-    ScheduleNextArrival();
+    // --- Próxima chegada do MESMO processo de Poisson (Etapa 2.1) ---
+    ScheduleNextArrival(sliceIdx);
 }
 
 /**
@@ -965,9 +1334,11 @@ KpmAndControlCallback()
             k.count++;
         }
 
-        // Escrever sqr-kpms.txt — KPM ESTENDIDO do contrato SQR §4 (nome novo:
-        // não colide com o rslaq-kpms.txt dos runs rslaq, rastreado no git).
-        // Colunas originais preservadas + windowThroughputMbps, snrDb, queueBytes.
+            // Escrever sqr-kpms.txt — KPM ESTENDIDO do contrato SQR §4 (nome novo:
+            // não colide com o rslaq-kpms.txt dos runs rslaq, rastreado no git).
+            // Colunas originais preservadas + windowThroughputMbps, snrDb, queueBytes
+            // (col. 11–13, §4) + dTxPackets, dRxPackets, dDelaySumSec, cqiWideband
+            // (col. 14–17, contrato v1.3 — ADITIVAS, só no FIM da linha).
         //
         // JANELA PARCIAL (contrato §4): UEs que entram no meio da janela
         // aparecem na janela SEGUINTE com deltas desde a ENTRADA (1ª borda de
@@ -985,13 +1356,13 @@ KpmAndControlCallback()
                             std::ios::out | std::ios::trunc);
             kpmHistory << "timestamp,ueImsi,sliceId,dTxBytes,dRxBytes,plr,resourceSharePct,"
                           "dLostPackets,throughputMbps,bufferBytes,windowThroughputMbps,snrDb,"
-                          "queueBytes\n";
+                          "queueBytes,dTxPackets,dRxPackets,dDelaySumSec,cqiWideband\n";
         }
         {
             std::ofstream kpmFile("sqr-kpms.txt", std::ios::out | std::ios::trunc);
             kpmFile << "timestamp,ueImsi,sliceId,dTxBytes,dRxBytes,plr,resourceSharePct,"
                        "dLostPackets,throughputMbps,bufferBytes,windowThroughputMbps,snrDb,"
-                       "queueBytes\n";
+                       "queueBytes,dTxPackets,dRxPackets,dDelaySumSec,cqiWideband\n";
 
             const double periodSec = static_cast<double>(g_indicationPeriodMs) / 1000.0;
             const double tEndSec = static_cast<double>(nowMs) / 1000.0;
@@ -1007,7 +1378,9 @@ KpmAndControlCallback()
                                uint64_t ts, uint16_t ueId, uint32_t sliceIdx,
                                uint64_t dTx, uint64_t dRx, double plr, double rsh,
                                uint32_t effLost, double thrLegacy, uint32_t buf,
-                               double windowThr, double snr, uint32_t queue) {
+                               double windowThr, double snr, uint32_t queue,
+                               uint32_t dTxPk, uint32_t dRxPk, double dDelaySec,
+                               int cqiWb) {
                 out << ts << "," << ueId << "," << sliceIdx << ","
                     << dTx << "," << dRx << ","
                     << std::fixed << std::setprecision(2) << plr << ","
@@ -1017,7 +1390,10 @@ KpmAndControlCallback()
                     << buf << ","
                     << std::setprecision(4) << windowThr << ","
                     << std::setprecision(2) << snr << ","
-                    << queue << "\n";
+                    << queue << ","
+                    << dTxPk << "," << dRxPk << ","
+                    << std::setprecision(6) << dDelaySec << ","
+                    << cqiWb << "\n";
             };
 
             for (auto& kv : g_ues)
@@ -1065,6 +1441,14 @@ KpmAndControlCallback()
                 prev.txPackets = k.txPackets;
                 prev.rxPackets = k.rxPackets;
                 prev.lostPackets = k.lostPackets;
+                // Contrato v1.3 (col. 16): delta do delaySum acumulado do
+                // FlowMonitor (soma dos delays dos pacotes recebidos na
+                // janela; latência média = dDelaySumSec / dRxPackets no
+                // Python). Mesma regra de janela parcial do resto do bloco.
+                const double dDelaySumSec =
+                    (k.delaySumSec >= prev.delaySumSec) ? (k.delaySumSec - prev.delaySumSec)
+                                                        : 0.0;
+                prev.delaySumSec = k.delaySumSec;
 
                 uint32_t effectiveLost = (dTxPackets >= dRxPackets) ? (dTxPackets - dRxPackets) : 0;
 
@@ -1102,13 +1486,25 @@ KpmAndControlCallback()
                 {
                     snrDb = g_schedulerPtr->GetUeDlSinrDb(g_ueIdToRnti[ueId]);
                 }
+                // cqiWideband (contrato v1.3, col. 17): o CQI wideband CRU
+                // (inteiro 1–15) que hoje é invertido para estimar snrDb —
+                // SEM conversão. Sentinela -1 quando não há CQI (contrato
+                // v1.3; a coluna snrDb e sua sentinela -999 permanecem
+                // INALTERADAS).
+                int cqiWideband = -1;
+                if (g_schedulerPtr && g_ueIdToRnti.count(ueId))
+                {
+                    cqiWideband = g_schedulerPtr->GetUeDlCqiWideband(g_ueIdToRnti[ueId]);
+                }
                 // queueBytes: fila DL do UE no MAC/RLC (mesma fonte do bufferBytes)
                 uint32_t queueBytes = bufferBytes;
 
                 emitRow(kpmFile, nowMs, ueId, sliceIdx, dTxBytes, dRxBytes, plr, rsh,
-                        effectiveLost, thrMbps, bufferBytes, windowThrMbps, snrDb, queueBytes);
+                        effectiveLost, thrMbps, bufferBytes, windowThrMbps, snrDb, queueBytes,
+                        dTxPackets, dRxPackets, dDelaySumSec, cqiWideband);
                 emitRow(kpmHistory, nowMs, ueId, sliceIdx, dTxBytes, dRxBytes, plr, rsh,
-                        effectiveLost, thrMbps, bufferBytes, windowThrMbps, snrDb, queueBytes);
+                        effectiveLost, thrMbps, bufferBytes, windowThrMbps, snrDb, queueBytes,
+                        dTxPackets, dRxPackets, dDelaySumSec, cqiWideband);
 
                 if (g_controlPath == ControlPath::E2)
                 {
@@ -1406,6 +1802,10 @@ KpmAndControlCallback()
         }
     }
 
+    // Dreno dos delays por pacote (contrato v1.3): descarrega o buffer junto
+    // com o KPM periódico, em TODOS os modos (network-only/IPC/E2).
+    FlushPacketDelays();
+
     // Agendar próximo callback
     Simulator::Schedule(MilliSeconds(g_indicationPeriodMs), &KpmAndControlCallback);
 }
@@ -1417,6 +1817,9 @@ KpmAndControlCallback()
 static void
 WriteFinalReport(const Ptr<Ipv4FlowClassifier>& classifier)
 {
+    // Contrato v1.3: drena os delays por pacote remanescentes (cauda da
+    // última janela, entregues após o último KpmAndControlCallback).
+    FlushPacketDelays();
     if (!g_monitorPtr)
     {
         return;
@@ -1479,6 +1882,7 @@ WriteFinalReport(const Ptr<Ipv4FlowClassifier>& classifier)
 
         std::cout << std::setprecision(3)
                   << "UE " << ue.ueId << " [" << SliceName(ue.slice) << "]"
+                  << " profile=" << SliceAppName(g_sliceApps[sliceIdx])
                   << " arrival=" << ue.arrivalSec << "s"
                   << " departure=" << (ue.active ? -1.0 : ue.departureSec) << "s"
                   << " sla=" << slaMbps << " Mbps"
@@ -1505,7 +1909,28 @@ WriteFinalReport(const Ptr<Ipv4FlowClassifier>& classifier)
               << "[SqrSim] IPC_DEGRADATION action_file_missing_keep_prev_quota="
               << g_actionFileMissingCount
               << " action_slice_line_missing_default_33pct=" << g_sliceLineMissingCount
-              << " (contract §5)\n";
+              << " (contract §5)\n"
+              // Contrato v1.3: auditoria dos delays por pacote (Rx sem tag =
+              // pacote entregue cuja ByteTag se perdeu no caminho — esperado 0).
+              << "[SqrSim] PACKET_DELAYS delivered_with_tag=" << g_packetDelayDelivered
+              << " rx_without_tag=" << g_packetDelayTagMissing
+              << " (csv: " << g_outputDir << "/sqr_packet_delays.csv, contract v1.3)\n"
+              // Etapa 2.1 (contrato §4.2): metadados dos perfis por slice no
+              // header do run — escolha registrada no contrato (deadline do
+              // URLLC como METADADO, não como coluna extra do
+              // sqr_packet_delays.csv, para manter os headers existentes
+              // byte-idênticos à parte 1 da Etapa 2.1).
+              << "[SqrSim] SLA_PROFILES slice_lambdas_per_min="
+              << g_sliceLambdasPerMin[0] << "," << g_sliceLambdasPerMin[1] << ","
+              << g_sliceLambdasPerMin[2]
+              << " apps=" << SliceAppName(g_sliceApps[0]) << ","
+              << SliceAppName(g_sliceApps[1]) << "," << SliceAppName(g_sliceApps[2])
+              << " urllc_pkt_bytes=" << g_urllcPktBytes
+              << " urllc_interval_ms=" << g_urllcIntervalMs
+              << " urllc_deadline_ms=" << g_urllcDeadlineMs
+              << " mmtc_pkt_bytes=" << g_mmtcPktBytes
+              << " mmtc_interval_ms=" << g_mmtcIntervalMs
+              << " (contract v1.4 §4.2)\n";
 
     if (g_controlPath == ControlPath::E2)
     {
@@ -1573,6 +1998,8 @@ main(int argc, char* argv[])
     std::string controlPathStr = "ipc"; // Fase 5.3: {ipc,e2}
     std::string e2PhasesStr = "0,50,100";
     std::string e2EndpointStr = "loopback"; // Fase 5.4: {loopback,xapp}
+    std::string sliceLambdasStr = "";       // Etapa 2.1: vazio ⇒ λ/3 por slice (R34)
+    std::string sliceAppsStr = "";          // Etapa 2.1: vazio ⇒ greedy×3 (retro)
 
     CommandLine cmd(__FILE__);
     cmd.AddValue("simTime", "Total sim time (s)", g_simTimeSec);
@@ -1591,8 +2018,35 @@ main(int argc, char* argv[])
     cmd.AddValue("gnbHeight", "gNB antenna height (m)", gnbHeightM);
     cmd.AddValue("ueHeight", "UE antenna height (m)", g_ueHeightM);
     cmd.AddValue("gnbTiltDeg", "gNB panel downtilt (deg)", gnbTiltDeg);
-    cmd.AddValue("lambdaUesPerMin", "Poisson arrival rate (UEs/min) [ARTIGO: 2]", g_lambdaUesPerMin);
+    cmd.AddValue("lambdaUesPerMin", "Poisson arrival rate TOTAL (UEs/min) [ARTIGO: 2] — "
+                                    "with empty sliceLambdas each slice runs an independent "
+                                    "lambda/3 process (statistically identical to pre-2.1)",
+                 g_lambdaUesPerMin);
     cmd.AddValue("meanSessionSec", "Mean session duration (s, exponential) [ARTIGO: 60]", g_meanSessionSec);
+    cmd.AddValue("sliceLambdas", "Per-slice Poisson arrival rates in UEs/min, comma list of "
+                                 "3 INDEPENDENT processes, e.g. 6,6,6 (arrival belongs to its "
+                                 "slice's process; 0 disables a slice; empty/absent = "
+                                 "lambdaUesPerMin/3 per slice, Etapa 2.1 contract §4.2)",
+                 sliceLambdasStr);
+    cmd.AddValue("sliceApps", "Per-slice traffic profile: greedy|urllc|mmtc, comma list of 3 "
+                              "(default greedy,greedy,greedy = pre-2.1 behavior; contract §4.2)",
+                 sliceAppsStr);
+    cmd.AddValue("urllcPktBytes", "URLLC profile: UDP payload per packet in bytes "
+                                  "[ASSUMIDO R35, default 32]",
+                 g_urllcPktBytes);
+    cmd.AddValue("urllcIntervalMs", "URLLC profile: period between packets in ms "
+                                    "[ASSUMIDO R35, default 1]",
+                 g_urllcIntervalMs);
+    cmd.AddValue("urllcDeadlineMs", "URLLC profile: ANALYSIS deadline in ms (metadata of the "
+                                    "run; the scheduler is NOT deadline-aware) "
+                                    "[ASSUMIDO R35, default 10]",
+                 g_urllcDeadlineMs);
+    cmd.AddValue("mmtcPktBytes", "mMTC profile: UDP payload per packet in bytes "
+                                 "[ASSUMIDO R35, default 200]",
+                 g_mmtcPktBytes);
+    cmd.AddValue("mmtcIntervalMs", "mMTC profile: period between packets in ms "
+                                   "[ASSUMIDO R35, default 1000]",
+                 g_mmtcIntervalMs);
     cmd.AddValue("slaMbps", "Per-slice per-UE SLA in Mbps [ARTIGO: 0.5,1.0,1.5]", slaStr);
     cmd.AddValue("ueOfferedMbps", "Per-UE offered DL UDP rate in Mbps — greedy full-buffer "
                                   "(default 100 > 2x cell peak; 0 = legacy ueOfferedMult x SLA)",
@@ -1671,6 +2125,38 @@ main(int argc, char* argv[])
         NS_FATAL_ERROR("rlcMode must be either 'am' or 'um'");
     }
     rlcMode = ToLower(rlcMode);
+
+    // --- Slices heterogêneos (Etapa 2.1, contrato §4.2) ---
+    g_sliceLambdasExplicit = !sliceLambdasStr.empty();
+    if (g_sliceLambdasExplicit)
+    {
+        g_sliceLambdasPerMin = ParseSliceLambdas(sliceLambdasStr);
+    }
+    else
+    {
+        // Default retrocompatível (register R34): λ/3 por slice — a superposição
+        // de 3 processos de Poisson independentes de taxa λ/3 é um processo de
+        // Poisson total de taxa λ com marca de slice uniforme, exatamente a
+        // semântica pré-2.1 (processo único + sorteio uniforme de slice). Passar
+        // λ literal para cada slice triplicaria a carga da campanha existente.
+        for (double& l : g_sliceLambdasPerMin)
+        {
+            l = g_lambdaUesPerMin / static_cast<double>(NUM_SLICES);
+        }
+    }
+    g_sliceApps = ParseSliceApps(sliceAppsStr);
+    if (g_urllcPktBytes == 0 || g_mmtcPktBytes == 0)
+    {
+        NS_FATAL_ERROR("urllcPktBytes and mmtcPktBytes must be positive");
+    }
+    if (g_urllcIntervalMs <= 0.0 || g_mmtcIntervalMs <= 0.0)
+    {
+        NS_FATAL_ERROR("urllcIntervalMs and mmtcIntervalMs must be positive");
+    }
+    if (g_urllcDeadlineMs <= 0.0)
+    {
+        NS_FATAL_ERROR("urllcDeadlineMs must be positive (analysis deadline)");
+    }
 
     // --- Caminho de controle (Fase 5.3) ---
     {
@@ -1815,10 +2301,22 @@ main(int argc, char* argv[])
               << "UE noise fig : " << ueNoiseFigureDb << " dB [ARTIGO]\n"
               << "Pathloss     : 3GPP UMa (urban macro) [ARTIGO]\n"
               << "Cell radius  : " << g_cellRadiusM << " m [ARTIGO]\n"
-              << "UE churn     : Poisson " << g_lambdaUesPerMin << " UEs/min, "
-              << "session Exp(" << g_meanSessionSec << " s) [ARTIGO]\n"
+              << "UE churn     : Poisson por slice "
+              << g_sliceLambdasPerMin[0] << "," << g_sliceLambdasPerMin[1] << ","
+              << g_sliceLambdasPerMin[2] << " UEs/min"
+              << (g_sliceLambdasExplicit ? " (--sliceLambdas, processos independentes)"
+                                         : " (= lambdaUesPerMin/3 cada; superposição = "
+                                           "Poisson global, pré-2.1 — R34)")
+              << ", session Exp(" << g_meanSessionSec << " s) [ARTIGO]\n"
               << "Mobility     : RandomWalk2d ~1 m/s [ASSUMIDO]\n"
-              << "Slices       : 3x eMBB, SLA/UE = " << slaStr << " Mbps [ARTIGO]\n"
+              << "Slices       : 3x, SLA/UE = " << slaStr << " Mbps [ARTIGO], apps = "
+              << SliceAppName(g_sliceApps[0]) << "," << SliceAppName(g_sliceApps[1]) << ","
+              << SliceAppName(g_sliceApps[2]) << " (contrato v1.4 §4.2)\n"
+              << "Traffic cfg  : urllc{pkt=" << g_urllcPktBytes
+              << " B, interval=" << g_urllcIntervalMs
+              << " ms, deadline=" << g_urllcDeadlineMs << " ms [ASSUMIDO R35, metadata]}"
+              << " mmtc{pkt=" << g_mmtcPktBytes << " B, interval=" << g_mmtcIntervalMs
+              << " ms [ASSUMIDO R35]}\n"
               << "Offered/UE   : "
               << (g_ueOfferedMbps > 0.0
                       ? (std::ostringstream{} << g_ueOfferedMbps << " Mbps UDP greedy full-buffer"
@@ -1961,6 +2459,17 @@ main(int argc, char* argv[])
     InternetStackHelper internet;
     internet.Install(remoteHostContainer);
 
+    // Contrato v1.3: tagueia os pacotes DL no remoteHost com o tempo de TX
+    // (latência por pacote). O trace "SendOutgoing" dispara DEPOIS da cópia
+    // do UdpSocketImpl e ANTES do packet->Copy() de SendRealOut — o callback
+    // é síncrono, logo a tag entra no objeto que de fato viaja (ver bloco
+    // SqrTxTimestampTag).
+    if (Ptr<Ipv4> rhIpv4 = g_remoteHostNode->GetObject<Ipv4>())
+    {
+        rhIpv4->TraceConnectWithoutContext("SendOutgoing",
+                                           MakeCallback(&SqrIpv4SendOutgoingTrace));
+    }
+
     // --- gNB device ---
     g_gnbNetDev = g_nrHelper->InstallGnbDevice(gNbNodes, g_allBwps);
     g_nrHelper->GetGnbPhy(g_gnbNetDev.Get(0), 0)->SetAttribute("Numerology", UintegerValue(numerology));
@@ -2087,12 +2596,17 @@ main(int argc, char* argv[])
     Simulator::Schedule(MilliSeconds(5), &AttachCheck);
     // 2) callback KPM/controle (a cada periodMs; exporta KPMs mesmo sem agente)
     Simulator::Schedule(MilliSeconds(g_indicationPeriodMs), &KpmAndControlCallback);
-    // 3) processo de Poisson de chegadas (a partir de t=0)
-    Simulator::Schedule(Seconds(0.0), &ScheduleNextArrival);
+    // 3) processos de Poisson de chegadas (Etapa 2.1: UM processo independente
+    //    por slice, todos a partir de t=0)
+    for (uint32_t s = 0; s < NUM_SLICES; s++)
+    {
+        Simulator::Schedule(Seconds(0.0), &ScheduleNextArrival, s);
+    }
 
     std::cout << "[SqrSim] Callbacks scheduled (attach check, KPM period="
-              << g_indicationPeriodMs << " ms, Poisson lambda="
-              << g_lambdaUesPerMin << " UEs/min)\n";
+              << g_indicationPeriodMs << " ms, Poisson per-slice lambdas="
+              << g_sliceLambdasPerMin[0] << "," << g_sliceLambdasPerMin[1] << ","
+              << g_sliceLambdasPerMin[2] << " UEs/min)\n";
 
     // --- Run ---
     Simulator::Stop(Seconds(g_simTimeSec));

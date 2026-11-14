@@ -40,7 +40,8 @@ echo "[run_sqr_tests] interpretador: ${PYTHON}"
 }
 
 # ---------------------------------------------------------------------
-# Gate: somente os testes sintéticos do SQR (+ baseline KBRL, Fase 3)
+# Gate: somente os testes sintéticos do SQR (+ baseline KBRL, Fase 3,
+# + oracle offline da Etapa 2.4, + SQR-JC pre-flight da Etapa 2.5)
 # ---------------------------------------------------------------------
 exec "${PYTHON}" -m pytest \
     tests/test_sqr_kernel.py \
@@ -52,4 +53,15 @@ exec "${PYTHON}" -m pytest \
     tests/test_sqr_checkpoint.py \
     tests/test_sqr_run.py \
     tests/test_sqr_kbrl.py \
+    tests/test_sqr_static_prop.py \
+    tests/test_sqr_oracle.py \
+    tests/test_sqr_replay.py \
+    tests/test_sqr_oracle_adjudication.py \
+    tests/test_sqr_oracle_recal.py \
+    tests/test_sqr_jc_kernel.py \
+    tests/test_sqr_jc_state_scaler.py \
+    tests/test_sqr_jc_action_space_search.py \
+    tests/test_sqr_jc_feasibility_floors.py \
+    tests/test_sqr_jc_controller.py \
+    tests/test_sqr_jc_regression_round2.py \
     "$@"

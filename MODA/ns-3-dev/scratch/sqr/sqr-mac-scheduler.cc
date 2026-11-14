@@ -281,7 +281,12 @@ SqrMacScheduler::AssignDLRBG(uint32_t symAvail, const ActiveUeMap& activeDl) con
      * (NÃO recalculada por demanda, NÃO renormalizada); RBGs excedentes
      * ficam ociosos; a cota nunca é ultrapassada. Estrutura de logging
      * (slice_alloc.csv, ue_detail.csv, etc.) e de alocação intra-slice
-     * (RR/PF/BCQI round-robin) reutilizada da base via herança.
+     * (RR/PF/BCQI round-robin) reutilizada da base via herança, COM UMA
+     * DIVERGÊNCIA: a porta de suficiência de demanda do upstream
+     * 5G-LENA (m_dlTbSize ≥ max(buffer,10) ⇒ UE não recebe mais RBG no slot;
+     * ver comentário no laço de alocação abaixo) — a base herdada do rslaq a
+     * omitia e preenchia a cota inteira sempre que havia QUALQUER buffer
+     * pendente, inflando prb_scheduled ≡ prb_budget nas slices CBR.
      */
     NS_LOG_FUNCTION(this << symAvail);
 
@@ -425,6 +430,9 @@ SqrMacScheduler::AssignDLRBG(uint32_t symAvail, const ActiveUeMap& activeDl) con
                     sinrDb = 10.0 * std::log10(std::max(sinrLin, 1e-12));
                 }
                 m_lastDlSinrDb[rnti] = sinrDb;
+                // Contrato SQR v1.3 (col. 17 cqiWideband): o valor CRU do
+                // wideband, no mesmo instantâneo do SINR acima; -1 sem CQI.
+                m_lastDlCqiWb[rnti] = (wbCqi > 0) ? static_cast<int>(wbCqi) : -1;
             }
 
             const int32_t sIdx = GetSliceIndexForRnti(rnti);
@@ -542,7 +550,26 @@ SqrMacScheduler::AssignDLRBG(uint32_t symAvail, const ActiveUeMap& activeDl) con
                         }
 
                         const uint32_t bufQueueSize = ue.second;
-                        const bool demandPassed = (bufQueueSize > 0 || ue.first->m_dlTbSize > 0);
+                        // Porta de suficiência de demanda do UPSTREAM
+                        // (NrMacSchedulerOfdma::AdvanceToNextUeToSchedule,
+                        // contrib/nr/model/nr-mac-scheduler-ofdma.cc:113-121 —
+                        // "Skip UEs which already have enough resources to
+                        // transmit"): um UE só recebe outro RBG enquanto a
+                        // capacidade de TB já atribuída NESTE slot
+                        // (m_dlTbSize, recalculado a cada RBG via
+                        // UpdateDlMetric) for MENOR que o buffer pendente
+                        // (piso de 10 B — DCI mínimo, regra do upstream).
+                        // O snapshot `ue.second` NUNCA zera dentro do laço; sem
+                        // esta porta, qualquer slice com buffer > 0 recebe a
+                        // COTA INTEIRA em todo slot (TB quase vazia de dados,
+                        // cheia de padding) e prb_scheduled ≡ prb_budget — bug
+                        // de telemetria da Rodada 2 (slice CBR com tráfego de
+                        // ~69 B/slot era contabilizada como cota cheia
+                        // 17 RBG × 54 slots = 918 RBGs/janela).
+                        const bool hasAnyDemand = (bufQueueSize > 0 || ue.first->m_dlTbSize > 0);
+                        const bool tbCoversBuffer =
+                            (ue.first->m_dlTbSize >= std::max(bufQueueSize, 10U));
+                        const bool demandPassed = (hasAnyDemand && !tbCoversBuffer);
 
                         if (logThisSlot && m_ueAllocCsv.is_open())
                         {

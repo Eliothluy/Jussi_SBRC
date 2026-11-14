@@ -69,7 +69,7 @@ A implementação está **autovalidada** (0% de violação quando a física perm
 
 **G4 — Percentuais internamente inconsistentes.** Seção V alega ">60% de economia de RBs"; Conclusão alega "20%" — sem denominador/agregação definidos. *Contribuição: métricas com denominadores explícitos (UE-tempo × slice-tempo) e IC 95% por seed.*
 
-**G5 — O-RAN apenas conceitual.** Nenhuma interface E2/RIC/xApp real; "compatível com near-RT RIC" é afirmado, não demonstrado. *Contribuição: SQR como xApp sobre RIC O-RAN SC via NORI (E2SM-KPM + RIC Control), com comparação de paridade e latência IPC vs E2 — validação que o original não fez.*
+**G5 — O-RAN apenas conceitual.** Nenhuma interface E2/RIC/xApp real; a arquitetura é declarada "suitable for deployment in an O-RAN RIC" (Seção I, bullet de contribuições) e a adequação ao RIC é afirmada, não demonstrada. *[Correção 2026-10-18: a frase entre aspas anterior — "compatível com near-RT RIC" — não consta no PDF (pdftotext: 0 ocorrências de "near-RT" e de "compat"); era paráfrase apresentada como citação.]* *Contribuição: SQR como xApp sobre RIC O-RAN SC via NORI (E2SM-KPM + RIC Control), com comparação de paridade e latência IPC vs E2 — validação que o original não fez.*
 
 **G6 — Regime operacional ignorado.** Sob inviabilidade (carga além da capacidade), observamos fenômeno não descrito: `A_safe` permanentemente vazio (100% modo incerto), τ saturando no piso e M no teto; o comportamento de γ=0 × γ=1 fica indistinguível — os efeitos do artigo só existem num regime viável que o artigo nunca caracteriza. *Contribuição: análise de regimes (viável × marginal × inviável) e diversidade de modos como métrica de diagnóstico.*
 

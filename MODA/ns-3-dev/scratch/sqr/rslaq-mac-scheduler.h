@@ -187,6 +187,18 @@ class RslaqMacScheduler : public NrMacSchedulerOfdmaRR
     double GetUeDlSinrDb(uint16_t rnti) const;
 
     /**
+     * @brief CQI wideband CRU do último relatório do UE (contrato SQR v1.3,
+     * coluna 17 do KPM: cqiWideband)
+     *
+     * Exporta o valor bruto (0–15) que hoje é lido para estimar snrDb por
+     * inversão nas tabelas do NrAmc (GetUeDlSinrDb) — SEM conversão.
+     * @param rnti UE RNTI
+     * @return CQI wideband 1–15; -1 (sentinela do contrato v1.3) se o UE
+     *         ainda não reportou CQI válido (wbCqi = 0)
+     */
+    int GetUeDlCqiWideband(uint16_t rnti) const;
+
+    /**
      * @brief Slots DL com chamada de scheduling desde o último reset de janela
      *
      * SQR: um contador por janela de decisão (incrementado a cada
@@ -357,6 +369,8 @@ class RslaqMacScheduler : public NrMacSchedulerOfdmaRR
     mutable uint64_t m_windowDlSlots{0};
     /** Último SINR DL estimado por RNTI (dB), a partir do CQI wideband. */
     mutable std::map<uint16_t, double> m_lastDlSinrDb;
+    /** Último CQI wideband CRU por RNTI (contrato v1.3, col. 17; -1 = sem CQI). */
+    mutable std::map<uint16_t, int> m_lastDlCqiWb;
 
     mutable std::vector<SliceAllocationStats> m_sliceAllocationStats;
 

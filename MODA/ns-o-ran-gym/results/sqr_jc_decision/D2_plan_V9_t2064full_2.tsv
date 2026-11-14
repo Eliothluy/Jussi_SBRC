@@ -1,0 +1,5 @@
+sid	run	lam	seed	win	alt	a	mech	sub
+S1_lam5_s2101_t2064	het_lam5_s2101	5	2101	2064	6	14-38-1	nbh:P2:+1:hi	0
+S1_lam5_s2101_t2064	het_lam5_s2101	5	2101	2064	1	16-37-0	paired:(0, 2):2:hi	0
+S1_lam5_s2101_t2064	het_lam5_s2101	5	2101	2064	10	12-20-16	rnd:3:sha1(het_lam5_s2101|2064)	0
+S1_lam5_s2101_t2064	het_lam5_s2101	5	2101	2064	8	3-24-4	rnd:1:sha1(het_lam5_s2101|2064)	0

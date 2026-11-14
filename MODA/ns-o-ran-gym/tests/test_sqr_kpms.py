@@ -5,6 +5,9 @@ Checklist: 13-column contract parse; sentinel -999 NEVER reaches the state
 derivations (lowest, p5 y_t with linear interpolation, UE count, queue sum);
 per-UE violation rate with empty-slice exclusion (register R19); watermark
 (last_timestamp); legacy 1-based slice ids; malformed rows skipped.
+Contract v1.3: additive columns 14-17 (dTxPackets/dRxPackets/dDelaySumSec/
+cqiWideband) parsed raw, derived latencyMeanMs/pdrWindow (None on
+non-positive denominators), 13-column files still parse.
 """
 
 import os
@@ -16,12 +19,14 @@ import numpy as np
 import pytest
 
 from nsoran.sqr.sqr_kpis import (
+    CQI_SENTINEL,
     DEFAULT_IMPUTED_SNR_DB,
     IMP_CARRIED,
     IMP_CELL_MEDIAN,
     IMP_DEFAULT,
     SNR_SENTINEL,
     SQR_KPM_COLUMNS,
+    SQR_KPM_COLUMNS_V13,
     SqrKpmParser,
     parse_sqr_kpm_file,
 )
@@ -226,6 +231,105 @@ def test_missing_file_returns_empty_window():
     assert w.total_ues == 0
     assert w.timestamp == 0
     assert all(w.slices[sid].p5_thr_mbps is None for sid in range(3))
+
+
+# ── Contract v1.3: additive columns 14–17 (latency/PDR/CQI) ─────────
+
+V13_HEADER = SQR_KPM_COLUMNS + SQR_KPM_COLUMNS_V13
+
+
+def _row_v13(ts=100, imsi=1, sid=0, wthr=1.0, snr=20.0, queue=1000, **over):
+    base = _row(ts=ts, imsi=imsi, sid=sid, wthr=wthr, snr=snr, queue=queue, **over)
+    base += [
+        over.get("dTxPackets", 100),
+        over.get("dRxPackets", 90),
+        over.get("dDelaySumSec", 0.18),
+        over.get("cqiWideband", 12),
+    ]
+    return base
+
+
+def test_v13_columns_derived_latency_and_pdr(tmp_path):
+    """latencyMeanMs = 1000·dDelaySumSec/dRxPackets; pdrWindow =
+    dRxPackets/dTxPackets; cqiWideband passes through RAW (no imputation)."""
+    path = tmp_path / "sqr-kpms.txt"
+    lines = [",".join(V13_HEADER)]
+    for row in [
+        _row_v13(imsi=1, sid=0, dTxPackets=100, dRxPackets=90,
+                 dDelaySumSec=0.18, cqiWideband=12),
+        _row_v13(imsi=2, sid=1, dTxPackets=200, dRxPackets=50,
+                 dDelaySumSec=1.25, cqiWideband=7),
+    ]:
+        lines.append(",".join(str(v) for v in row))
+    path.write_text("\n".join(lines) + "\n")
+
+    w = parse_sqr_kpm_file(str(path), sla_thresholds=SLAS)
+    assert w.total_ues == 2
+    r0, r1 = w.rows
+    assert r0.latency_mean_ms == pytest.approx(2.0)    # 1000·0.18/90
+    assert r0.pdr_window == pytest.approx(0.9)         # 90/100
+    assert r0.cqi_wideband == 12
+    assert r1.latency_mean_ms == pytest.approx(25.0)   # 1000·1.25/50
+    assert r1.pdr_window == pytest.approx(0.25)        # 50/200
+    assert r1.cqi_wideband == 7
+
+
+def test_v13_zero_denominators_yield_none(tmp_path):
+    """latencyMeanMs/pdrWindow are None (never inf/ZeroDivisionError) when
+    the denominator is not > 0 (contract v1.3)."""
+    path = tmp_path / "sqr-kpms.txt"
+    lines = [
+        ",".join(V13_HEADER),
+        ",".join(str(v) for v in _row_v13(imsi=1, sid=0, dTxPackets=0,
+                                          dRxPackets=0, dDelaySumSec=0.5)),
+    ]
+    path.write_text("\n".join(lines) + "\n")
+    w = parse_sqr_kpm_file(str(path), sla_thresholds=SLAS)
+    r = w.rows[0]
+    assert r.latency_mean_ms is None
+    assert r.pdr_window is None
+
+
+def test_v13_cqi_sentinel_and_unparsable_pass_through_raw(tmp_path):
+    """Wire sentinel -1 (no CQI) and unparsable values degrade to
+    CQI_SENTINEL — the raw column is NEVER imputed or altered."""
+    path = tmp_path / "sqr-kpms.txt"
+    lines = [
+        ",".join(V13_HEADER),
+        ",".join(str(v) for v in _row_v13(imsi=1, sid=0, cqiWideband=-1)),
+        ",".join(str(v) for v in _row_v13(imsi=2, sid=0, cqiWideband="junk")),
+    ]
+    path.write_text("\n".join(lines) + "\n")
+    w = parse_sqr_kpm_file(str(path), sla_thresholds=SLAS)
+    assert w.rows[0].cqi_wideband == CQI_SENTINEL
+    assert w.rows[1].cqi_wideband == CQI_SENTINEL
+
+
+def test_legacy_13col_file_still_parses_with_v13_defaults(tmp_path):
+    """Backward compatibility: a 13-column file — and a 13-field row under
+    the v1.3 header (e.g. the E2/xApp materialization) — parses unchanged;
+    the new fields take their defaults (0.0 packets/delay, CQI sentinel)
+    and the derived latency/PDR are None."""
+    legacy_path = _write_kpm(tmp_path / "legacy.txt", [_row(ts=100, imsi=1, sid=0)])
+    w = parse_sqr_kpm_file(str(legacy_path), sla_thresholds=SLAS)
+    r = w.rows[0]
+    assert (r.d_tx_packets, r.d_rx_packets, r.d_delay_sum_sec) == (0.0, 0.0, 0.0)
+    assert r.cqi_wideband == CQI_SENTINEL
+    assert r.latency_mean_ms is None
+    assert r.pdr_window is None
+    # Existing behaviors unaffected by the extension.
+    assert r.snr_db == 20.0 and not r.snr_was_imputed
+
+    mixed = tmp_path / "mixed.txt"
+    mixed.write_text(
+        ",".join(V13_HEADER) + "\n"
+        + ",".join(str(v) for v in _row(ts=200, imsi=2, sid=1)) + "\n"
+    )
+    w2 = parse_sqr_kpm_file(str(mixed), sla_thresholds=SLAS)
+    r2 = w2.rows[0]
+    assert r2.timestamp == 200
+    assert r2.latency_mean_ms is None and r2.pdr_window is None
+    assert r2.cqi_wideband == CQI_SENTINEL
 
 
 # ── Run manually ────────────────────────────────────────────────────

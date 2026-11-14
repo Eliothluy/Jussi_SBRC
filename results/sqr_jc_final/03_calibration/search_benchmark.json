@@ -1,0 +1,25 @@
+{
+  "gate": "G5_search_runtime",
+  "protocol": "SQRJC-ETAPA-2.5-FINAL (\u00a737/\u00a738)",
+  "n_states": 100,
+  "stratification": "CAL states em ordem (low/mid/high pela mistura de lambdas)",
+  "exhaustive": {
+    "n_states": 100,
+    "median_ms": 14944.074867496965,
+    "p95_ms": 15113.735714137874,
+    "p99_ms": 15193.988164401526,
+    "max_ms": 15276.072174005094,
+    "n_actions": 27720,
+    "passed_p95_80ms": false
+  },
+  "coarse_to_fine": {
+    "params": {
+      "coarse_step": 4,
+      "refine_radius": 4
+    },
+    "n_states": 25,
+    "median_ms": 358.34792199602816,
+    "p95_ms": 385.65882140828757
+  },
+  "note": "PASS exaustivo se p95 <= 80 ms; caso contrario validar o coarse-to-fine no gate \u00a738 (concordancia >= 98%, regret mediano <= 2%, p95 <= 5%, p95 tempo <= 80 ms) antes do PILOT."
+}

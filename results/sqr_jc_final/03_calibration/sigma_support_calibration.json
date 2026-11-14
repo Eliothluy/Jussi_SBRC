@@ -1,0 +1,273 @@
+{
+  "candidates": {
+    "50": {
+      "threshold": 0.01575871702089049,
+      "supported_frac": 0.5000070290863593,
+      "pass": false,
+      "reasons": [
+        "suporte 0.500 < 0.7",
+        "slice0 q25: alvo 0.25 fora do CI bootstrap [0.164,0.193]",
+        "slice0 q75: alvo 0.75 fora do CI bootstrap [0.679,0.717]",
+        "slice1 q25: alvo 0.25 fora do CI bootstrap [0.224,0.244]"
+      ],
+      "slice0_q25_coverage": 0.1782481647779916,
+      "slice0_q25_ci": [
+        0.16435036704440167,
+        0.1933593471598603
+      ],
+      "slice0_q75_coverage": 0.6965291141044829,
+      "slice0_q75_ci": [
+        0.6792744636875491,
+        0.7166328130568028
+      ],
+      "slice1_q25_coverage": 0.23372875921769798,
+      "slice1_q25_ci": [
+        0.2241062840654056,
+        0.24447739660147483
+      ],
+      "slice1_q75_coverage": 0.7521641551779417,
+      "slice1_q75_ci": [
+        0.7449503045848028,
+        0.7593820134658544
+      ],
+      "slice2_q25_coverage": 0.24901724829522665,
+      "slice2_q25_ci": [
+        0.24596871239470516,
+        0.25214600882470917
+      ],
+      "slice2_q75_coverage": 0.7484155635780184,
+      "slice2_q75_ci": [
+        0.7449659045326915,
+        0.7517870036101083
+      ]
+    },
+    "60": {
+      "threshold": 0.041172787845182676,
+      "supported_frac": 0.6000028116345437,
+      "pass": false,
+      "reasons": [
+        "suporte 0.600 < 0.7",
+        "slice0 q25: alvo 0.25 fora do CI bootstrap [0.165,0.191]",
+        "slice0 q75: alvo 0.75 fora do CI bootstrap [0.671,0.709]",
+        "slice1 q25: alvo 0.25 fora do CI bootstrap [0.221,0.240]"
+      ],
+      "slice0_q25_coverage": 0.1772863568215892,
+      "slice0_q25_ci": [
+        0.16453960519740132,
+        0.1907187031484258
+      ],
+      "slice0_q75_coverage": 0.6894677661169415,
+      "slice0_q75_ci": [
+        0.6710316716641679,
+        0.7090860819590206
+      ],
+      "slice1_q25_coverage": 0.23009193318658552,
+      "slice1_q25_ci": [
+        0.2210280978894212,
+        0.23980318529069014
+      ],
+      "slice1_q75_coverage": 0.7481548621002201,
+      "slice1_q75_ci": [
+        0.741551210669429,
+        0.7552796840605982
+      ],
+      "slice2_q25_coverage": 0.250232691343882,
+      "slice2_q25_ci": [
+        0.2475102026204625,
+        0.25316997207703873
+      ],
+      "slice2_q75_coverage": 0.7476193885587457,
+      "slice2_q75_ci": [
+        0.7448270924321615,
+        0.7501968926755924
+      ]
+    },
+    "70": {
+      "threshold": 0.1246038187377359,
+      "supported_frac": 0.6999985941827281,
+      "pass": false,
+      "reasons": [
+        "suporte 0.700 < 0.7",
+        "slice0 q25: alvo 0.25 fora do CI bootstrap [0.164,0.189]",
+        "slice0 q75: alvo 0.75 fora do CI bootstrap [0.661,0.699]",
+        "slice1 q25: alvo 0.25 fora do CI bootstrap [0.220,0.240]",
+        "slice1 q75: alvo 0.75 fora do CI bootstrap [0.734,0.750]",
+        "slice2 q75: alvo 0.75 fora do CI bootstrap [0.745,0.750]"
+      ],
+      "slice0_q25_coverage": 0.176409666283084,
+      "slice0_q25_ci": [
+        0.16374424626006906,
+        0.18929948216340622
+      ],
+      "slice0_q75_coverage": 0.680379746835443,
+      "slice0_q75_ci": [
+        0.6610414269275029,
+        0.6985644418872267
+      ],
+      "slice1_q25_coverage": 0.22989949748743718,
+      "slice1_q25_ci": [
+        0.2198492462311558,
+        0.2401810187300137
+      ],
+      "slice1_q75_coverage": 0.7415486523526724,
+      "slice1_q75_ci": [
+        0.7342365235267245,
+        0.7495460255824578
+      ],
+      "slice2_q25_coverage": 0.2488500766615559,
+      "slice2_q25_ci": [
+        0.24611525898273448,
+        0.2515865608959403
+      ],
+      "slice2_q75_coverage": 0.7474168388774082,
+      "slice2_q75_ci": [
+        0.7446170255316312,
+        0.7499500033331111
+      ]
+    },
+    "80": {
+      "threshold": 0.6457150889764267,
+      "supported_frac": 0.7999943767309126,
+      "pass": false,
+      "reasons": [
+        "slice0 q25: alvo 0.25 fora do CI bootstrap [0.161,0.188]",
+        "slice0 q75: alvo 0.75 fora do CI bootstrap [0.652,0.691]",
+        "slice1 q25: alvo 0.25 fora do CI bootstrap [0.220,0.240]",
+        "slice1 q75: alvo 0.75 fora do CI bootstrap [0.728,0.745]",
+        "slice2 q25: alvo 0.25 fora do CI bootstrap [0.244,0.249]",
+        "slice2 q75: alvo 0.75 fora do CI bootstrap [0.740,0.746]"
+      ],
+      "slice0_q25_coverage": 0.17433089344582892,
+      "slice0_q25_ci": [
+        0.1614209085321562,
+        0.18809157959434541
+      ],
+      "slice0_q75_coverage": 0.671620942057328,
+      "slice0_q75_ci": [
+        0.652116276470917,
+        0.6911214169972622
+      ],
+      "slice1_q25_coverage": 0.22917575228957698,
+      "slice1_q25_ci": [
+        0.21969036197121675,
+        0.2397541430440471
+      ],
+      "slice1_q75_coverage": 0.7361535106846926,
+      "slice1_q75_ci": [
+        0.7281945050152638,
+        0.7446576537287396
+      ],
+      "slice2_q25_coverage": 0.24639927662597688,
+      "slice2_q25_ci": [
+        0.24362203707291868,
+        0.24904734224633468
+      ],
+      "slice2_q75_coverage": 0.7430084608925919,
+      "slice2_q75_ci": [
+        0.7401666343731835,
+        0.7458502874120002
+      ]
+    },
+    "90": {
+      "threshold": 0.8141645670745681,
+      "supported_frac": 0.8999901592790969,
+      "pass": false,
+      "reasons": [
+        "slice0 q25: alvo 0.25 fora do CI bootstrap [0.161,0.188]",
+        "slice0 q75: alvo 0.75 fora do CI bootstrap [0.652,0.689]",
+        "slice1 q25: alvo 0.25 fora do CI bootstrap [0.218,0.239]",
+        "slice1 q75: alvo 0.75 fora do CI bootstrap [0.727,0.744]",
+        "slice2 q25: alvo 0.25 fora do CI bootstrap [0.243,0.249]",
+        "slice2 q75: alvo 0.75 fora do CI bootstrap [0.739,0.745]"
+      ],
+      "slice0_q25_coverage": 0.1742381962272575,
+      "slice0_q25_ci": [
+        0.16128892733564013,
+        0.18813902221230047
+      ],
+      "slice0_q75_coverage": 0.6710012278156045,
+      "slice0_q75_ci": [
+        0.6520817055474941,
+        0.6894798526621275
+      ],
+      "slice1_q25_coverage": 0.22916213275299238,
+      "slice1_q25_ci": [
+        0.21838955386289446,
+        0.23917301414581066
+      ],
+      "slice1_q75_coverage": 0.7353645266594124,
+      "slice1_q75_ci": [
+        0.7267627856365615,
+        0.7441784548422198
+      ],
+      "slice2_q25_coverage": 0.24611515893997035,
+      "slice2_q25_ci": [
+        0.2429557031401122,
+        0.24882326391127732
+      ],
+      "slice2_q75_coverage": 0.7421497195176994,
+      "slice2_q75_ci": [
+        0.7392481784770133,
+        0.7451157392481785
+      ]
+    },
+    "95": {
+      "threshold": 0.8966462350170528,
+      "supported_frac": 0.9534393319556324,
+      "pass": false,
+      "reasons": [
+        "slice0 q25: alvo 0.25 fora do CI bootstrap [0.161,0.188]",
+        "slice0 q75: alvo 0.75 fora do CI bootstrap [0.652,0.691]",
+        "slice1 q25: alvo 0.25 fora do CI bootstrap [0.219,0.239]",
+        "slice1 q75: alvo 0.75 fora do CI bootstrap [0.727,0.743]",
+        "slice2 q25: alvo 0.25 fora do CI bootstrap [0.243,0.249]",
+        "slice2 q75: alvo 0.75 fora do CI bootstrap [0.739,0.745]"
+      ],
+      "slice0_q25_coverage": 0.1742525658188309,
+      "slice0_q25_ci": [
+        0.16086568496207052,
+        0.18797830209727798
+      ],
+      "slice0_q75_coverage": 0.6707385095939313,
+      "slice0_q75_ci": [
+        0.6515478580990629,
+        0.6908202253458278
+      ],
+      "slice1_q25_coverage": 0.22903752039151712,
+      "slice1_q25_ci": [
+        0.21881185426862426,
+        0.23893692224034802
+      ],
+      "slice1_q75_coverage": 0.7349646547036432,
+      "slice1_q75_ci": [
+        0.7265905383360522,
+        0.7434502446982055
+      ],
+      "slice2_q25_coverage": 0.2460516985753884,
+      "slice2_q25_ci": [
+        0.2430848320763231,
+        0.24895249145877651
+      ],
+      "slice2_q75_coverage": 0.7419583575066073,
+      "slice2_q75_ci": [
+        0.7387352543028428,
+        0.7450525365822214
+      ]
+    }
+  },
+  "chosen_percentile": null,
+  "sigma_support": null,
+  "grid": [
+    50,
+    60,
+    70,
+    80,
+    90,
+    95
+  ],
+  "block_bootstrap": {
+    "block_len_windows": 50,
+    "resamples": 1000,
+    "criterion": "|coverage - target| <= 0.1 e alvo no CI 95%"
+  }
+}

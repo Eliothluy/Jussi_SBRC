@@ -1,0 +1,59 @@
+{
+  "gate": "D0A",
+  "version": "D0A-v1",
+  "date": "2026-11-08",
+  "status": "PASS",
+  "status_detail": "D0A_PASS com resultados cientificos REVISTOS (§5.11: integridade de dados/replays confirmada; labels corrigidos honestamente). A conclusao 5/5 nao precisou sobreviver intacta e nao sobreviveu sem qualificacao.",
+  "criteria": {
+    "G0A-1": {
+      "result": "PASS",
+      "evidence": "D0A_replay_5x3.csv: 15/15 celulas recomputadas de traces brutos com window_kpis/_sla_oks CONGELADAS (adjudication.py); proveniencia + SHA-256 em D0A_input_inventory.csv (52 itens, 0 missing); valores A2 bit-identicos a g2_deltas.csv"
+    },
+    "G0A-2": {
+      "result": "PASS",
+      "evidence": "A/A OFFLINE dos 10 replays (5 estados x 2 acoes alternativas): prefixo KPM bit-identico 10/10 e prefixo de delays bit-identico 10/10 (regra congelada II-b por ENTREGA < t*100ms). Nota: stage1 havia marcado replay_valid=False nas 5 E1 por falso-negativo do check de banner (runner v2 nao imprime o formato procurado) - os replays sao integros"
+    },
+    "G0A-3": {
+      "result": "PASS_REVISED",
+      "evidence": "Inconsistencia ENCONTRADA e corrigida: label E1 '0/5' era artefato de metrica do stage1_validate.py (eMBB por thr_min em vez da mediana R36; URLLC por miss em vez de p95 R37; mMTC 100ms em vez de rolling R38) + uso de linhas replay_valid=False sem filtro. Revisado: A1 = 3/5 frozen (2/5 strict + 1 UNKNOWN). A2 = 5/5 frozen confirmado / 4/5 strict + 1 UNKNOWN. Fig2 revisada em audit_v2/ com original preservado"
+    },
+    "G0A-4": {
+      "result": "PASS",
+      "evidence": "mMTC sob a_m=0 com denominador explicito: tx in-window = 0 nas 15 celulas (tratego 1pkt/s/UE); PDR rolling 1,0 dos resgates e portado por pacotes PRE-t (1-3 pacotes); sob evidencia estrita in-window mMTC = NO_ACTIVE_DEMAND/UNKNOWN nas 5 celulas A2 => strict joint = 0/5 PASS. Evidencia positiva do oposto: t1423 (unico tx in-window sob a_m=0) perdeu o pacote (PDR100=0); D6 mediu a_m_min=1"
+    },
+    "G0A-5": {
+      "result": "PASS",
+      "evidence": "R19 reconciliado EXATO: 24.482/12.075/12.407 (50,68%); por lambda 85,6/48,2/25,1% (parecer correto; legenda da galeria '~100% lambda2' corrigida); por seed em r19_by_seed_lambda.csv; ausencia por slice: eMBB 6.600 / URLLC 5.132 / mMTC 5.779; G4-A 8.592/1.041 exato"
+    },
+    "G0A-6": {
+      "result": "PASS",
+      "evidence": "resource_units_trace.md: C=53=53RBGs=53PRBs (NumRbPerRbg=1; floor(10MHz*0,96/180kHz)=53); cadeia Python->dedicatedPRB->ComputeRbgQuotas exata; telemetria total_rbg=53=total_prb spot-checked; ALLOCATED_USAGE Sigma<=C 27.720; divergencia narrativa R01 refutada (emenda do register pendente em D0-B)"
+    },
+    "G0A-7": {
+      "result": "PASS",
+      "evidence": "urllc_timing_audit.md: curva a_u recomputada bit-identica com coorte de CHEGADA (= causal pos-t); rolling 1s apenas em rotulos G4-B; colapso a_u=0 REPORTED (G3 + t1423); mecanismo fino = MECHANISM_NOT_IDENTIFIED (sem traces sub-slot) - textos revisados"
+    },
+    "G0A-8": {
+      "result": "PASS",
+      "evidence": "D0A_CLAIM_LEDGER.csv: 12 alegacoes com status (VERIFIED_RAW / CONTRADICTED->CORRECTED / CANDIDATE / REPORTED_ONLY / VERIFIED); parecer tratado como lista de teste, nunca como dado"
+    }
+  },
+  "scientific_revisions": {
+    "A2_48-5-0": "frozen 5/5 confirmado; strict ALL3 4/5 + 1 UNKNOWN; mMTC rolling portado por historico (divulgacao obrigatoria)",
+    "A1_37-13-3": "frozen 3/5 (era '0/5' - METRIC_BUG stage1); strict 2/5 + 1 UNKNOWN",
+    "consequence_for_H1": "existe recuperacao IN-SUPORTE (3/5 frozen) - a hipotese Joint Selection (H1 do protocolo v2) ganha motivacao empirica direta; a leitura 'so fora dos pisos' cai",
+    "consequence_for_R1_C3": "gate v2 segue STOP (classificacao oracle INFEASIBLE permanece o fato), mas a justificativa numerica 0/5 muda para 3/5"
+  },
+  "blockers": [],
+  "open_items": [
+    "propagacao das revisoes para figuras/relatorios/PLANO/hipoteses (trabalho de D0-B)",
+    "emenda da narrativa R01 no assumptions_register (D0-B)",
+    "figuras 4/6/7 regeradas com bbox tight (cosmetico) e fig2 revisada por dado"
+  ],
+  "evidence_inventory_file": "D0A_input_inventory.csv",
+  "replay_matrix_file": "D0A_replay_5x3.csv",
+  "r19_summary_file": "r19_by_seed_lambda.csv",
+  "resource_audit_file": "resource_units_trace.md",
+  "next_stage_authorized": true,
+  "next_stage": "D0-B (baseline/instrumentacao/congelamento - sem campanha nova)"
+}

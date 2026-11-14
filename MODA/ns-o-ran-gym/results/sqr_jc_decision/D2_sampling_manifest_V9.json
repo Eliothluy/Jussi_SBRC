@@ -1,0 +1,22 @@
+{
+  "sampling_seed": 20261108,
+  "C": 53,
+  "n_states": 30,
+  "n_rows": 390,
+  "substitutions": 29,
+  "files": {
+    "D2_sampling_FINAL_V9.csv": "0e64e507b4969548",
+    "generator": "b0b478488fafae25",
+    "emenda1": "334be91e1f210c2d",
+    "d1/het_lam2_s2101/decisions.jsonl": "1c71db8cbfe08449",
+    "d1/het_lam2_s2102/decisions.jsonl": "ebd84fb5fc7b227d",
+    "d1/het_lam2_s2103/decisions.jsonl": "807eb8f4d4ac1d97",
+    "d1/het_lam5_s2101/decisions.jsonl": "46be75e40307f148",
+    "d1/het_lam5_s2102/decisions.jsonl": "19e27e776a5fd1af",
+    "d1/het_lam5_s2103/decisions.jsonl": "bbeefe995af6fe0b",
+    "d1/het_lam6_s2101/decisions.jsonl": "08e5c8cab6107c86",
+    "d1/het_lam6_s2102/decisions.jsonl": "a920fa0ce6440ac9",
+    "d1/het_lam6_s2103/decisions.jsonl": "a6190ebe84486a85"
+  },
+  "note": "hashes registrados ANTES da execu\u00e7\u00e3o de qualquer replay D2"
+}

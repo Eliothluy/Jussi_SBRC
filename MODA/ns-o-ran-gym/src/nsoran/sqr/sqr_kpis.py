@@ -9,6 +9,22 @@ UE per 100 ms decision window, with the 13 frozen columns:
 
 (columns 1-10 = legacy rslaq header; 11-13 = SQR extensions, contract §4).
 
+**Contract v1.3 (Rodada 2, Etapa 2.1):** ``sqr-sim`` appends FOUR columns to
+the END of every line (additive — the 13 frozen columns keep their order and
+meaning, and 13-column files remain fully parseable):
+
+    dTxPackets,dRxPackets,dDelaySumSec,cqiWideband
+
+``dTxPackets``/``dRxPackets``/``dDelaySumSec`` are per-window FlowMonitor
+deltas (same partial-window rules as the byte deltas); ``cqiWideband`` is
+the RAW wideband CQI (1–15) that backs the snrDb inversion, wire sentinel
+-1 = no CQI (``CQI_SENTINEL``).  The parser exposes them on
+:class:`UeKpmRow` together with the derived per-UE-window
+``latency_mean_ms`` (= 1000·dDelaySumSec/dRxPackets) and ``pdr_window``
+(= dRxPackets/dTxPackets) — both ``None`` when the denominator is not > 0.
+No SNR/latency imputation is performed on the new columns: they pass
+through raw.
+
 This wrapper is NEW code in ``src/nsoran/sqr/`` — the core
 ``environments.rslaq_kpis`` module is untouched (AGENTS.md §5 rule 2).
 
@@ -62,6 +78,23 @@ SQR_KPM_COLUMNS: tuple[str, ...] = (
 #: 0 dB SNR (register R09, correção v1.1).
 SNR_SENTINEL = -999.0
 
+#: Contract v1.3 (Rodada 2, Etapa 2.1): ADDITIVE columns 14-17 of
+#: sqr-kpms.txt / sqr_kpm_history.csv — appended AFTER the 13 frozen ones.
+#: ``SQR_KPM_COLUMNS`` itself stays frozen at 13 so the E2/xApp
+#: materialization (``xapp_sqr.write_kpm_window``, which emits 13-field
+#: rows) keeps its byte-identical format; readers treat v1.3 columns as
+#: OPTIONAL by name.
+SQR_KPM_COLUMNS_V13: tuple[str, ...] = (
+    "dTxPackets",
+    "dRxPackets",
+    "dDelaySumSec",
+    "cqiWideband",
+)
+
+#: Wire sentinel for "no CQI" in the raw wideband CQI column (contract
+#: v1.3).  Passed through RAW — never imputed, never fed to the state.
+CQI_SENTINEL = -1
+
 #: Last-resort SNR imputation: centre of the snr_norm = clip(snr/30, 0, 1)
 #: scale (register R09).
 DEFAULT_IMPUTED_SNR_DB = 15.0
@@ -94,6 +127,28 @@ class UeKpmRow:
     snr_was_imputed: bool
     snr_imputation: str | None  # IMP_* label, None when the wire value was used
     queue_bytes: float
+    # ── Contract v1.3, columns 14–17 (raw pass-through; defaults keep the
+    # dataclass backward-compatible with 13-column rows) ──
+    d_tx_packets: float = 0.0
+    d_rx_packets: float = 0.0
+    d_delay_sum_sec: float = 0.0
+    cqi_wideband: float = CQI_SENTINEL  # raw; -1 = no CQI (never imputed)
+
+    @property
+    def latency_mean_ms(self) -> float | None:
+        """Mean per-packet DL latency of the UE in this window, in ms
+        (= 1000 · dDelaySumSec / dRxPackets); None when dRxPackets <= 0."""
+        if self.d_rx_packets > 0:
+            return 1000.0 * self.d_delay_sum_sec / self.d_rx_packets
+        return None
+
+    @property
+    def pdr_window(self) -> float | None:
+        """Per-window packet delivery ratio of the UE (= dRxPackets /
+        dTxPackets); None when dTxPackets <= 0."""
+        if self.d_tx_packets > 0:
+            return self.d_rx_packets / self.d_tx_packets
+        return None
 
 
 @dataclass(frozen=True)
@@ -252,6 +307,19 @@ class SqrKpmParser:
             return v if np.isfinite(v) else default
 
         snr_raw, snr_valid = self._impute_snr(ue_imsi, row.get("snrDb"))
+        # Contract v1.3 (columns 14–17): OPTIONAL — a 13-column row (legacy
+        # file or the E2/xApp materialization) leaves these keys absent;
+        # DictReader yields None for them.  dTx/dRxPackets and dDelaySumSec
+        # fall back to 0.0; cqiWideband falls back to CQI_SENTINEL (-1), and
+        # an unparsable wire value also degrades to the sentinel.  All four
+        # pass through RAW (no imputation).
+        raw_cqi = row.get("cqiWideband")
+        try:
+            cqi_val = float(raw_cqi)
+            if not np.isfinite(cqi_val):
+                cqi_val = float(CQI_SENTINEL)
+        except (TypeError, ValueError):
+            cqi_val = float(CQI_SENTINEL)
         return UeKpmRow(
             timestamp=ts,
             ue_imsi=ue_imsi,
@@ -268,6 +336,10 @@ class SqrKpmParser:
             snr_was_imputed=not snr_valid,
             snr_imputation=None if snr_valid else self._last_method,
             queue_bytes=_f("queueBytes"),
+            d_tx_packets=_f("dTxPackets"),
+            d_rx_packets=_f("dRxPackets"),
+            d_delay_sum_sec=_f("dDelaySumSec"),
+            cqi_wideband=cqi_val,
         )
 
     def _impute_snr(self, ue_imsi: int, wire_value) -> tuple[float, bool]:

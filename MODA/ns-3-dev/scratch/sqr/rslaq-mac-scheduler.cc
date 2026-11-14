@@ -1073,6 +1073,9 @@ RslaqMacScheduler::AssignDLRBG(uint32_t symAvail, const ActiveUeMap& activeDl) c
                     sinrDb = 10.0 * std::log10(std::max(sinrLin, 1e-12));
                 }
                 m_lastDlSinrDb[rnti] = sinrDb;
+                // Contrato SQR v1.3 (col. 17 cqiWideband): o valor CRU do
+                // wideband, no mesmo instantâneo do SINR acima; -1 sem CQI.
+                m_lastDlCqiWb[rnti] = (wbCqi > 0) ? static_cast<int>(wbCqi) : -1;
             }
 
             int32_t sIdx = GetSliceIndexForRnti(rnti);
@@ -1616,6 +1619,14 @@ RslaqMacScheduler::GetUeDlSinrDb(uint16_t rnti) const
     auto it = m_lastDlSinrDb.find(rnti);
     // Sentinela do contrato SQR §4 / register R09: -999 = "nunca houve CQI".
     return (it != m_lastDlSinrDb.end()) ? it->second : -999.0;
+}
+
+int
+RslaqMacScheduler::GetUeDlCqiWideband(uint16_t rnti) const
+{
+    auto it = m_lastDlCqiWb.find(rnti);
+    // Sentinela do contrato SQR v1.3 (col. 17): -1 = "nunca houve CQI válido".
+    return (it != m_lastDlCqiWb.end()) ? it->second : -1;
 }
 
 } // namespace ns3

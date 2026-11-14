@@ -1,0 +1,1469 @@
+{
+ "n_rows": 100,
+ "n_unique": 92,
+ "n_dup": 8,
+ "unique": [
+  {
+   "_id": "A02",
+   "eixo": "A",
+   "file_line": 2,
+   "title": "ns-O-RAN: Simulating O-RAN 5G Systems in ns-3",
+   "authors": "Andrea Lacava, Matteo Bordin, Michele Polese, Rajarajan Sivaraj, Tommaso Zugno, Francesca Cuomo, Tommaso Melodia",
+   "year": "2023",
+   "venue": "WNS3 '23 (ACM Workshop on ns-3; venue completo não indexado no OpenAlex)",
+   "doi": "10.1145/3592149.3592161",
+   "raw_doi": "10.1145/3592149.3592161",
+   "_sources": [
+    "openalex:A3"
+   ],
+   "why_relevant": "Ancestral direto do nosso ambiente (fork ns-O-RAN Gym); define o loop fechado ns-3<->Near-RT RIC simulado que a pergunta 5 exige citar."
+  },
+  {
+   "_id": "A03",
+   "eixo": "A",
+   "file_line": 3,
+   "title": "O-RAN with Machine Learning in ns-3",
+   "authors": "Wesley Garey, Tanguy Ropitault, Richard Rouil, Evan Black, Weichao Gao",
+   "year": "2023",
+   "venue": "WNS3 '23 (ACM Workshop on ns-3; venue completo não indexado no OpenAlex)",
+   "doi": "10.1145/3592149.3592157",
+   "raw_doi": "10.1145/3592149.3592157",
+   "_sources": [
+    "openalex:A3"
+   ],
+   "why_relevant": "Mesmo workshop do ns-O-RAN; integração alternativa ns-3+O-RAN com ML (NIST), antecedente da linhagem de simulação O-RAN que reutilizamos."
+  },
+  {
+   "_id": "A04",
+   "eixo": "A",
+   "file_line": 4,
+   "title": "ColO-RAN: Developing Machine Learning-Based xApps for Open RAN Closed-Loop Control on Programmable Experimental Platforms",
+   "authors": "Michele Polese, Leonardo Bonati, Salvatore D'Oro, Stefano Basagni, Tommaso Melodia",
+   "year": "2022",
+   "venue": "IEEE Transactions on Mobile Computing",
+   "doi": "10.1109/tmc.2022.3188013",
+   "raw_doi": "10.1109/tmc.2022.3188013",
+   "_sources": [
+    "openalex:A2,A4,A5"
+   ],
+   "why_relevant": "Referência canônica de xApps ML em loop fechado sobre SDR programável; define métricas/protocolo de avaliação de xApp que nosso caminho E2 deve igualar."
+  },
+  {
+   "_id": "A05",
+   "eixo": "A",
+   "file_line": 5,
+   "title": "Programmable and Customized Intelligence for Traffic Steering in 5G Networks Using Open RAN Architectures",
+   "authors": "Andrea Lacava, Michele Polese, Rajarajan Sivaraj, Rahul Soundrarajan, Bhawani Shanker Bhati, Tarunjeet Singh, Tommaso Zugno, Francesca Cuomo, Tommaso Melodia",
+   "year": "2023",
+   "venue": "IEEE Transactions on Mobile Computing",
+   "doi": "10.1109/tmc.2023.3266642",
+   "raw_doi": "10.1109/tmc.2023.3266642",
+   "_sources": [
+    "openalex:A1,A2,A3"
+   ],
+   "why_relevant": "Validação de campo (OpenRAN Gym) de xApp de traffic steering — antecedente de validação real de xApp que a pergunta 5 pede."
+  },
+  {
+   "_id": "A06",
+   "eixo": "A",
+   "file_line": 6,
+   "title": "Intelligent Closed-loop RAN Control with xApps in OpenRAN Gym",
+   "authors": "Leonardo Bonati, Michele Polese, Salvatore D'Oro, Stefano Basagni, Tommaso Melodia",
+   "year": "2022",
+   "venue": "arXiv (preprint)",
+   "doi": "10.48550/arxiv.2208.14877",
+   "raw_doi": "10.48550/arxiv.2208.14877",
+   "_sources": [
+    "openalex:A4"
+   ],
+   "why_relevant": "Documenta xApps em loop fechado no OpenRAN Gym, o ecossistema do qual o ns-o-ran-gym do MODA deriva."
+  },
+  {
+   "_id": "A07",
+   "eixo": "A",
+   "file_line": 7,
+   "title": "Design and implementation of an xApp integrating FlexRIC with the ns-O-RAN Framework",
+   "authors": "Taeil Jung, Jaehyung Choi, Geon-Hee Kim, Een-Kee Hong",
+   "year": "2025",
+   "venue": "International Conference on Information and Communication Technology Convergence (ICTC)",
+   "doi": "10.1109/ictc66702.2025.11388719",
+   "raw_doi": "10.1109/ictc66702.2025.11388719",
+   "_sources": [
+    "openalex:A3"
+   ],
+   "why_relevant": "Integra exatamente FlexRIC + ns-O-RAN — a mesma combinação da nossa Fase 5; antecedente direto a comparar (paridade/latência)."
+  },
+  {
+   "_id": "A08",
+   "eixo": "A",
+   "file_line": 8,
+   "title": "FlexRIC: An SDK for Next-Generation SD-RANs",
+   "authors": "Robert Schmidt, Mikel Irazabal, Navid Nikaein",
+   "year": "2021",
+   "venue": "CoNEXT '21 (17th International Conference on emerging Networking EXperiments and Technologies), ACM",
+   "doi": "10.1145/3485983.3494870",
+   "raw_doi": "10.1145/3485983.3494870",
+   "_sources": [
+    "websearch"
+   ],
+   "why_relevant": "Paper de origem do FlexRIC (RIC alternativo citado no AGENTS §10 e não adotado); DOI corrigido via registro Crossref CoNEXT '21 + página EURECOM 6737 — o resumo de busca havia dado DOI inexistente e autores errados."
+  },
+  {
+   "_id": "A09",
+   "eixo": "A",
+   "file_line": 9,
+   "title": "Enabling NS-3 Simulations Integrated with Latest Versions of Open RAN Near-RT RICs (NORI)",
+   "authors": "Andrey A. Miranda de Oliveira, João Albuquerque, Cleverson Nahum, Daniel Campos, Kleber Cardoso, Aldebaro Klautau, José Rezende",
+   "year": "2025",
+   "venue": "XLIII Simpósio Brasileiro de Telecomunicações e Processamento de Sinais (SBrT 2025), Natal/RN (PDF lido integralmente nesta sessão; sem DOI no documento)",
+   "doi": "",
+   "raw_doi": "",
+   "_sources": [
+    "websearch"
+   ],
+   "why_relevant": "Paper do módulo NORI portado na nossa Fase 5 (contrib/nori): integra ns-3/5G-LENA ao Near-RT RIC OSC via E2 (E2AP v2.02.03) e demonstra xApp RL alocando PRBs por slice (claim dos autores)."
+  },
+  {
+   "_id": "A10",
+   "eixo": "A",
+   "file_line": 10,
+   "title": "O-RAN: Analysis of Latency-Critical Interfaces and Overview of Time Sensitive Networking Solutions",
+   "authors": "Esteban Municio, Ginés García-Avilés, Andrés García-Saavedra, Xavier Costa-Pérez",
+   "year": "2023",
+   "venue": "IEEE Communications Standards Magazine",
+   "doi": "10.1109/mcomstd.0001.2200041",
+   "raw_doi": "10.1109/mcomstd.0001.2200041",
+   "_sources": [
+    "openalex:A4"
+   ],
+   "why_relevant": "Análise de latência das interfaces O-RAN (incl. E2) e soluções TSN — base para contextualizar nosso p50/p95 de 2,39/9,28 ms."
+  },
+  {
+   "_id": "A11",
+   "eixo": "A",
+   "file_line": 11,
+   "title": "Evaluation of the Latency of Machine Learning Random Access DDoS Detection in Open RAN",
+   "authors": "Paulo Ricardo Branco da Silva et al.",
+   "year": "2024",
+   "venue": "Proceedings of the 28th Annual International Conference on Mobile Computing And Networking (ACM; container conforme OpenAlex)",
+   "doi": "10.1145/3636534.3701546",
+   "raw_doi": "10.1145/3636534.3701546",
+   "_sources": [
+    "openalex:A2"
+   ],
+   "why_relevant": "Medição de latência fim a fim de inferência ML em loop Open RAN — metodologia comparável à nossa medição de latência E2."
+  },
+  {
+   "_id": "A12",
+   "eixo": "A",
+   "file_line": 12,
+   "title": "Accelerating Inter-App Communications for Time-Critical O-RAN Control Loops",
+   "authors": "Lorenzo Rosa, Andrea Garbugli, Domenico Scotece, Luca Foschini",
+   "year": "2026",
+   "venue": "IEEE Networking Letters",
+   "doi": "10.1109/lnet.2026.3670470",
+   "raw_doi": "10.1109/lnet.2026.3670470",
+   "_sources": [
+    "openalex:A4"
+   ],
+   "why_relevant": "Latência de loops de controle time-critical entre xApps — sustenta a discussão do orçamento de 50 ms do nosso contrato E2."
+  },
+  {
+   "_id": "A13",
+   "eixo": "A",
+   "file_line": 13,
+   "title": "Enabling Real-Time AI in O-RAN: Deploying and Measuring AI Inside a Near-RT RIC xApp",
+   "authors": "Lawrence Obiuwevwi et al.",
+   "year": "2026",
+   "venue": "International Conference on Computer Communications and Networks (ICCCN)",
+   "doi": "10.1109/icccn69946.2026.11662852",
+   "raw_doi": "10.1109/icccn69946.2026.11662852",
+   "_sources": [
+    "openalex:A2"
+   ],
+   "why_relevant": "Implanta e mede IA dentro de xApp em Near-RT RIC com latência mensurada — antecedente próximo da nossa validação E2 (pergunta 5)."
+  },
+  {
+   "_id": "A14",
+   "eixo": "A",
+   "file_line": 14,
+   "title": "REAL: Reinforcement Learning-Enabled xApps for Experimental Closed-Loop Optimization in O-RAN with OSC RIC and srsRAN",
+   "authors": "Ryan Barker, Alireza Ebrahimi Dorcheh, Tolunay Seyfi, Fatemeh Afghah",
+   "year": "2025",
+   "venue": "IEEE ICC Workshops",
+   "doi": "10.1109/iccworkshops67674.2025.11162144",
+   "raw_doi": "10.1109/iccworkshops67674.2025.11162144",
+   "_sources": [
+    "openalex:A2,A3"
+   ],
+   "why_relevant": "xApps RL experimentais em loop fechado com OSC RIC + srsRAN — validação real comparável à nossa (pergunta 5)."
+  },
+  {
+   "_id": "A15",
+   "eixo": "A",
+   "file_line": 15,
+   "title": "A Tutorial on O-RAN Deployment Solutions for 5G: From Simulation to Emulated and Real Testbeds",
+   "authors": "Juan Luis Herrera, Sofia Montebugnoli, Domenico Scotece, Luca Foschini, Paolo Bellavista",
+   "year": "2025",
+   "venue": "IEEE Communications Surveys & Tutorials",
+   "doi": "10.1109/comst.2025.3577687",
+   "raw_doi": "10.1109/comst.2025.3577687",
+   "_sources": [
+    "openalex:A1"
+   ],
+   "why_relevant": "Mapeia o espectro simulação->emulação->testbeds O-RAN; enquadra nossa posição DEGRADED->RIC real na linhagem (pergunta 5)."
+  },
+  {
+   "_id": "A16",
+   "eixo": "A",
+   "file_line": 16,
+   "title": "ORANSlice: An Open Source 5G Network Slicing Platform for O-RAN",
+   "authors": "Hai Cheng, Salvatore D'Oro, Rajeev Gangula, Sakthivel Velumani, Davide Villa, Leonardo Bonati, Michele Polese, Tommaso Melodia, Gabriel E. Arrobo, Christian Maciocco",
+   "year": "2024",
+   "venue": "Proceedings of the 28th Annual International Conference on Mobile Computing And Networking (ACM; container conforme OpenAlex)",
+   "doi": "10.1145/3636534.3701544",
+   "raw_doi": "10.1145/3636534.3701544",
+   "_sources": [
+    "openalex:A2,A5"
+   ],
+   "why_relevant": "Plataforma open source de slicing 5G sobre O-RAN com artefato público — antecedente de reprodutibilidade (G2) e slicing via RIC."
+  },
+  {
+   "_id": "A17",
+   "eixo": "A",
+   "file_line": 17,
+   "title": "O-RAN-Enabled Intelligent Network Slicing to Meet Service-Level Agreement (SLA)",
+   "authors": "Jiongyu Dai, Lianjun Li, Ramin Safavinejad, Shadab Mahboob, Hao Chen, Vishnu V Ratnam, Haining Wang, Jianzhong Zhang, Lingjia Liu",
+   "year": "2024",
+   "venue": "IEEE Transactions on Mobile Computing",
+   "doi": "10.1109/tmc.2024.3476338",
+   "raw_doi": "10.1109/tmc.2024.3476338",
+   "_sources": [
+    "openalex:A5",
+    "openalex:B3"
+   ],
+   "why_relevant": "Slicing O-RAN orientado a SLA controlado via RIC — SOTA a contrastar com SQR/KBRL (perguntas 1 e 5)."
+  },
+  {
+   "_id": "A18",
+   "eixo": "A",
+   "file_line": 18,
+   "title": "RSLAQ—A Robust SLA-Driven 6G O-RAN QoS Xapp Using Deep Reinforcement Learning",
+   "authors": "Noe Marcelo Yungaicela-Naula, Vishal Sharma, Sandra Scott-Hayward",
+   "year": "2026",
+   "venue": "IEEE Transactions on Mobile Computing",
+   "doi": "10.1109/tmc.2026.3666787",
+   "raw_doi": "10.1109/tmc.2026.3666787",
+   "_sources": [
+    "openalex:A5",
+    "openalex:B2;B4",
+    "openalex:eixoD_6"
+   ],
+   "why_relevant": "xApp DRL SLA-driven do grupo cujo cenário dá nome ao ambiente MODA (rslaq-sim); versão de journal do SLAQ/ISNCC 2025 — baseline moderno a citar."
+  },
+  {
+   "_id": "A19",
+   "eixo": "A",
+   "file_line": 19,
+   "title": "An O-RAN Framework for AI/ML-Based Localization with OpenAirInterface and FlexRIC",
+   "authors": "Nada Bouknana, Mohsen Ahadi, Florian Kaltenberger, Robert Schmidt",
+   "year": "2026",
+   "venue": "WONS 2026 (conforme DOI; venue não indexado no OpenAlex)",
+   "doi": "10.23919/wons68803.2026.11501782",
+   "raw_doi": "10.23919/wons68803.2026.11501782",
+   "_sources": [
+    "openalex:A2"
+   ],
+   "why_relevant": "Framework O-RAN com OpenAirInterface + FlexRIC validado em laboratório — mais um ponto da linhagem FlexRIC (pergunta 5)."
+  },
+  {
+   "_id": "A20",
+   "eixo": "A",
+   "file_line": 20,
+   "title": "End-to-End O-RAN Control-Loop For Radio Resource Allocation in SDR-Based 5G Network",
+   "authors": "Asheesh Tripathi, Jaswanth S. R. Mallu, Md. Habibur Rahman, Abida Sultana, Aditya Sathish, Alexandre Huff, Mayukh Roy Chowdhury, Aloizio P. Silva",
+   "year": "2023",
+   "venue": "IEEE Military Communications Conference (MILCOM)",
+   "doi": "10.1109/milcom58377.2023.10356316",
+   "raw_doi": "10.1109/milcom58377.2023.10356316",
+   "_sources": [
+    "openalex:A1"
+   ],
+   "why_relevant": "Loop de controle O-RAN fim a fim para alocação de rádio em SDR — antecedente de validação de loop de controle com métricas."
+  },
+  {
+   "_id": "A21",
+   "eixo": "A",
+   "file_line": 21,
+   "title": "A Practical Demonstration of DRL-Based Dynamic Resource Allocation xApp Using OpenAirInterface",
+   "authors": "Onur Sever, Onur Salan, İbrahim Hökelek, Ali Görçin",
+   "year": "2025",
+   "venue": "arXiv (preprint)",
+   "doi": "10.48550/arxiv.2501.05879",
+   "raw_doi": "10.48550/arxiv.2501.05879",
+   "_sources": [
+    "openalex:A2,A5"
+   ],
+   "why_relevant": "Demonstração prática de xApp DRL de alocação dinâmica sobre OpenAirInterface — evidência de viabilidade de xApp de alocação via E2."
+  },
+  {
+   "_id": "A22",
+   "eixo": "A",
+   "file_line": 22,
+   "title": "xDevSM: An Open-Source Framework for Portable, AI-Ready xApps Across Heterogeneous O-RAN Deployments",
+   "authors": "Angelo Feraudo, Stefano Maxenti, Andrea Lacava, Leonardo Bonati, Paolo Bellavista, Michele Polese, Tommaso Melodia",
+   "year": "2026",
+   "venue": "IEEE Transactions on Network and Service Management",
+   "doi": "10.1109/tnsm.2026.3733344",
+   "raw_doi": "10.1109/tnsm.2026.3733344",
+   "_sources": [
+    "openalex:A3"
+   ],
+   "why_relevant": "xApps portáveis entre RICs heterogêneos — relevante para discutir o acoplamento da nossa stack NORI/e2sim e migração para RIC real (G5)."
+  },
+  {
+   "_id": "A23",
+   "eixo": "A",
+   "file_line": 23,
+   "title": "Predictive Closed-Loop Service Automation in O-RAN Based Network Slicing",
+   "authors": "Joseph Thaliath, Solmaz Niknam, Sukhdeep Singh, Rahul Banerji, Navrati Saxena, Harpreet S. Dhillon, Jeffrey H. Reed, Ali Kashif Bashir, Avinash Bhat, Abhishek Roy",
+   "year": "2022",
+   "venue": "IEEE Communications Standards Magazine",
+   "doi": "10.1109/mcomstd.0001.2200017",
+   "raw_doi": "10.1109/mcomstd.0001.2200017",
+   "_sources": [
+    "openalex:A4"
+   ],
+   "why_relevant": "Automação preditiva de slicing via loop fechado O-RAN — visão de arquitetura contra a qual nossa validação empírica se posiciona."
+  },
+  {
+   "_id": "A24",
+   "eixo": "A",
+   "file_line": 24,
+   "title": "Understanding O-RAN: Architecture, Interfaces, Algorithms, Security, and Research Challenges",
+   "authors": "Michele Polese, Leonardo Bonati, Salvatore D'Oro, Stefano Basagni, Tommaso Melodia",
+   "year": "2023",
+   "venue": "IEEE Communications Surveys & Tutorials",
+   "doi": "10.1109/comst.2023.3239220",
+   "raw_doi": "10.1109/comst.2023.3239220",
+   "_sources": [
+    "openalex:A4,A5"
+   ],
+   "why_relevant": "Survey canônico de arquitetura/interfaces O-RAN (1094 citações) — referência de fundo obrigatória do eixo A."
+  },
+  {
+   "_id": "A25",
+   "eixo": "A",
+   "file_line": 25,
+   "title": "Development on Open-RAN Simulator with 5G-LENA",
+   "authors": "Jae-Wook Lee, Soojung Jung, Seung-Eun Hong, Hoon Lee",
+   "year": "2024",
+   "venue": "International Conference on Information Networking (ICOIN)",
+   "doi": "10.1109/icoin59985.2024.10572115",
+   "raw_doi": "10.1109/icoin59985.2024.10572115",
+   "_sources": [
+    "openalex:A3"
+   ],
+   "why_relevant": "Simulador Open-RAN sobre 5G-LENA (mesmo módulo NR do MODA) — antecedente direto da nossa combinação ns-3.46+v5.2."
+  },
+  {
+   "_id": "A26",
+   "eixo": "A",
+   "file_line": 26,
+   "title": "A Comprehensive Tutorial and Survey of O-RAN: Exploring Slicing-Aware Architecture, Deployment Options, Use Cases, and Challenges",
+   "authors": "Khurshid Alam, Mohammad Asif Habibi, Matthias Tammen, Dennis Krummacker, Walid Saad, Marco Di Renzo, Tommaso Melodia, Xavier Costa-Pérez, Merouane Abdelkader Debbah, Ashutosh Dutta, Hans Dieter Schott",
+   "year": "2025",
+   "venue": "IEEE Communications Surveys & Tutorials",
+   "doi": "10.1109/comst.2025.3598406",
+   "raw_doi": "10.1109/comst.2025.3598406",
+   "_sources": [
+    "openalex:A3,A4"
+   ],
+   "why_relevant": "Tutorial/survey de O-RAN slicing-aware — enquadra arquitetura de slicing no RIC (G5/G7) e o estado da arte da área."
+  },
+  {
+   "_id": "B02",
+   "eixo": "B",
+   "file_line": 2,
+   "title": "Model-Based Reinforcement Learning With Kernels for Resource Allocation in RAN Slices",
+   "authors": "Juan José Alcaraz; Fernando Losilla; Andréa Zanella; Michele Zorzi",
+   "year": "2022",
+   "venue": "IEEE Transactions on Wireless Communications",
+   "doi": "10.1109/twc.2022.3195570",
+   "raw_doi": "10.1109/twc.2022.3195570",
+   "_sources": [
+    "openalex:B2;B3;B4",
+    "OpenAlex C4 (DOI verificado no Crossref)",
+    "openalex:eixoD_1+eixoD_1b | websearch(WS1)"
+   ],
+   "why_relevant": "KBRL — baseline reproduzido em port fiel pelo nosso projeto e origem do método model-based com kernels que o artigo SQR compara; referência obrigatória do eixo (pergunta 8)."
+  },
+  {
+   "_id": "B04",
+   "eixo": "B",
+   "file_line": 4,
+   "title": "Safe and Accelerated Deep Reinforcement Learning-Based O-RAN Slicing: A Hybrid Transfer Learning Approach",
+   "authors": "Ahmad M. Nagib; Hatem Abou-Zeid; Hossam S. Hassanein",
+   "year": "2023",
+   "venue": "IEEE Journal on Selected Areas in Communications",
+   "doi": "10.1109/jsac.2023.3336191",
+   "raw_doi": "10.1109/jsac.2023.3336191",
+   "_sources": [
+    "openalex:B2"
+   ],
+   "why_relevant": "Safe RL com transfer learning já aplicado a slicing O-RAN — antecedente central para delimitar a novidade do SQR (pergunta 8)."
+  },
+  {
+   "_id": "B05",
+   "eixo": "B",
+   "file_line": 5,
+   "title": "SafeSlice: Enabling SLA-Compliant O-RAN Slicing via Safe Deep Reinforcement Learning",
+   "authors": "Ahmad M. Nagib; Hatem Abou-Zeid; Hossam S. Hassanein",
+   "year": "2025",
+   "venue": "2025 IEEE International Conference on Machine Learning for Communication and Networking (ICMLCN)",
+   "doi": "10.1109/icmlcn64995.2025.11140546",
+   "raw_doi": "10.1109/icmlcn64995.2025.11140546",
+   "_sources": [
+    "websearch→openalex:eixoB_6",
+    "websearch(WS3)+openalex:eixoD_6"
+   ],
+   "why_relevant": "SafeSlice — restrições de latência cumulativa (trajetória) e instantânea (estado) com camada de segurança em xApp O-RAN; candidato forte a antecedente do SQR-JC (pergunta 8)."
+  },
+  {
+   "_id": "B06",
+   "eixo": "B",
+   "file_line": 6,
+   "title": "Flexible RAN Slicing in Open RAN With Constrained Multi-Agent Reinforcement Learning",
+   "authors": "Mohammad Zangooei; Morteza Golkarifard; Mohamed Rouili; Niloy Saha; Raouf Boutaba",
+   "year": "2023",
+   "venue": "IEEE Journal on Selected Areas in Communications",
+   "doi": "10.1109/jsac.2023.3336156",
+   "raw_doi": "10.1109/jsac.2023.3336156",
+   "_sources": [
+    "openalex:B2;B3;B4",
+    "websearch(WS3)+openalex:eixoD_7"
+   ],
+   "why_relevant": "Coordenação multi-agente com restrições de SLA em Open RAN — checa se 'coordenação conjunta consciente de risco/restrição' já existe (pergunta 8, G8)."
+  },
+  {
+   "_id": "B07",
+   "eixo": "B",
+   "file_line": 7,
+   "title": "Dynamic RAN Slicing for Service-Oriented Vehicular Networks via Constrained Learning",
+   "authors": "Wen Rong Wu; Nan Chen; Conghao Zhou; Mushu Li; Xuemin Shen; Weihua Zhuang; Xu Li",
+   "year": "2020",
+   "venue": "IEEE Journal on Selected Areas in Communications",
+   "doi": "10.1109/jsac.2020.3041405",
+   "raw_doi": "10.1109/jsac.2020.3041405",
+   "_sources": [
+    "openalex:B2"
+   ],
+   "why_relevant": "Formulação constrained learning/CMDP para slicing RAN dinâmico veicular — referência de formulação com restrição de SLA (pergunta 8)."
+  },
+  {
+   "_id": "B08",
+   "eixo": "B",
+   "file_line": 8,
+   "title": "Generalizable Resource Scaling of 5G Slices using Constrained Reinforcement Learning",
+   "authors": "Muhammad Sulaiman; Mahdieh Ahmadi; Mohammad A. Salahuddin; Raouf Boutaba; Aladdin Saleh",
+   "year": "2023",
+   "venue": "IEEE/IFIP Network Operations and Management Symposium (NOMS)",
+   "doi": "10.1109/noms56928.2023.10154267",
+   "raw_doi": "10.1109/noms56928.2023.10154267",
+   "_sources": [
+    "openalex:B2"
+   ],
+   "why_relevant": "Constrained RL para resource scaling de slices 5G com generalização — baseline de segurança e de metodologia de avaliação (pergunta 8)."
+  },
+  {
+   "_id": "B09",
+   "eixo": "B",
+   "file_line": 9,
+   "title": "CVaR-Constrained Optimization for Risk-Aware Dynamic Resource Allocation in 5G RAN Slicing",
+   "authors": "S Mahalakshmi; S Markkandan",
+   "year": "2026",
+   "venue": "IEEE Open Journal of the Communications Society",
+   "doi": "10.1109/ojcoms.2026.3699475",
+   "raw_doi": "10.1109/ojcoms.2026.3699475",
+   "_sources": [
+    "openalex:B2"
+   ],
+   "why_relevant": "CVaR-constrained para alocação dinâmica em RAN slicing — medida de risco (cauda) vizinha do quantílico do SQR (pergunta 8, G6)."
+  },
+  {
+   "_id": "B10",
+   "eixo": "B",
+   "file_line": 10,
+   "title": "Risk-Aware Reinforcement Learning Framework for User-Centric O-RAN",
+   "authors": "Shahrukh Khan Kasi; Fahd Ahmed Khan; Sabit Ekin; Ali Imran",
+   "year": "2025",
+   "venue": "IEEE Transactions on Machine Learning in Communications and Networking",
+   "doi": "10.1109/tmlcn.2025.3534139",
+   "raw_doi": "10.1109/tmlcn.2025.3534139",
+   "_sources": [
+    "openalex:B2",
+    "openalex:eixoD_2b"
+   ],
+   "why_relevant": "Risk-aware RL para O-RAN user-centric — antecedente de RL consciente de risco com granularidade per-UE (perguntas 7 e 8)."
+  },
+  {
+   "_id": "B11",
+   "eixo": "B",
+   "file_line": 11,
+   "title": "GAN-Powered Deep Distributional Reinforcement Learning for Resource Management in Network Slicing",
+   "authors": "Yuxiu Hua; Rongpeng Li; Zhifeng Zhao; Xianfu Chen; Honggang Zhang",
+   "year": "2019",
+   "venue": "IEEE Journal on Selected Areas in Communications",
+   "doi": "10.1109/jsac.2019.2959185",
+   "raw_doi": "10.1109/jsac.2019.2959185",
+   "_sources": [
+    "openalex:B5"
+   ],
+   "why_relevant": "GAN-powered deep distributional RL para slicing — antecedente do ramo distributional/quantílico explorado pelo SQR (pergunta 8)."
+  },
+  {
+   "_id": "B12",
+   "eixo": "B",
+   "file_line": 12,
+   "title": "Offline and Distributional Reinforcement Learning for Wireless Communications",
+   "authors": "Eslam Eldeeb; Hirley Alves",
+   "year": "2025",
+   "venue": "IEEE Communications Magazine",
+   "doi": "10.1109/mcom.001.2400521",
+   "raw_doi": "10.1109/mcom.001.2400521",
+   "_sources": [
+    "websearch→openalex:eixoB_6"
+   ],
+   "why_relevant": "Offline+distributional RL (estilo QR-DQN) para comunicações sem fio — estado da arte quantílico fora do slicing, base conceitual do comparativo (pergunta 8)."
+  },
+  {
+   "_id": "B14",
+   "eixo": "B",
+   "file_line": 14,
+   "title": "DRL-Based Latency-Aware Network Slicing in O-RAN with Time-Varying SLAs",
+   "authors": "Raoul Raftopoulos; Salvatore D’Oro; Tommaso Melodia; Giovanni Schembra",
+   "year": "2024",
+   "venue": "2024 International Conference on Computing, Networking and Communications (ICNC)",
+   "doi": "10.1109/icnc59896.2024.10556357",
+   "raw_doi": "10.1109/icnc59896.2024.10556357",
+   "_sources": [
+    "openalex:B3"
+   ],
+   "why_relevant": "DRL para slicing O-RAN com SLAs variáveis no tempo avaliado em OpenRAN Gym (ns-3) — linhagem de ambiente idêntica à nossa (perguntas 1 e 5)."
+  },
+  {
+   "_id": "B15",
+   "eixo": "B",
+   "file_line": 15,
+   "title": "PSASlicing: Perpetual SLA-Aware Reinforcement Learning for O-RAN Slice Management",
+   "authors": "Mingrui Yin; Yang Deng; Ahan Kak; Nakjung Choi; Tao Han",
+   "year": "2024",
+   "venue": "Globecom",
+   "doi": "10.1109/globecom52923.2024.10901152",
+   "raw_doi": "10.1109/globecom52923.2024.10901152",
+   "_sources": [
+    "openalex:B3"
+   ],
+   "why_relevant": "PSASlicing — claim de RL perpétuo sem violação de SLA; contraponto direto ao trade-off risco×consumo que propomos auditar (perguntas 4 e 6, G6)."
+  },
+  {
+   "_id": "B16",
+   "eixo": "B",
+   "file_line": 16,
+   "title": "Slicing Framework for Service Level Agreement Guarantee in Heterogeneous Networks—A Deep Reinforcement Learning Approach",
+   "authors": "Heng Zhang; Shugong Xu; Shunqing Zhang; Zhiyuan Jiang",
+   "year": "2021",
+   "venue": "IEEE Wireless Communications Letters",
+   "doi": "10.1109/lwc.2021.3123733",
+   "raw_doi": "10.1109/lwc.2021.3123733",
+   "_sources": [
+    "openalex:B3"
+   ],
+   "why_relevant": "Framework DRL para garantia de SLA em redes heterogêneas — antecedente de formulação com violação/garantia como critério (pergunta 4)."
+  },
+  {
+   "_id": "B17",
+   "eixo": "B",
+   "file_line": 17,
+   "title": "Multi-Tenant Cross-Slice Resource Orchestration: A Deep Reinforcement Learning Approach",
+   "authors": "Xianfu Chen; Zhifeng Zhao; Celimuge Wu; Mehdi Bennis; Hang Liu; Yusheng Ji; Honggang Zhang",
+   "year": "2019",
+   "venue": "IEEE Journal on Selected Areas in Communications",
+   "doi": "10.1109/jsac.2019.2933893",
+   "raw_doi": "10.1109/jsac.2019.2933893",
+   "_sources": [
+    "openalex:B1"
+   ],
+   "why_relevant": "Orquestração cross-slice multi-tenant com DRL — SOTA clássico de coordenação inter-slice (pergunta 8)."
+  },
+  {
+   "_id": "B18",
+   "eixo": "B",
+   "file_line": 18,
+   "title": "Intelligent Radio Access Network Slicing for Service Provisioning in 6G: A Hierarchical Deep Reinforcement Learning Approach",
+   "authors": "Jie Mei; Xianbin Wang; Kan Zheng; Gary Boudreau; Akram Bin Sediq; Hatem Abou-Zeid",
+   "year": "2021",
+   "venue": "IEEE Transactions on Communications",
+   "doi": "10.1109/tcomm.2021.3090423",
+   "raw_doi": "10.1109/tcomm.2021.3090423",
+   "_sources": [
+    "openalex:B1"
+   ],
+   "why_relevant": "Hierarchical DRL para RAN slicing em 6G (Ericsson) — arquitetura de política hierárquica comparável à do SQR (pergunta 8)."
+  },
+  {
+   "_id": "B19",
+   "eixo": "B",
+   "file_line": 19,
+   "title": "Flexible Resource Block Allocation to Multiple Slices for Radio Access Network Slicing Using Deep Reinforcement Learning",
+   "authors": "Yu Abiko; Takato Saito; Daizo Ikeda; K. Ohta; Tadanori Mizuno; Hiroshi Mineno",
+   "year": "2020",
+   "venue": "IEEE Access",
+   "doi": "10.1109/access.2020.2986050",
+   "raw_doi": "10.1109/access.2020.2986050",
+   "_sources": [
+    "openalex:B1"
+   ],
+   "why_relevant": "Alocação flexível de resource blocks por slice via DRL — mesma granularidade de ação (RB/PRB por slice) do SQR (perguntas 3 e 4)."
+  },
+  {
+   "_id": "B20",
+   "eixo": "B",
+   "file_line": 20,
+   "title": "Resource Slicing for eMBB and URLLC Services in Radio Access Network Using Hierarchical Deep Learning",
+   "authors": "Mehdi Setayesh; Shahab Bahrami; Vincent W. S. Wong",
+   "year": "2022",
+   "venue": "IEEE Transactions on Wireless Communications",
+   "doi": "10.1109/twc.2022.3171264",
+   "raw_doi": "10.1109/twc.2022.3171264",
+   "_sources": [
+    "openalex:B1"
+   ],
+   "why_relevant": "Resource slicing hierárquico eMBB/URLLC — heterogeneidade de serviços ausente no SQR (G8)."
+  },
+  {
+   "_id": "B21",
+   "eixo": "B",
+   "file_line": 21,
+   "title": "Deep Reinforcement Learning for Online Resource Allocation in Network Slicing",
+   "authors": "Yue Cai; Peng Cheng; Zhuo Chen; Ming Ding; Branka S. Vucetic; Yonghui Li",
+   "year": "2023",
+   "venue": "IEEE Transactions on Mobile Computing",
+   "doi": "10.1109/tmc.2023.3328950",
+   "raw_doi": "10.1109/tmc.2023.3328950",
+   "_sources": [
+    "openalex:B5"
+   ],
+   "why_relevant": "DRL para alocação online de recursos em slicing (TMC) — baseline moderno recorrente (pergunta 8)."
+  },
+  {
+   "_id": "B22",
+   "eixo": "B",
+   "file_line": 22,
+   "title": "Multi-Agent Reinforcement Learning for Slicing Resource Allocation in Vehicular Networks",
+   "authors": "Yaping Cui; Hongji Shi; Ruyan Wang; Peng He; Dapeng Wu; Xinyun Huang",
+   "year": "2023",
+   "venue": "IEEE Transactions on Intelligent Transportation Systems",
+   "doi": "10.1109/tits.2023.3314929",
+   "raw_doi": "10.1109/tits.2023.3314929",
+   "_sources": [
+    "openalex:B4"
+   ],
+   "why_relevant": "MARL para alocação de slices veiculares — ramo multi-agente que o SQR não cobre (pergunta 8, G8)."
+  },
+  {
+   "_id": "B23",
+   "eixo": "B",
+   "file_line": 23,
+   "title": "Federated Deep Reinforcement Learning for Resource Allocation in O-RAN Slicing",
+   "authors": "Han Zhang; Hao Zhou; Melike Erol‐Kantarci",
+   "year": "2022",
+   "venue": "Globecom",
+   "doi": "10.1109/globecom48099.2022.10001658",
+   "raw_doi": "10.1109/globecom48099.2022.10001658",
+   "_sources": [
+    "openalex:B4"
+   ],
+   "why_relevant": "Federated DRL para alocação em O-RAN slicing — alternativa distribuída à projeção centralizada do SQR (pergunta 8)."
+  },
+  {
+   "_id": "B24",
+   "eixo": "B",
+   "file_line": 24,
+   "title": "DORA: Dynamic O-RAN Resource Allocation for Multi-Slice 5G Networks",
+   "authors": "Alireza Ebrahimi Dorcheh; Tolunay Seyfi; Fatemeh Afghah",
+   "year": "2025",
+   "venue": "2025 IEEE Middle East Conference on Communications and Networking (MECOM)",
+   "doi": "10.1109/mecom67453.2025.11439664",
+   "raw_doi": "10.1109/mecom67453.2025.11439664",
+   "_sources": [
+    "websearch→openalex:eixoB_7"
+   ],
+   "why_relevant": "DORA — PPO alocando PRBs por slice (URLLC/eMBB/mMTC) em O-RAN; trabalho recente de mesma granularidade de ação (perguntas 3 e 4)."
+  },
+  {
+   "_id": "B25",
+   "eixo": "B",
+   "file_line": 25,
+   "title": "Hierarchical Cooperative MARL for Joint Downlink PRB and Power Allocation in a 5G System",
+   "authors": "Alireza Ebrahimi Dorcheh; Tolunay Seyfi; Ryan Barker; Fatemeh Afghah",
+   "year": "2026",
+   "venue": "arXiv (Cornell University)",
+   "doi": "10.48550/arxiv.2605.02149",
+   "raw_doi": "10.48550/arxiv.2605.02149",
+   "_sources": [
+    "websearch→openalex:eixoB_7"
+   ],
+   "why_relevant": "MARL hierárquico cooperativo para PRB+potência conjuntos — antecedente próximo de coordenação conjunta (SQR-JC); preprint arXiv (DOI DataCite, fora do Crossref)."
+  },
+  {
+   "_id": "B26",
+   "eixo": "B",
+   "file_line": 26,
+   "title": "Deep Reinforcement Learning for Resource Management on Network Slicing: A Survey",
+   "authors": "Johanna Andrea Hurtado Sánchez; Katherine Casilimas; Oscar Maurício Caicedo Rendón",
+   "year": "2022",
+   "venue": "Sensors",
+   "doi": "10.3390/s22083031",
+   "raw_doi": "10.3390/s22083031",
+   "_sources": [
+    "openalex:B1;B5"
+   ],
+   "why_relevant": "Survey DRL×network slicing — mapeamento de fases de resource management, métricas e baselines do eixo (pergunta 4)."
+  },
+  {
+   "_id": "C02",
+   "eixo": "C",
+   "file_line": 2,
+   "title": "Enhancing the ns-3 5G-LENA Simulator with Capabilities for Flexible and Dynamic RAN Slicing Scenarios",
+   "authors": "Orfeas Agis Karachalios; Kimon P. Kontovasilis; Symeon Papavassiliou",
+   "year": "2026",
+   "venue": "Proceedings of the 2026 International Conference on ns-3",
+   "doi": "10.1145/3837358.3837362",
+   "raw_doi": "10.1145/3837358.3837362",
+   "_sources": [
+    "OpenAlex C1"
+   ],
+   "why_relevant": "Extensão do próprio 5G-LENA para RAN slicing flexível e dinâmico — antecedente de plataforma mais próximo do nosso cenário."
+  },
+  {
+   "_id": "C03",
+   "eixo": "C",
+   "file_line": 3,
+   "title": "Extending QoS-aware scheduling in ns-3 5G-LENA: A Lyapunov based solution",
+   "authors": "Neco Villegas; Ana Larrañaga; Luis F. Diez; Katerina Koutlia; Sandra Lagén et al.",
+   "year": "2024",
+   "venue": "2024 Workshop on ns-3",
+   "doi": "10.1145/3659111.3659118",
+   "raw_doi": "10.1145/3659111.3659118",
+   "_sources": [
+    "OpenAlex C1+C2"
+   ],
+   "why_relevant": "Scheduler QoS-aware implementado e avaliado no MAC do 5G-LENA — precedente de instrumentação de ação no MAC (G3)."
+  },
+  {
+   "_id": "C04",
+   "eixo": "C",
+   "file_line": 4,
+   "title": "Evolving 5G-LENA Towards 6G: Integrating AI for Intelligent Scheduling of Multi-Flow Traffic",
+   "authors": "Hyerin Kim; Katerina Koutlia; Biljana Bojović; Amir Ashtari Gargari; Gabriel Carvalho Ferreira",
+   "year": "2025",
+   "venue": "Proceedings of the 2025 International Conference on ns-3",
+   "doi": "10.1145/3747204.3747222",
+   "raw_doi": "10.1145/3747204.3747222",
+   "_sources": [
+    "OpenAlex C1+C2"
+   ],
+   "why_relevant": "Integração de IA ao scheduler do 5G-LENA — mostra o padrão de extensão do MAC que adotaremos no cenário SQR."
+  },
+  {
+   "_id": "C05",
+   "eixo": "C",
+   "file_line": 5,
+   "title": "Enabling QoS Provisioning Support for Delay-Critical Traffic and Multi-Flow Handling in ns-3 5G-LENA",
+   "authors": "Katerina Koutlia; Sandra Lagén; Biljana Bojović",
+   "year": "2023",
+   "venue": "Proceedings of the 2023 Workshop on ns-3",
+   "doi": "10.1145/3592149.3592159",
+   "raw_doi": "10.1145/3592149.3592159",
+   "_sources": [
+    "OpenAlex C1"
+   ],
+   "why_relevant": "Suporte a QoS por fluxo no módulo NR do ns-3 — base para métricas por slice/UE."
+  },
+  {
+   "_id": "C06",
+   "eixo": "C",
+   "file_line": 6,
+   "title": "SARA: Sub-band Aware Resource Assignment for 5G-LENA",
+   "authors": "Gabriel Carvalho Ferreira; Biljana Bojović; Amir Ashtari Gargari; Sandra Lagén",
+   "year": "2025",
+   "venue": "Proceedings of the 2025 International Conference on ns-3",
+   "doi": "10.1145/3747204.3747214",
+   "raw_doi": "10.1145/3747204.3747214",
+   "_sources": [
+    "OpenAlex C1"
+   ],
+   "why_relevant": "Atribuição de RBs por sub-banda no 5G-LENA — granularidade análoga às cotas de PRB do SQR (G3)."
+  },
+  {
+   "_id": "C07",
+   "eixo": "C",
+   "file_line": 7,
+   "title": "Flexible Channel Model Configuration for Scalable 5G-LENA Simulations",
+   "authors": "João Pedro Albuquerque; Aldebaro Barreto da Rocha Klautau Junior; Biljana Bojović; Amir Ashtari Gargari; Gabriel Carvalho Ferreira et al.",
+   "year": "2025",
+   "venue": "Proceedings of the 2025 International Conference on ns-3",
+   "doi": "10.1145/3747204.3747211",
+   "raw_doi": "10.1145/3747204.3747211",
+   "_sources": [
+    "OpenAlex C1+C3"
+   ],
+   "why_relevant": "Configuração flexível de modelo de canal/path loss no 5G-LENA — insumo direto para a matriz de calibração potência/raio/LOS (G1)."
+  },
+  {
+   "_id": "C08",
+   "eixo": "C",
+   "file_line": 8,
+   "title": "Enabling Site-Specific Cellular Network Simulation Through Ray-Tracing-Driven ns-3",
+   "authors": "Tanguy Ropitault; Matteo Bordin; Paolo Testolina; Michele Polese; Pedram Johari et al.",
+   "year": "2026",
+   "venue": "2026 IEEE 23rd Consumer Communications & Networking Conference (CCNC)",
+   "doi": "10.1109/ccnc65079.2026.11366300",
+   "raw_doi": "10.1109/ccnc65079.2026.11366300",
+   "_sources": [
+    "OpenAlex C1+C2"
+   ],
+   "why_relevant": "Calibração site-specific via ray tracing no ns-3, no mesmo venue do artigo SQR (CCNC 2026) — precede nossa calibração realista (G1)."
+  },
+  {
+   "_id": "C09",
+   "eixo": "C",
+   "file_line": 9,
+   "title": "Implementation of a Spatial Channel Model for ns-3",
+   "authors": "Tommaso Zugno; Michele Polese; Natale Patriciello; Biljana Bojović; Sandra Lagen et al.",
+   "year": "2020",
+   "venue": "Proceedings of the 2020 Workshop on ns-3",
+   "doi": "10.1145/3389400.3389401",
+   "raw_doi": "10.1145/3389400.3389401",
+   "_sources": [
+    "OpenAlex C1"
+   ],
+   "why_relevant": "Implementação e validação do modelo de canal espacial 3GPP TR 38.901 no ns-3 — fundamento da cadeia de propagação que rege RLF de borda (G1)."
+  },
+  {
+   "_id": "C10",
+   "eixo": "C",
+   "file_line": 10,
+   "title": "An E2E Simulator for 5G NR Networks",
+   "authors": "Natale Patriciello; Sandra Lagén; Biljana Bojović; Lorenza Giupponi",
+   "year": "2019",
+   "venue": "Simulation Modelling Practice and Theory (preprint arXiv:1911.05534; DOI arXiv 10.48550/arxiv.1911.05534)",
+   "doi": "10.1016/j.simpat.2019.101933",
+   "raw_doi": "10.1016/j.simpat.2019.101933",
+   "_sources": [
+    "OpenAlex C1/C3 (versão de periódico verificada no Crossref)"
+   ],
+   "why_relevant": "Paper de origem do módulo NR (5G-LENA/CTTC) usado no MODA — referência primária da plataforma e do seu modelo E2E."
+  },
+  {
+   "_id": "C11",
+   "eixo": "C",
+   "file_line": 11,
+   "title": "An open-source implementation and validation of 5G NR configured grant for URLLC in ns-3 5G LENA: A scheduling case study in industry 4.0 scenarios",
+   "authors": "Ana Larrañaga; M. Carmen Lucas-Estañ; Sandra Lagén; Zoraze Ali; Imanol Martínez et al.",
+   "year": "2023",
+   "venue": "Journal of Network and Computer Applications",
+   "doi": "10.1016/j.jnca.2023.103638",
+   "raw_doi": "10.1016/j.jnca.2023.103638",
+   "_sources": [
+    "OpenAlex C1"
+   ],
+   "why_relevant": "Implementação open-source com validação explícita no 5G-LENA — metodologia de relato de implementação+validação (G2)."
+  },
+  {
+   "_id": "C12",
+   "eixo": "C",
+   "file_line": 12,
+   "title": "3GPP NR V2X Mode 2: Overview, Models and System-Level Evaluation",
+   "authors": "Zoraze Ali; Sandra Lagén; Lorenza Giupponi; Richard Rouil",
+   "year": "2021",
+   "venue": "IEEE Access",
+   "doi": "10.1109/access.2021.3090855",
+   "raw_doi": "10.1109/access.2021.3090855",
+   "_sources": [
+    "OpenAlex C1+C2+C3"
+   ],
+   "why_relevant": "Avaliação system-level de larga escala com 5G-LENA — prática de documentação de cenário e parâmetros para reprodutibilidade."
+  },
+  {
+   "_id": "C13",
+   "eixo": "C",
+   "file_line": 13,
+   "title": "Enabling NGMN Mixed Traffic Models for ns-3",
+   "authors": "Biljana Bojović; Sandra Lagén",
+   "year": "2022",
+   "venue": "Proceedings of the 2022 Workshop on ns-3",
+   "doi": "10.1145/3532577.3532602",
+   "raw_doi": "10.1145/3532577.3532602",
+   "_sources": [
+    "OpenAlex C1+C2"
+   ],
+   "why_relevant": "Modelos de tráfego misto NGMN no ns-3 — fidelidade da geração de tráfego nos cenários de slicing (chegada Poisson/sessões)."
+  },
+  {
+   "_id": "C14",
+   "eixo": "C",
+   "file_line": 14,
+   "title": "Calibration of the 5G-LENA System Level Simulator in 3GPP Reference Scenarios",
+   "authors": "Katerina Koutlia; Biljana Bojovic; Zoraze Ali; Sandra Lagen",
+   "year": "2025",
+   "venue": "RS-OJICT (RS Innovative Technologies) v.5 n.15; preprint arXiv:2205.03278",
+   "doi": "",
+   "raw_doi": "não reportado",
+   "_sources": [
+    "WebSearch (página RS-OJICT via leitor web; preprint verificado via API arXiv)"
+   ],
+   "why_relevant": "Calibração do próprio 5G-LENA contra cenários de referência 3GPP (macro outdoor) — precedente central para a calibração realista (G1)."
+  },
+  {
+   "_id": "C15",
+   "eixo": "C",
+   "file_line": 15,
+   "title": "SLA-Driven Hierarchical Autonomic Control for Network Slicing in 5G/B5G Networks",
+   "authors": "Wanderson Costa; Ariel Portela; Tiago de Andrade; Rafael Lopes Gomes",
+   "year": "2026",
+   "venue": "Proceedings of the 2026 Latin America Networking Conference (LATINCOM)",
+   "doi": "10.1145/3834582.3834591",
+   "raw_doi": "10.1145/3834582.3834591",
+   "_sources": [
+    "WebSearch; DOI verificado no Crossref"
+   ],
+   "why_relevant": "Controle hierárquico orientado a SLA para slicing avaliado em ns-3/5G-LENA — antecedente próximo de avaliação de violação de SLA na nossa plataforma."
+  },
+  {
+   "_id": "C16",
+   "eixo": "C",
+   "file_line": 16,
+   "title": "A Simulation Execution Manager for ns-3",
+   "authors": "Davide Magrin; Dizhi Zhou; Michele Zorzi",
+   "year": "2019",
+   "venue": "International ACM Conference on Modeling, Analysis and Simulation of Wireless and Mobile Systems (MSWiM)",
+   "doi": "10.1145/3345768.3355942",
+   "raw_doi": "10.1145/3345768.3355942",
+   "_sources": [
+    "OpenAlex C2"
+   ],
+   "why_relevant": "Execução em lote/paralela de simulações ns-3 — infraestrutura de campanha multi-seed reprodutível (G2)."
+  },
+  {
+   "_id": "C17",
+   "eixo": "C",
+   "file_line": 17,
+   "title": "ns-3 NEXT",
+   "authors": "Hélder Fontes; Vitor Lamela; Rui Lopes Campos; Manuel Ricardo",
+   "year": "2019",
+   "venue": "Proceedings of the 2019 Workshop on ns-3",
+   "doi": "10.1145/3321349.3321359",
+   "raw_doi": "10.1145/3321349.3321359",
+   "_sources": [
+    "OpenAlex C2"
+   ],
+   "why_relevant": "Framework de reprodutibilidade para ns-3 — práticas e ferramental para G2."
+  },
+  {
+   "_id": "C18",
+   "eixo": "C",
+   "file_line": 18,
+   "title": "Validation of the ns-3 802.11ax OFDMA implementation",
+   "authors": "Davide Magrin; Stefano Avallone; Sumit Roy; Michele Zorzi",
+   "year": "2021",
+   "venue": "Proceedings of the Workshop on ns-3",
+   "doi": "10.1145/3460797.3460798",
+   "raw_doi": "10.1145/3460797.3460798",
+   "_sources": [
+    "OpenAlex C2"
+   ],
+   "why_relevant": "Validação sistemática de implementação MAC/PHY do ns-3 — modelo metodológico para validar nosso scheduler slice-aware."
+  },
+  {
+   "_id": "C19",
+   "eixo": "C",
+   "file_line": 19,
+   "title": "Computer Network Simulation with ns-3: A Systematic Literature Review",
+   "authors": "Lelio Campanile; Marco Gribaudo; Mauro Iacono; Fiammetta Marulli; Michele Mastroianni",
+   "year": "2020",
+   "venue": "Electronics",
+   "doi": "10.3390/electronics9020272",
+   "raw_doi": "10.3390/electronics9020272",
+   "_sources": [
+    "OpenAlex C3"
+   ],
+   "why_relevant": "Revisão sistemática do uso do ns-3 — contexto de credibilidade de simulação e relato de parâmetros (G2)."
+  },
+  {
+   "_id": "C20",
+   "eixo": "C",
+   "file_line": 20,
+   "title": "Implementation and Calibration of the 3GPP Industrial Channel Model for ns-3",
+   "authors": "Ramos Andrea; Yanet Estrada; Cantero Miguel; Romero Jaime; Martin-Sacristan David et al.",
+   "year": "2022",
+   "venue": "Zenodo (artefato/dataset; DOI DataCite)",
+   "doi": "10.5281/zenodo.6553700",
+   "raw_doi": "10.5281/zenodo.6553700",
+   "_sources": [
+    "OpenAlex C3 (DOI verificado na API DataCite)"
+   ],
+   "why_relevant": "Calibração de modelo de canal 3GPP industrial dentro do ns-3 — prática documentada de calibração (G1)."
+  },
+  {
+   "_id": "C21",
+   "eixo": "C",
+   "file_line": 21,
+   "title": "Rework the Radio Link Budget for 5G and Beyond",
+   "authors": "Kamil Bechta; Jinfeng Du; Marcin Rybakowski",
+   "year": "2020",
+   "venue": "IEEE Access",
+   "doi": "10.1109/access.2020.3039423",
+   "raw_doi": "10.1109/access.2020.3039423",
+   "_sources": [
+    "OpenAlex C3+C5"
+   ],
+   "why_relevant": "Reformulação do link budget para 5G — suporte analítico ao déficit de link budget (~25–30 dB) que identificamos na borda da célula."
+  },
+  {
+   "_id": "C22",
+   "eixo": "C",
+   "file_line": 22,
+   "title": "Building-Aware Path Loss Modeling in ns-3",
+   "authors": "Hugo Le Dirach; Marc Boyer; Emmanuel Lochin",
+   "year": "2025",
+   "venue": "Proceedings of the 2025 International Conference on ns-3",
+   "doi": "10.1145/3747204.3747220",
+   "raw_doi": "10.1145/3747204.3747220",
+   "_sources": [
+    "OpenAlex C3"
+   ],
+   "why_relevant": "Modelagem de path loss consciente de prédios no ns-3 — fidelidade de propagação para cenários realistas (G1)."
+  },
+  {
+   "_id": "C24",
+   "eixo": "C",
+   "file_line": 24,
+   "title": "Framework for Slice-Aware Radio Resource Management Utilizing Artificial Neural Networks",
+   "authors": "Behnam Khodapanah; Ahmad Awada; Ingo Viering; Andre Noll Barreto; Meryem Simsek et al.",
+   "year": "2020",
+   "venue": "IEEE Access",
+   "doi": "10.1109/access.2020.3026164",
+   "raw_doi": "10.1109/access.2020.3026164",
+   "_sources": [
+    "OpenAlex C4"
+   ],
+   "why_relevant": "RRM slice-aware com restrições de SLA avaliado em simulação system-level — comparação com abordagem de gerência de cotas."
+  },
+  {
+   "_id": "C25",
+   "eixo": "C",
+   "file_line": 25,
+   "title": "Highly Flexible RAN Slicing Approach to Manage Isolation, Priority, Efficiency",
+   "authors": "Dania Marabissi; Romano Fantacci",
+   "year": "2019",
+   "venue": "IEEE Access",
+   "doi": "10.1109/access.2019.2929732",
+   "raw_doi": "10.1109/access.2019.2929732",
+   "_sources": [
+    "OpenAlex C4"
+   ],
+   "why_relevant": "Avaliação de isolamento/prioridade/eficiência entre slices no RAN — conecta ao mecanismo de degradação/isolamento (§5)."
+  },
+  {
+   "_id": "C26",
+   "eixo": "C",
+   "file_line": 26,
+   "title": "Uplink coverage enhancements for extremely large-cell sites",
+   "authors": "M. Pavan Reddy; G. Koteswara Rao; Dileep Kumar; K. Subhash; SaiDhiraj Amuru et al.",
+   "year": "2022",
+   "venue": "EURASIP Journal on Wireless Communications and Networking",
+   "doi": "10.1186/s13638-022-02133-3",
+   "raw_doi": "10.1186/s13638-022-02133-3",
+   "_sources": [
+    "OpenAlex C5"
+   ],
+   "why_relevant": "Cobertura uplink em células macro muito grandes via simulação system+link level — precedente para a inviabilidade de SLA a 2 km / RLF de borda."
+  },
+  {
+   "_id": "D03",
+   "eixo": "D",
+   "file_line": 3,
+   "title": "Safe RAN Slicing in O-RAN: Minimizing SLA Violations via Model-Based Reinforcement Learning",
+   "authors": "Aerman Tuerxun, Akihiro Nakao",
+   "year": "2026",
+   "venue": "IEEE CCNC 2026",
+   "doi": "10.1109/ccnc65079.2026.11366589",
+   "raw_doi": "10.1109/ccnc65079.2026.11366589",
+   "_sources": [
+    "openalex:eixoD_1b"
+   ],
+   "why_relevant": "Artigo-base do projeto (reproduzido/auditado); nucleo do eixo D: regressao quantilica kernel + projecao de acoes para slicing O-RAN."
+  },
+  {
+   "_id": "D06",
+   "eixo": "D",
+   "file_line": 6,
+   "title": "Safe-NORA: Safe Reinforcement Learning-based Mobile Network Resource Allocation for Diverse User Demands",
+   "authors": "Wenzhen Huang, Tong Li, Yuting Cao, Zhe Lyu, Yanping Liang, Li Yu, Depeng Jin, Junge Zhang, Yong Li",
+   "year": "2023",
+   "venue": "ACM International Conference on Information and Knowledge Management (CIKM)",
+   "doi": "10.1145/3583780.3615043",
+   "raw_doi": "10.1145/3583780.3615043",
+   "_sources": [
+    "openalex:eixoD_5+eixoD_2b"
+   ],
+   "why_relevant": "Safe RL para alocacao de recursos de rede movel em casos de uso diversos; safe RL aplicado a rede movel, nao so robotica."
+  },
+  {
+   "_id": "D07",
+   "eixo": "D",
+   "file_line": 7,
+   "title": "A Constrained Reinforcement Learning Based Approach for Network Slicing",
+   "authors": "Yongshuai Liu, Jiaxin Ding, Xin Liu",
+   "year": "2020",
+   "venue": "Proceedings/Proceedings - International Conference on Network Protocols",
+   "doi": "10.1109/icnp49622.2020.9259378",
+   "raw_doi": "10.1109/icnp49622.2020.9259378",
+   "_sources": [
+    "openalex:eixoD_4"
+   ],
+   "why_relevant": "Formulacao CMDP explicita para network slicing; primeiro bloco da linhagem constrained-RL-slicing."
+  },
+  {
+   "_id": "D08",
+   "eixo": "D",
+   "file_line": 8,
+   "title": "CLARA: A Constrained Reinforcement Learning Based Resource Allocation Framework for Network Slicing",
+   "authors": "Yongshuai Liu, Jiaxin Ding, Zhi-Li Zhang, Xin Liu",
+   "year": "2021",
+   "venue": "IEEE International Conference on Big Data (BigData)",
+   "doi": "10.1109/bigdata52589.2021.9671840",
+   "raw_doi": "10.1109/bigdata52589.2021.9671840",
+   "_sources": [
+    "openalex:eixoD_4+websearch(WS3)"
+   ],
+   "why_relevant": "CLARA: constrained RL para alocacao multi-dominio em slicing; baseline recorrente da area."
+  },
+  {
+   "_id": "D09",
+   "eixo": "D",
+   "file_line": 9,
+   "title": "Resource Allocation Method for Network Slicing Using Constrained Reinforcement Learning",
+   "authors": "Yongshuai Liu, Jiaxin Ding, Xin Liu",
+   "year": "2021",
+   "venue": "IFIP Networking Conference (IFIP Networking)",
+   "doi": "10.23919/ifipnetworking52078.2021.9472202",
+   "raw_doi": "10.23919/ifipnetworking52078.2021.9472202",
+   "_sources": [
+    "openalex:eixoD_4"
+   ],
+   "why_relevant": "Mesmo grupo Liu/Ding/Xin; comparacao de formulacoes constrained aplicadas a slicing (variação de venues)."
+  },
+  {
+   "_id": "D10",
+   "eixo": "D",
+   "file_line": 10,
+   "title": "Constraint-Aware Deep Reinforcement Learning for End-to-End Resource Orchestration in Mobile Networks",
+   "authors": "Qiang Liu, Nakjung Choi, Tao Han",
+   "year": "2021",
+   "venue": "Proceedings/Proceedings - International Conference on Network Protocols",
+   "doi": "10.1109/icnp52444.2021.9651934",
+   "raw_doi": "10.1109/icnp52444.2021.9651934",
+   "_sources": [
+    "openalex:eixoD_6"
+   ],
+   "why_relevant": "DRL constraint-aware de ponta a ponta (RAN+transporte); escopo mais amplo que o SQR, delimita a fronteira do eixo."
+  },
+  {
+   "_id": "D12",
+   "eixo": "D",
+   "file_line": 12,
+   "title": "Distributional Reinforcement Learning With Quantile Regression",
+   "authors": "Will Dabney, Mark Rowland, Marc G. Bellemare, Rémi Munos",
+   "year": "2018",
+   "venue": "Proceedings of the AAAI Conference on Artificial Intelligence",
+   "doi": "10.1609/aaai.v32i1.11791",
+   "raw_doi": "10.1609/aaai.v32i1.11791",
+   "_sources": [
+    "websearch(WS2)+openalex:eixoD_9_qrdqn"
+   ],
+   "why_relevant": "Seminal da regressao quantilica em RL (pinball/QR-DQN) - mecanismo central do SQR; excecao seminal pre-2019 via snowballing (criterio I1)."
+  },
+  {
+   "_id": "D13",
+   "eixo": "D",
+   "file_line": 13,
+   "title": "Safety-constrained reinforcement learning with a distributional safety critic",
+   "authors": "Qisong Yang, Thiago D. Simão, Simon H. Tindemans, Matthijs T. J. Spaan",
+   "year": "2022",
+   "venue": "Machine Learning",
+   "doi": "10.1007/s10994-022-06187-8",
+   "raw_doi": "10.1007/s10994-022-06187-8",
+   "_sources": [
+    "openalex:eixoD_3"
+   ],
+   "why_relevant": "Combinacao direta distributional x safety-constrained (critico de seguranca distribucional); testa se a intersecao quantile x safe ja existe fora de RAN."
+  },
+  {
+   "_id": "D14",
+   "eixo": "D",
+   "file_line": 14,
+   "title": "Non-Crossing Quantile Regression for Distributional Reinforcement Learning",
+   "authors": "Fan Zhou, Jianing Wang, Xingdong Feng",
+   "year": "2020",
+   "venue": "neural information processing systems",
+   "doi": "",
+   "raw_doi": "não reportado",
+   "_sources": [
+    "openalex:eixoD_3+eixoD_9_qrdqn"
+   ],
+   "why_relevant": "Refinamento do estimador quantilico (monotonicidade/cruzamento) em distributional RL; antecedente do estimador f_tau do SQR."
+  },
+  {
+   "_id": "D15",
+   "eixo": "D",
+   "file_line": 15,
+   "title": "Millimeter Wave Communications With an Intelligent Reflector: Performance Optimization and Distributional Reinforcement Learning",
+   "authors": "Qianqian Zhang, Walid Saad, Mehdi Bennis",
+   "year": "2021",
+   "venue": "IEEE Transactions on Wireless Communications",
+   "doi": "10.1109/twc.2021.3107520",
+   "raw_doi": "10.1109/twc.2021.3107520",
+   "_sources": [
+    "openalex:eixoD_3"
+   ],
+   "why_relevant": "Distributional RL aplicado a mmWave/IRS; distributional em wireless fora de slicing, mostra dispersao da tecnica."
+  },
+  {
+   "_id": "D16",
+   "eixo": "D",
+   "file_line": 16,
+   "title": "A Comparative Analysis of Expected and Distributional Reinforcement Learning",
+   "authors": "Clare Lyle, Marc G. Bellemare, Pablo Samuel Castro",
+   "year": "2019",
+   "venue": "Proceedings of the AAAI Conference on Artificial Intelligence",
+   "doi": "10.1609/aaai.v33i01.33014504",
+   "raw_doi": "10.1609/aaai.v33i01.33014504",
+   "_sources": [
+    "openalex:eixoD_3b"
+   ],
+   "why_relevant": "Analisa quando distributional supera expected RL; fundamenta (ou nao) a premissa de que quantis ajudam na alocacao."
+  },
+  {
+   "_id": "D17",
+   "eixo": "D",
+   "file_line": 17,
+   "title": "Offline and Distributional Reinforcement Learning for Radio Resource Management",
+   "authors": "Eslam Eldeeb, Hirley Alves",
+   "year": "2025",
+   "venue": "Joint European Conference on Networks and Communications & 6G Summit (EuCNC/6G Summit)",
+   "doi": "10.1109/eucnc/6gsummit63408.2025.11037178",
+   "raw_doi": "10.1109/eucnc/6gsummit63408.2025.11037178",
+   "_sources": [
+    "openalex:eixoD_3b"
+   ],
+   "why_relevant": "Distributional + offline RL para gestao de recursos de radio; estado da arte recente em RRM distributional."
+  },
+  {
+   "_id": "D18",
+   "eixo": "D",
+   "file_line": 18,
+   "title": "Auditing the Risk Claims of Distributional Reinforcement Learning",
+   "authors": "Hari Prasad",
+   "year": "2026",
+   "venue": "arXiv (Cornell University)",
+   "doi": "10.48550/arxiv.2607.11607",
+   "raw_doi": "10.48550/arxiv.2607.11607",
+   "_sources": [
+    "openalex:eixoD_3b"
+   ],
+   "why_relevant": "Auditoria dos claims de risco em distributional RL; precedente metodologico direto do nosso angulo de auditoria empirica."
+  },
+  {
+   "_id": "D19",
+   "eixo": "D",
+   "file_line": 19,
+   "title": "Safety-Guided Deep Reinforcement Learning via Online Gaussian Process Estimation",
+   "authors": "Jiameng Fan, Wenchao Li",
+   "year": "2019",
+   "venue": "OpenBU (Boston University)",
+   "doi": "10.48550/arxiv.1903.02526",
+   "raw_doi": "10.48550/arxiv.1903.02526",
+   "_sources": [
+    "openalex:eixoD_2"
+   ],
+   "why_relevant": "Safe DRL guiado por processo gaussiano online; linhagem GP-safe que o SQR herda via kernel Matern."
+  },
+  {
+   "_id": "D20",
+   "eixo": "D",
+   "file_line": 20,
+   "title": "Robust Regression for Safe Exploration in Control",
+   "authors": "Anqi Liu, Guanya Shi, Soon‐Jo Chung, Animashree Anandkumar, Yisong Yue",
+   "year": "2019",
+   "venue": "arXiv (Cornell University)",
+   "doi": "10.48550/arxiv.1906.05819",
+   "raw_doi": "10.48550/arxiv.1906.05819",
+   "_sources": [
+    "openalex:eixoD_2"
+   ],
+   "why_relevant": "Regressao robusta para exploracao segura; mecanismo de seguranca por incerteza de regressao, primo do f_tau do SQR."
+  },
+  {
+   "_id": "D21",
+   "eixo": "D",
+   "file_line": 21,
+   "title": "Kernel-Based Safe Exploration in Deep Reinforcement Learning",
+   "authors": "Rupak Majumdar, Nikhil Singh, Sadegh Soudjani",
+   "year": "2026",
+   "venue": "arXiv (Cornell University)",
+   "doi": "10.48550/arxiv.2605.22207",
+   "raw_doi": "10.48550/arxiv.2605.22207",
+   "_sources": [
+    "openalex:eixoD_2"
+   ],
+   "why_relevant": "Kernel-based safe exploration em deep RL; intersecao direta kernel x seguranca que e o nucleo do SQR."
+  },
+  {
+   "_id": "D22",
+   "eixo": "D",
+   "file_line": 22,
+   "title": "Safe Reinforcement Learning With Model Uncertainty Estimates",
+   "authors": "Björn Lütjens, Michael Everett, Jonathan P. How",
+   "year": "2019",
+   "venue": "Proceedings - IEEE International Conference on Robotics and Automation/Proceedings",
+   "doi": "10.1109/icra.2019.8793611",
+   "raw_doi": "10.1109/icra.2019.8793611",
+   "_sources": [
+    "openalex:eixoD_5"
+   ],
+   "why_relevant": "Seguranca por estimativa de incerteza do modelo; antecedente do \"modo incerto\" (epsilon-softmax/kNN) do SQR."
+  },
+  {
+   "_id": "D23",
+   "eixo": "D",
+   "file_line": 23,
+   "title": "Provably Safe Reinforcement Learning via Action Projection Using Reachability Analysis and Polynomial Zonotopes",
+   "authors": "Niklas Kochdumper, Hanna Krasowski, Xiao Wang, Stanley Bak, Matthias Althoff",
+   "year": "2023",
+   "venue": "IEEE Open Journal of Control Systems",
+   "doi": "10.1109/ojcsys.2023.3256305",
+   "raw_doi": "10.1109/ojcsys.2023.3256305",
+   "_sources": [
+    "openalex:eixoD_5"
+   ],
+   "why_relevant": "Projecao de acao com garantia formal (reachability); mecanismo-irmao da projecao proporcional do SQR (G8)."
+  },
+  {
+   "_id": "D24",
+   "eixo": "D",
+   "file_line": 24,
+   "title": "Safe Reinforcement Learning using Action Projection: Safeguard the Policy or the Environment?",
+   "authors": "Hannah Markgraf, Sawant, Shambhuraj, Hanna Krasowski, Lukas Schäfer, Sébastien Gros, Matthias Althoff",
+   "year": "2025",
+   "venue": "arXiv (Cornell University)",
+   "doi": "10.48550/arxiv.2509.12833",
+   "raw_doi": "10.48550/arxiv.2509.12833",
+   "_sources": [
+    "openalex:eixoD_5"
+   ],
+   "why_relevant": "Analise critica do que a projecao de acao efetivamente protege; base para a falha local-seguro -> global-inseguro (G8)."
+  },
+  {
+   "_id": "D26",
+   "eixo": "D",
+   "file_line": 26,
+   "title": "xTRUCE: A Provably Safe Arbiter for Multi-xApp Conflict Mitigation in Agentic O-RAN",
+   "authors": "Le Xia, Rose Qingyang Hu, Paul S. Kudyba, Zhenlin An, Haijian Sun",
+   "year": "2026",
+   "venue": "arXiv (Cornell University)",
+   "doi": "10.48550/arxiv.2608.28532",
+   "raw_doi": "10.48550/arxiv.2608.28532",
+   "_sources": [
+    "openalex:eixoD_6+eixoD_8"
+   ],
+   "why_relevant": "Arbitro provavelmente seguro para conflito multi-xApp em O-RAN; coordenacao de acoes conflitantes, relevante ao SQR-JC."
+  }
+ ],
+ "dup_rows": [
+  {
+   "id": "B03",
+   "eixo": "B",
+   "file_line": 3,
+   "title": "RSLAQ—A Robust SLA-Driven 6G O-RAN QoS Xapp Using Deep Reinforcement Learning",
+   "doi": "10.1109/tmc.2026.3666787",
+   "dup_of": "A18",
+   "match": "doi"
+  },
+  {
+   "id": "B13",
+   "eixo": "B",
+   "file_line": 13,
+   "title": "O-RAN-Enabled Intelligent Network Slicing to Meet Service-Level Agreement (SLA)",
+   "doi": "10.1109/tmc.2024.3476338",
+   "dup_of": "A17",
+   "match": "doi"
+  },
+  {
+   "id": "C23",
+   "eixo": "C",
+   "file_line": 23,
+   "title": "Model-Based Reinforcement Learning With Kernels for Resource Allocation in RAN Slices",
+   "doi": "10.1109/twc.2022.3195570",
+   "dup_of": "B02",
+   "match": "doi"
+  },
+  {
+   "id": "D02",
+   "eixo": "D",
+   "file_line": 2,
+   "title": "Model-Based Reinforcement Learning With Kernels for Resource Allocation in RAN Slices",
+   "doi": "10.1109/twc.2022.3195570",
+   "dup_of": "B02",
+   "match": "doi"
+  },
+  {
+   "id": "D04",
+   "eixo": "D",
+   "file_line": 4,
+   "title": "SafeSlice: Enabling SLA-Compliant O-RAN Slicing via Safe Deep Reinforcement Learning",
+   "doi": "10.1109/icmlcn64995.2025.11140546",
+   "dup_of": "B05",
+   "match": "doi"
+  },
+  {
+   "id": "D05",
+   "eixo": "D",
+   "file_line": 5,
+   "title": "Flexible RAN Slicing in Open RAN With Constrained Multi-Agent Reinforcement Learning",
+   "doi": "10.1109/jsac.2023.3336156",
+   "dup_of": "B06",
+   "match": "doi"
+  },
+  {
+   "id": "D11",
+   "eixo": "D",
+   "file_line": 11,
+   "title": "Risk-Aware Reinforcement Learning Framework for User-Centric O-RAN",
+   "doi": "10.1109/tmlcn.2025.3534139",
+   "dup_of": "B10",
+   "match": "doi"
+  },
+  {
+   "id": "D25",
+   "eixo": "D",
+   "file_line": 25,
+   "title": "RSLAQ—A Robust SLA-Driven 6G O-RAN QoS Xapp Using Deep Reinforcement Learning",
+   "doi": "10.1109/tmc.2026.3666787",
+   "dup_of": "A18",
+   "match": "doi"
+  }
+ ]
+}

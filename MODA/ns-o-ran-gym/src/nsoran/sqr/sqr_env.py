@@ -99,6 +99,15 @@ def read_effective_total_prbs(sim_path: str | None) -> int | None:
     10 MHz scenario: 13 RBGs x 4 PRBs + 1, register R01 as amended — the
     round 3GPP number 52 is NOT the grid the scheduler actually holds).
 
+    [ERRATA D0-A/B 08/11/2026 — orquestrador, protocolo v2 §5.5] The
+    mechanism narrative above ("13 RBGs x 4 PRBs + 1") is REFUTED by code
+    reading: the correct chain is NumRbPerRbg=1 (NrHelper default, not
+    recalculated by 38.214) with m_rbNum = floor(10 MHz * 0.96 / 180 kHz)
+    = 53, hence 53 RBGs = 53 PRBs (RbOverhead 0.04). The NUMBER 53 and the
+    telemetry remain correct; only this sentence's mechanism was wrong.
+    Evidence: results/sqr_jc_final/01_resource_unit/resource_unit_manifest.md
+    + audit MODA/docs/sqr/jc_decision/audit/resource_units_trace.md.
+
     Returns None whenever there is no telemetry yet, the file has no
     complete row, the last row is a torn write (column-count mismatch),
     the column is malformed or the value is not positive — the caller then
