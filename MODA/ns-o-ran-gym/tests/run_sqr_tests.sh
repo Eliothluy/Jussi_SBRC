@@ -64,4 +64,5 @@ exec "${PYTHON}" -m pytest \
     tests/test_sqr_jc_feasibility_floors.py \
     tests/test_sqr_jc_controller.py \
     tests/test_sqr_jc_regression_round2.py \
+    tests/test_sqr_jc_freeze_contract.py \
     "$@"

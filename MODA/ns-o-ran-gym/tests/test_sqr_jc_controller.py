@@ -402,3 +402,210 @@ def test_sqr_het_slice_wise_plus_projection():
     from nsoran.sqr_jc.sqr_het import SqrHetController as _S
 
     assert hasattr(het, "apply_virtual_updates")
+
+
+def test_sqr_het_scaler_indexing_audit_emu_bug():
+    """Audit (A4 pre-check): document exact FeatureScaler indexing bug in
+    ``sqr_het.py`` ('letter = \"emu\"[slice_id]') while slices are (eMBB, URLLC,
+    mMTC). Confirms URLLC uses (n_m, queue_m) bounds and mMTC uses (n_u, queue_u)
+    bounds, leaving A4 frozen without silently fixing it."""
+    from dataclasses import replace
+    from nsoran.sqr_jc.joint_state import FEATURE_INDEX
+    from nsoran.sqr_jc.sqr_het import SqrHetController
+
+    # Distinct per-slice p99 bounds (p1=0.0, p99=exact cap via 101-row grid).
+    caps = {
+        "n_e": 10.0, "n_u": 30.0, "n_m": 20.0,
+        "queue_e": 100.0, "queue_u": 700.0, "queue_m": 1400.0,
+    }
+    raw = np.zeros((101, ZDIM), dtype=np.float64)
+    for feat, cap in caps.items():
+        raw[99:, FEATURE_INDEX[feat]] = cap
+    scaler = FeatureScaler(c=53)
+    scaler.fit(raw)
+
+    controllers = tuple(
+        SqrSliceController(state_dim=6, n_prbs=53, gamma=0.0,
+                           sla_threshold=0.0, memory_size=64)
+        for _ in range(3)
+    )
+    het = SqrHetController(controllers, scaler, c=53, mean_field=False)
+    st = replace(
+        _state(),
+        n_e=5, n_u=6, n_m=4,
+        queue_e=50.0, queue_u=350.0, queue_m=700.0,
+        kpi_e_raw=1.75, kpi_u_raw=5.0, kpi_m_raw=0.90,
+        snr_e=15.0, snr_u=15.0, snr_m=15.0,
+    )
+    z0, z1, z2 = het.slice_state(st, 0), het.slice_state(st, 1), het.slice_state(st, 2)
+
+    # eMBB (slice 0): uses n_e=10, queue_e=100 (unaffected).
+    assert np.isclose(z0[0], 5.0 / 10.0)
+    assert np.isclose(z0[1], 50.0 / 100.0)
+
+    # URLLC (slice 1): physical values (n_u=6, queue_u=350), scaled by (n_m=20, queue_m=1400)
+    # instead of (n_u=30, queue_u=700)!
+    assert np.isclose(z1[0], 6.0 / 20.0) and not np.isclose(z1[0], 6.0 / 30.0)
+    assert np.isclose(z1[1], 350.0 / 1400.0) and not np.isclose(z1[1], 350.0 / 700.0)
+
+    # mMTC (slice 2): physical values (n_m=4, queue_m=700), scaled by (n_u=30, queue_u=700)
+    # instead of (n_m=20, queue_m=1400)!
+    assert np.isclose(z2[0], 4.0 / 30.0) and not np.isclose(z2[0], 4.0 / 20.0)
+    assert np.isclose(z2[1], 700.0 / 700.0) and not np.isclose(z2[1], 700.0 / 1400.0)
+
+    # KPI & SNR remain correctly aligned per slice.
+    assert np.isclose(z1[2], 5.0 / 10.0) and np.isclose(z2[2], 0.90)
+    assert np.isclose(z1[3], 15.0 / 30.0) and np.isclose(z2[3], 15.0 / 30.0)
+
+    # Also verify against frozen CAL manifest if present in workspace.
+    manifest = os.path.abspath(os.path.join(
+        os.path.dirname(__file__), "..", "..", "..",
+        "results", "sqr_jc_final", "03_calibration", "feature_scaler_manifest.yaml",
+    ))
+    if os.path.exists(manifest):
+        cal_scaler = FeatureScaler.load_manifest(manifest)
+        het_cal = SqrHetController(controllers, cal_scaler, c=53, mean_field=False)
+        st_cal = replace(st, n_u=2, n_m=2, queue_u=709.0, queue_m=709.0)
+        zu_cal = het_cal.slice_state(st_cal, 1)
+        zm_cal = het_cal.slice_state(st_cal, 2)
+        # In CAL manifest: n_u_p99=3, n_m_p99=2; queue_u_p99=709, queue_m_p99=1422.
+        assert np.isclose(zu_cal[0], 2.0 / 2.0)       # saturated at n_u=2 instead of 2/3
+        assert np.isclose(zu_cal[1], 709.0 / 1422.0)  # half-scaled instead of 1.0
+        assert np.isclose(zm_cal[0], 2.0 / 3.0)       # 0.6667 instead of 1.0
+        assert np.isclose(zm_cal[1], 709.0 / 709.0)   # saturated at 709 B instead of ~0.4986
+
+
+def test_sqr_het_mean_field_a4_isolation_and_causality():
+    """A4 (--mean_field): replaces dims 4..5 with [prb_others_norm, total_ues_norm]
+    from pre-decision state while keeping dims 0..3 bit-identical and R11 intact."""
+    from dataclasses import replace
+    from nsoran.sqr.sqr_env import N_MAX_CELL, clip_norm
+    from nsoran.sqr_jc.sqr_het import SqrHetController
+
+    scaler = _make_scaler()
+    ctls_off = tuple(
+        SqrSliceController(state_dim=6, n_prbs=53, gamma=0.0,
+                           sla_threshold=0.0, memory_size=64)
+        for _ in range(3)
+    )
+    ctls_on = tuple(
+        SqrSliceController(state_dim=6, n_prbs=53, gamma=0.0,
+                           sla_threshold=0.0, memory_size=64)
+        for _ in range(3)
+    )
+    het_off = SqrHetController(ctls_off, scaler, c=53, mean_field=False)
+    het_on = SqrHetController(ctls_on, scaler, c=53, mean_field=True)
+
+    st = replace(
+        _state(),
+        n_e=3, n_u=2, n_m=5,
+        prev_a_e=18, prev_a_u=12, prev_a_m=15,
+        viol_e=1, viol_u=0, viol_m=1,
+    )
+    expected_total_ues = clip_norm(3 + 2 + 5, N_MAX_CELL)  # 10 / 20 = 0.5
+    expected_others = (
+        clip_norm(12 + 15, 53),  # slice 0
+        clip_norm(18 + 15, 53),  # slice 1
+        clip_norm(18 + 12, 53),  # slice 2
+    )
+    for sid in range(3):
+        z_off = het_off.slice_state(st, sid)
+        z_on = het_on.slice_state(st, sid)
+        # Dims 0..3 are bit-identical (preserves scaler semantics and bug isolation).
+        assert np.array_equal(z_on[:4], z_off[:4])
+        # A0 keeps [prev_a_i/C, viol_i].
+        prev_i = (18, 12, 15)[sid]
+        viol_i = (1, 0, 1)[sid]
+        assert np.isclose(z_off[4], prev_i / 53.0) and np.isclose(z_off[5], float(viol_i))
+        # A4 restores [prb_others_norm, total_ues_norm].
+        assert np.isclose(z_on[4], expected_others[sid])
+        assert np.isclose(z_on[5], expected_total_ues)
+
+    # Causality at t=0 (prev_a = (0,0,0)) and empty slice (n_u=0):
+    st_t0 = replace(_state(), n_e=4, n_u=0, n_m=2, prev_a_e=0, prev_a_u=0, prev_a_m=0)
+    for sid in range(3):
+        z0 = het_on.slice_state(st_t0, sid)
+        assert z0[4] == 0.0
+        assert np.isclose(z0[5], clip_norm(6, N_MAX_CELL))
+
+    # R11 margin adaptation responds identically to violated outcome (m < 0)
+    # without depending on z_i[4..5] (adapts at violation_window=100).
+    out_viol = SliceOutcome(embb_throughput_mbps=0.5, urllc_p95_ms=25.0,
+                            mmtc_pdr_rolling=0.50)
+    m_before = [c.margin for c in het_on.controllers]
+    tau_before = [c.tau for c in het_on.controllers]
+    for _ in range(het_on.controllers[0].violation_window):
+        recs_off = het_off.observe_outcome(st, (18, 12, 15), out_viol)
+        recs_on = het_on.observe_outcome(st, (18, 12, 15), out_viol)
+        assert len(recs_on) == 3 and len(recs_off) == 3
+    assert [c.tau for c in het_on.controllers] == [c.tau for c in het_off.controllers]
+    assert [c.margin for c in het_on.controllers] == [c.margin for c in het_off.controllers]
+    assert all(c.margin > mb for c, mb in zip(het_on.controllers, m_before))
+    assert all(c.tau < tb for c, tb in zip(het_on.controllers, tau_before))
+
+
+def test_sqr_het_scaler_indexing_fix_eum_a_scaler():
+    """A_scaler (--fix_scaler_index): maps slice_id -> 'eum'[slice_id] so
+    eMBB, URLLC, and mMTC each use their own user-count and queue scalers
+    while keeping dims 2..5 bit-identical and preserving fix_scaler_index=False."""
+    from dataclasses import replace
+    from nsoran.sqr_jc.joint_state import FEATURE_INDEX
+    from nsoran.sqr_jc.sqr_het import SqrHetController
+
+    caps = {
+        "n_e": 10.0, "n_u": 30.0, "n_m": 20.0,
+        "queue_e": 100.0, "queue_u": 700.0, "queue_m": 1400.0,
+    }
+    raw = np.zeros((101, ZDIM), dtype=np.float64)
+    for feat, cap in caps.items():
+        raw[99:, FEATURE_INDEX[feat]] = cap
+    scaler = FeatureScaler(c=53)
+    scaler.fit(raw)
+
+    ctls_bug = tuple(
+        SqrSliceController(state_dim=6, n_prbs=53, gamma=0.0,
+                           sla_threshold=0.0, memory_size=64)
+        for _ in range(3)
+    )
+    ctls_fix = tuple(
+        SqrSliceController(state_dim=6, n_prbs=53, gamma=0.0,
+                           sla_threshold=0.0, memory_size=64)
+        for _ in range(3)
+    )
+    het_bug = SqrHetController(ctls_bug, scaler, c=53, fix_scaler_index=False)
+    het_fix = SqrHetController(ctls_fix, scaler, c=53, fix_scaler_index=True)
+
+    st = replace(
+        _state(),
+        n_e=5, n_u=6, n_m=4,
+        queue_e=50.0, queue_u=350.0, queue_m=700.0,
+        kpi_e_raw=1.75, kpi_u_raw=5.0, kpi_m_raw=0.90,
+        snr_e=15.0, snr_u=15.0, snr_m=15.0,
+    )
+    for sid in range(3):
+        zb = het_bug.slice_state(st, sid)
+        zf = het_fix.slice_state(st, sid)
+        assert np.array_equal(zf[2:], zb[2:])
+
+    z0 = het_fix.slice_state(st, 0)
+    z1 = het_fix.slice_state(st, 1)
+    z2 = het_fix.slice_state(st, 2)
+    assert np.isclose(z0[0], 5.0 / 10.0) and np.isclose(z0[1], 50.0 / 100.0)
+    assert np.isclose(z1[0], 6.0 / 30.0) and np.isclose(z1[1], 350.0 / 700.0)
+    assert np.isclose(z2[0], 4.0 / 20.0) and np.isclose(z2[1], 700.0 / 1400.0)
+
+    manifest = os.path.abspath(os.path.join(
+        os.path.dirname(__file__), "..", "..", "..",
+        "results", "sqr_jc_final", "03_calibration", "feature_scaler_manifest.yaml",
+    ))
+    if os.path.exists(manifest):
+        cal_scaler = FeatureScaler.load_manifest(manifest)
+        het_cal = SqrHetController(ctls_fix, cal_scaler, c=53, fix_scaler_index=True)
+        st_cal = replace(st, n_e=2, n_u=2, n_m=2, queue_e=1000.0, queue_u=709.0, queue_m=709.0)
+        zu_cal = het_cal.slice_state(st_cal, 1)
+        zm_cal = het_cal.slice_state(st_cal, 2)
+        assert np.isclose(zu_cal[0], 2.0 / 3.0)
+        assert np.isclose(zu_cal[1], 709.0 / 709.0)
+        assert np.isclose(zm_cal[0], 2.0 / 2.0)
+        assert np.isclose(zm_cal[1], 709.0 / 1422.0)
+
