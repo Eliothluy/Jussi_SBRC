@@ -639,6 +639,7 @@ def run_episode(
         if (het is not None and causal_trace_path)
         else None
     )
+    _deferred_trace_kwargs = None
 
     class _HoldDecision:
         """step-row placeholder while no KPM window exists yet."""
@@ -883,28 +884,42 @@ def run_episode(
                 zs = [het.slice_state(st, sid) for sid in range(num_slices)]
                 preds_b, preds_a = [], []
                 f_a0, f_a37, f_amax = [], [], []
+                _sc_cache = []
                 for sid in range(num_slices):
                     sc = controllers[sid].score_candidates(zs[sid])
+                    if _causal_writer is not None:
+                        _sc_cache.append(sc)
                     preds_b.append(float(sc["f"][int(het_dec.proposals[sid])]))
                     preds_a.append(float(sc["f"][int(het_dec.action[sid])]))
                     f_a0.append(float(sc["f"][0]))
                     f_a37.append(float(sc["f"][min(37, len(sc["f"]) - 1)]))
                     f_amax.append(float(sc["f"][-1]))
+                _deferred_trace_kwargs = None
                 if _causal_writer is not None:
-                    _causal_writer.record_decision(
-                        step_index=step + 1,
-                        sim_time_ms=int(win.timestamp),
-                        policy="SQR_HET",
-                        state=st,
-                        zs=zs,
-                        controllers=controllers,
-                        capacity_c=int(total_prbs),
-                        a_raw_per_slice=[int(d.raw_action) for d in decisions],
-                        a_prop_per_slice=list(het_dec.proposals),
-                        a_exec_per_slice=list(het_dec.action),
-                        cut_per_slice=list(het_dec.cut),
-                        modes_per_slice=[d.mode for d in decisions],
+                    _trace_kwargs = {
+                        "step_index": step + 1,
+                        "sim_time_ms": int(win.timestamp),
+                        "policy": "SQR_HET",
+                        "state": st,
+                        "zs": zs,
+                        "controllers": controllers,
+                        "capacity_c": int(total_prbs),
+                        "a_raw_per_slice": [int(d.raw_action) for d in decisions],
+                        "a_prop_per_slice": list(het_dec.proposals),
+                        "a_exec_per_slice": list(het_dec.action),
+                        "cut_per_slice": list(het_dec.cut),
+                        "modes_per_slice": [d.mode for d in decisions],
+                        "precomputed_scores": _sc_cache,
+                    }
+                    _will_apply_virt = (not freeze) and any(het_dec.cut) and (
+                        float(getattr(het, "virtual_alpha", 0.0)) != 0.0
                     )
+                    if _will_apply_virt:
+                        _causal_writer.record_decision(**_trace_kwargs)
+                    else:
+                        # Defer serialization/flush until right AFTER controlSemaphore.release()
+                        # while ns-3 simulates the next window (zero overhead inside the 50 ms IPC timeout).
+                        _deferred_trace_kwargs = _trace_kwargs
                 if (not freeze) and any(het_dec.cut):
                     het.apply_virtual_updates(st, het_dec.proposals,
                                               het_dec.action)
@@ -964,7 +979,25 @@ def run_episode(
             proposals = [d.action for d in decisions]
 
         # -- act (projection + CSV happen inside the env) ------------------
-        obs, reward, terminated, truncated, info = env.step(np.array(proposals, dtype=np.int64))
+        _trace_payload = locals().get("_deferred_trace_kwargs")
+        _orig_wait = getattr(env, "_wait_data_availability", None)
+        _trace_flushed = [False]
+        if _trace_payload is not None and _causal_writer is not None and callable(_orig_wait):
+            def _post_release_wait():
+                if not _trace_flushed[0]:
+                    _trace_flushed[0] = True
+                    _causal_writer.record_decision(**_trace_payload)
+                return _orig_wait()
+            env._wait_data_availability = _post_release_wait
+        try:
+            obs, reward, terminated, truncated, info = env.step(np.array(proposals, dtype=np.int64))
+        finally:
+            if _orig_wait is not None and getattr(env, "_wait_data_availability", None) is not _orig_wait:
+                env._wait_data_availability = _orig_wait
+            if _trace_payload is not None and _causal_writer is not None and not _trace_flushed[0]:
+                _trace_flushed[0] = True
+                _causal_writer.record_decision(**_trace_payload)
+            _deferred_trace_kwargs = None
 
         # Dynamic C (register R01 as amended): the env adopts the effective
         # cell capacity read from the ns-3 telemetry; sync the controllers

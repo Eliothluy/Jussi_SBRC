@@ -477,6 +477,72 @@ def test_causal_trace_strict_causality_and_bit_exact_parity(tmp_path):
             assert psm["f_candidates"][37] == pytest.approx(dec["f_at_a37"][sid], abs=1e-12)
             assert psm["f_candidates"][53] == pytest.approx(dec["f_at_amax"][sid], abs=1e-12)
 
+    # Also verify deferred trace flush (_wait_data_availability hook after control release)
+    # yields bit-identical trace records to immediate flush.
+    class _DeferredHookEnv(_ScriptedHetEnv):
+        def __init__(self, sim_dir: str, n_steps: int = 25) -> None:
+            super().__init__(sim_dir, n_steps=n_steps, force_heavy=True)
+            self.wait_calls = 0
+
+        def _wait_data_availability(self) -> None:
+            self.wait_calls += 1
+
+        def step(self, action):
+            obs, reward, term, trunc, info = super().step(action)
+            self._wait_data_availability()
+            return obs, reward, term, trunc, info
+
+    sim_def = os.path.join(str(tmp_path), "sim_def")
+    run_def = os.path.join(str(tmp_path), "run_def")
+    os.makedirs(sim_def, exist_ok=True)
+    os.makedirs(run_def, exist_ok=True)
+    env_def = _DeferredHookEnv(sim_def, n_steps=50)
+    ctls_def = _make_controllers()
+    het_def = SqrHetController(
+        tuple(ctls_def[sid] for sid in range(3)),
+        _make_scaler(tmp_path),
+        53,
+        virtual_alpha=0.0,
+        empty_slice_guard=True,
+        mean_field=False,
+        fix_scaler_index=True,
+    )
+    boot_def = {
+        sid: PropDemandController(
+            slice_id=sid, n_prbs=53, num_slices=3,
+            window_provider=lambda e=env_def: e.builder.last_window,
+        )
+        for sid in range(3)
+    }
+    trace_def = os.path.join(run_def, "causal_trace_deferred.jsonl.gz")
+    sqr_run.run_episode(
+        env_def,
+        ctls_def,
+        het=het_def,
+        het_runtime=HetRuntime(sim_def),
+        het_bootstrap=boot_def,
+        decision_jsonl=os.path.join(run_def, "decisions.jsonl"),
+        het_meta={"run_id": "parity_test"},
+        gamma=1.0,
+        virtual_alpha=0.0,
+        freeze=False,
+        warmup_steps=15,
+        seed=2102,
+        causal_trace_path=trace_def,
+        causal_trace_meta={
+            "run_id": "parity_test",
+            "versions": {
+                "freeze_contract_version": FREEZE_CONTRACT_VERSION,
+                "causal_trace_version": CAUSAL_TRACE_VERSION,
+            },
+            "config_sha256": "parity-cfg-hash",
+        },
+    )
+    assert env_def.wait_calls == 50
+    with gzip.open(trace_def, "rt", encoding="utf-8") as fh:
+        trace_def_lines = [json.loads(line) for line in fh if line.strip()]
+    assert trace_def_lines == trace_lines
+
 
 class _DivergentFutureHetEnv(_ScriptedHetEnv):
     """Identical physical windows for w <= diverge_after_win, shocked future afterwards."""

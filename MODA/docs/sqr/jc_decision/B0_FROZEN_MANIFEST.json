@@ -1,7 +1,7 @@
 {
   "frozen_baseline_id": "B0-rest",
   "candidate_arm": "A1+A2a+A_scaler",
-  "scientific_framing": "SQR-HET adaptado e corrigido (não reprodução literal do SQR original devido às diferenças documentadas em R12 e mean-field; robustez científica inter-seed NÃO estabelecida — queda de ~27 pp em STRICT_ALL3_R19 na seed 2103 sob alta simultaneidade URLLC registrada sem tuning).",
+  "scientific_framing": "SQR-HET adaptado e corrigido (n\u00e3o reprodu\u00e7\u00e3o literal do SQR original devido \u00e0s diferen\u00e7as documentadas em R12 e mean-field; robustez cient\u00edfica inter-seed N\u00c3O estabelecida \u2014 queda de ~27 pp em STRICT_ALL3_R19 na seed 2103 sob alta simultaneidade URLLC registrada sem tuning).",
   "status": "TECHNICAL_FREEZE_DEFINITIVE",
   "freeze_date": "2026-11-15",
   "git_provenance": {
@@ -13,7 +13,7 @@
       "MODA/ns-3-dev/scratch/sqr/sqr-mac-scheduler.h": "67fce42634adeb92c8b08909e9e8b60ad25b0d74ad97b288fbe8a1e9709b63e2",
       "MODA/ns-3-dev/scratch/sqr/sqr-mac-scheduler.cc": "4b4664d3299b2f1b7177f4cd5d0f479ead4a4f77f95098ae4f8732cec7efdb56",
       "MODA/ns-3-dev/build/scratch/sqr/ns3.46-sqr-sim-default": "6403e2ebdc7a7318adf18f37acb674134a9fc412421c3cbb0dd1d5528c9eb0b1",
-      "MODA/ns-o-ran-gym/examples/sqr_run.py": "7b2a5f026bb08f1cc9590d67d5fdd45c74657d8335f2837a948a560f3f829700",
+      "MODA/ns-o-ran-gym/examples/sqr_run.py": "8fdc61cce5b17dc29d06ef8a020d46032f7a69f6a0f560b6aba05aeffe7a9ae1",
       "MODA/ns-o-ran-gym/src/nsoran/sqr/sqr_controller.py": "3542036ce5d63733a996180389c58beb28be472668c87384556b0798d4b0aca8",
       "MODA/ns-o-ran-gym/src/nsoran/sqr/quantile_regressor.py": "4670edaccbfd41f0ca4addaa81e160f35676da3ed990f0eb85ecf2549d4ce4f0",
       "MODA/ns-o-ran-gym/src/nsoran/sqr/kernel.py": "1cbd9ab61222660bb744d243bee7867742079b4519d3feb9e0b7e8df79e83885",
@@ -24,10 +24,11 @@
       "MODA/ns-o-ran-gym/src/nsoran/sqr_jc/sla_margin.py": "ebd9621d71f554126f69a2a2ba87c90eecaa024414a31d4eed724e41517d96d0",
       "MODA/ns-o-ran-gym/src/nsoran/sqr_jc/sla_manifest.yaml": "12ffd2cfc4769b8c7d63c2ec501b755fe8a0038a2bc89687231dd3605304be2c",
       "MODA/ns-o-ran-gym/src/nsoran/sqr_jc/joint_state.py": "bac94bb07ebdfbef2169a935363a800f57c4d91213a6a8fbd004796f1a5a1e26",
-      "MODA/ns-o-ran-gym/src/nsoran/sqr_jc/freeze_contract.py": "a961cc7bc315a6cfe371c6cf75b93fd1d350b56a083ce83e8069e7c0f093bac4",
-      "MODA/ns-o-ran-gym/tests/test_sqr_jc_freeze_contract.py": "34438a9a16e6579fec24968a63f3ed4c0d5777bc3caa052713d94c2cc4df27bf"
+      "MODA/ns-o-ran-gym/src/nsoran/sqr_jc/freeze_contract.py": "09ec156eba2e5ff385d60bea874bc1780fbb1e4484e961562e69f0c6abc85d1a",
+      "MODA/ns-o-ran-gym/tests/test_sqr_jc_freeze_contract.py": "ecb192dd4ddbcda3ff845b7635817b9bc734250283a098729fd35412c5e890cc"
     },
-    "note_historical_isolation": "MODA/ns-o-ran-gym/src/nsoran/sqr_jc/joint_selector.py preservado intocado; este manifesto de fechamento cobre exclusivamente os artefatos congelados de B0-rest e seu contrato causal."
+    "note_historical_isolation": "MODA/ns-o-ran-gym/src/nsoran/sqr_jc/joint_selector.py preservado intocado; este manifesto de fechamento cobre exclusivamente os artefatos congelados de B0-rest e seu contrato causal.",
+    "trace_timing_fix_note": "Precomputed score reuse + post-controlSemaphore deferred CausalTraceWriter flush to avoid +37ms overhead inside 50ms IPC sem_timedwait; B0-rest algorithm, SLAs, features and hyperparameters unchanged."
   },
   "environment": {
     "os_kernel": "Linux Elioth-Desktop 7.0.0-43-generic #43-Ubuntu SMP PREEMPT_DYNAMIC x86_64 GNU/Linux",
@@ -70,11 +71,28 @@
     "rlc_mode": "UM (MaxTxBufferSize=10485760)",
     "mac_scheduler": "SqrMacScheduler (R27 cota absoluta de RBGs; totalRbg=totalPrb=53 efetivos na telemetria MAC; intraAlgo=PF)",
     "ue_mobility": "UniformDiscPositionAllocator(rho=300 m) + RandomWalk2dMobilityModel(Speed U(0.5, 1.5) m/s, Time=2s)",
-    "arrival_process": "3 processos de Poisson homogêneos independentes por slice desde t=0 (taxa lam/3 por slice; alinhamento à fase de 7 ms do padrão TDD), sessão Exp(60 s) limitada por simTime=300 s",
+    "arrival_process": "3 processos de Poisson homog\u00eaneos independentes por slice desde t=0 (taxa lam/3 por slice; alinhamento \u00e0 fase de 7 ms do padr\u00e3o TDD), sess\u00e3o Exp(60 s) limitada por simTime=300 s",
     "slice_profiles": {
-      "0_eMBB": {"app": "greedy", "offered_mbps": 100.0, "sla_gate": "median(windowThroughputMbps) >= 3.5 Mbps"},
-      "1_URLLC": {"app": "urllc", "pkt_bytes": 32, "interval_ms": 1.0, "offered_udp_mbps": 0.256, "deadline_ms": 10.0, "sla_gate": "p95(delay_ms) <= 10.0 ms (R19 pool)"},
-      "2_mMTC": {"app": "mmtc", "pkt_bytes": 200, "interval_ms": 1000.0, "offered_udp_mbps": 0.0016, "sla_gate": "rolling_1s_pdr >= 0.95"}
+      "0_eMBB": {
+        "app": "greedy",
+        "offered_mbps": 100.0,
+        "sla_gate": "median(windowThroughputMbps) >= 3.5 Mbps"
+      },
+      "1_URLLC": {
+        "app": "urllc",
+        "pkt_bytes": 32,
+        "interval_ms": 1.0,
+        "offered_udp_mbps": 0.256,
+        "deadline_ms": 10.0,
+        "sla_gate": "p95(delay_ms) <= 10.0 ms (R19 pool)"
+      },
+      "2_mMTC": {
+        "app": "mmtc",
+        "pkt_bytes": 200,
+        "interval_ms": 1000.0,
+        "offered_udp_mbps": 0.0016,
+        "sla_gate": "rolling_1s_pdr >= 0.95"
+      }
     }
   },
   "cli_invocation": {
@@ -100,7 +118,7 @@
       "--margin_bounds 2.0,50.0",
       "--output <DIR>"
     ],
-    "note_effective_capacity": "CLI --c_prbs 52 é sincronizado dinamicamente pela telemetria MAC do ns-3 para total_prbs_final=53 RBGs; --slas 3.5,3.5,3.5 atua apenas no parser legado auxiliar, enquanto SQR-HET e oráculo operam com sla_threshold=0.0 sobre sla_manifest.yaml v1.1-g4b."
+    "note_effective_capacity": "CLI --c_prbs 52 \u00e9 sincronizado dinamicamente pela telemetria MAC do ns-3 para total_prbs_final=53 RBGs; --slas 3.5,3.5,3.5 atua apenas no parser legado auxiliar, enquanto SQR-HET e or\u00e1culo operam com sla_threshold=0.0 sobre sla_manifest.yaml v1.1-g4b."
   },
   "config_descriptor": {
     "controller": "sqr_het",
@@ -111,7 +129,10 @@
     "fix_scaler_index": true,
     "mean_field": false,
     "margin_init": 10.0,
-    "margin_bounds": [2.0, 50.0],
+    "margin_bounds": [
+      2.0,
+      50.0
+    ],
     "tau_init": 0.05,
     "tau_step": 0.005,
     "violation_window": 100,
@@ -145,23 +166,67 @@
     "scaler_manifest_sha256": "08db8784c0097df08d242bff4340448d33b096c86df8befc6026ba1965af5c16"
   },
   "differences_vs_original_sqr_paper": [
-    "R12 desativado (--virtual_alpha 0.0): no artigo original há penalização virtual em cortes por projeção; aqui virtual_alpha=0.0 elimina viés quantílico severo observado em A1 sem alterar pinball real, bootstrap, SLAs ou R19.",
-    "Mean-field desativado (mean_field=False): no artigo original s_t inclui features globais da célula (z4, z5); reativação em A4 sob scaler corrigido degradou ou não trouxe ganho consistente em seed=2102.",
-    "Guarda de demanda em slice vazia (--empty_slice_guard): suprime propostas não nulas (a_raw=a_prop=0) quando slice está ociosa pré-decisão, evitando desperdício de RBGs e projeções espúrias.",
-    "Correção de indexação do FeatureScaler (--fix_scaler_index): mapeamento corrigido para 'eum' (eMBB, URLLC, mMTC) em lugar do bug histórico 'emu'.",
-    "Feedback atrasado URLLC (--urllc_delayed_update): fechamento causal do pool URLLC para observação tardia da margem R19 p95 <= 10.0 ms.",
-    "Margens normalizadas heterogêneas (Lambda=0): eMBB >= 3.5 Mbps, URLLC p95 <= 10.0 ms e mMTC PDR >= 0.95 via sla_manifest.yaml v1.1-g4b, com M0=10.0, M in [2.0, 50.0], gamma=1 e C efetivo = 53."
+    "R12 desativado (--virtual_alpha 0.0): no artigo original h\u00e1 penaliza\u00e7\u00e3o virtual em cortes por proje\u00e7\u00e3o; aqui virtual_alpha=0.0 elimina vi\u00e9s quant\u00edlico severo observado em A1 sem alterar pinball real, bootstrap, SLAs ou R19.",
+    "Mean-field desativado (mean_field=False): no artigo original s_t inclui features globais da c\u00e9lula (z4, z5); reativa\u00e7\u00e3o em A4 sob scaler corrigido degradou ou n\u00e3o trouxe ganho consistente em seed=2102.",
+    "Guarda de demanda em slice vazia (--empty_slice_guard): suprime propostas n\u00e3o nulas (a_raw=a_prop=0) quando slice est\u00e1 ociosa pr\u00e9-decis\u00e3o, evitando desperd\u00edcio de RBGs e proje\u00e7\u00f5es esp\u00farias.",
+    "Corre\u00e7\u00e3o de indexa\u00e7\u00e3o do FeatureScaler (--fix_scaler_index): mapeamento corrigido para 'eum' (eMBB, URLLC, mMTC) em lugar do bug hist\u00f3rico 'emu'.",
+    "Feedback atrasado URLLC (--urllc_delayed_update): fechamento causal do pool URLLC para observa\u00e7\u00e3o tardia da margem R19 p95 <= 10.0 ms.",
+    "Margens normalizadas heterog\u00eaneas (Lambda=0): eMBB >= 3.5 Mbps, URLLC p95 <= 10.0 ms e mMTC PDR >= 0.95 via sla_manifest.yaml v1.1-g4b, com M0=10.0, M in [2.0, 50.0], gamma=1 e C efetivo = 53."
   ],
   "observed_robustness_results_preserved": {
-    "seed_2102_lam5": {"n_het_closed": 1994, "pass": 563, "fail": 222, "unknown": 1209, "known": 785, "coverage_pct": 39.37, "cond_pass_pct": 71.72, "uncond_pass_pct": 28.23},
-    "seed_2103_lam5": {"n_het_closed": 1947, "pass": 657, "fail": 820, "unknown": 470, "known": 1477, "coverage_pct": 75.86, "cond_pass_pct": 44.48, "uncond_pass_pct": 33.74},
-    "seed_2102_lam6": {"n_het_closed": 1994, "pass": 662, "fail": 535, "unknown": 797, "known": 1197, "coverage_pct": 60.03, "cond_pass_pct": 55.30, "uncond_pass_pct": 33.20},
-    "seed_2103_lam6": {"n_het_closed": 1994, "pass": 465, "fail": 1152, "unknown": 377, "known": 1617, "coverage_pct": 81.09, "cond_pass_pct": 28.76, "uncond_pass_pct": 23.32}
+    "seed_2102_lam5": {
+      "n_het_closed": 1994,
+      "pass": 563,
+      "fail": 222,
+      "unknown": 1209,
+      "known": 785,
+      "coverage_pct": 39.37,
+      "cond_pass_pct": 71.72,
+      "uncond_pass_pct": 28.23
+    },
+    "seed_2103_lam5": {
+      "n_het_closed": 1947,
+      "pass": 657,
+      "fail": 820,
+      "unknown": 470,
+      "known": 1477,
+      "coverage_pct": 75.86,
+      "cond_pass_pct": 44.48,
+      "uncond_pass_pct": 33.74
+    },
+    "seed_2102_lam6": {
+      "n_het_closed": 1994,
+      "pass": 662,
+      "fail": 535,
+      "unknown": 797,
+      "known": 1197,
+      "coverage_pct": 60.03,
+      "cond_pass_pct": 55.3,
+      "uncond_pass_pct": 33.2
+    },
+    "seed_2103_lam6": {
+      "n_het_closed": 1994,
+      "pass": 465,
+      "fail": 1152,
+      "unknown": 377,
+      "known": 1617,
+      "coverage_pct": 81.09,
+      "cond_pass_pct": 28.76,
+      "uncond_pass_pct": 23.32
+    }
   },
   "seeds_used_for_dev_and_robustness": {
-    "dev_calibration_and_ablation": [2102],
-    "dev_robustness_check": [2103],
-    "independent_eval_seeds_blocked": [3101, 3102, 3103]
+    "dev_calibration_and_ablation": [
+      2102
+    ],
+    "dev_robustness_check": [
+      2103
+    ],
+    "independent_eval_seeds_blocked": [
+      3101,
+      3102,
+      3103
+    ]
   },
   "verified_dev_checkpoints": {
     "het_lam2_s2102": {

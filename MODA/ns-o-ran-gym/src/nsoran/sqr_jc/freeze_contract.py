@@ -400,6 +400,7 @@ class CausalTraceWriter:
         a_exec_per_slice: Sequence[int],
         cut_per_slice: Sequence[bool],
         modes_per_slice: Sequence[str],
+        precomputed_scores: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
         """Capture one instantaneous causal decision snapshot (pure/read-only)."""
         ctl_list = (
@@ -409,7 +410,11 @@ class CausalTraceWriter:
         )
         per_slice = []
         for sid, (z, ctl) in enumerate(zip(zs, ctl_list)):
-            sc = ctl.score_candidates(z)  # pure: zero RNG, zero mutation
+            sc = (
+                precomputed_scores[sid]
+                if (precomputed_scores is not None and sid < len(precomputed_scores))
+                else ctl.score_candidates(z)  # pure: zero RNG, zero mutation
+            )
             knn_a, knn_mode = ctl.k_nn_action(z)  # pure: zero RNG, zero mutation
             sd = ctl.state_dict()
             per_slice.append({

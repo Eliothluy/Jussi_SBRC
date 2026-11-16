@@ -1,0 +1,360 @@
+{
+  "all_ok": true,
+  "runs": [
+    {
+      "tag": "het_lam2_s2102",
+      "lam": 2,
+      "seed": 2102,
+      "orig_first_ipc_lag_step": null,
+      "traced_first_ipc_lag_step": null,
+      "clean_cut_step": 999999,
+      "pre_timeout_parity_ok": true,
+      "pre_checks": {
+        "dec": true,
+        "kpm": true,
+        "prb": true,
+        "del_delivered": true,
+        "step_excl_dt": true
+      },
+      "file_checks": {
+        "decisions.jsonl": {
+          "sha256_orig": "61aee4bf2b1a7edeb6c481fbf13a6bc638940f0f1b6023875662697b97f2125f",
+          "sha256_traced": "61aee4bf2b1a7edeb6c481fbf13a6bc638940f0f1b6023875662697b97f2125f",
+          "exact": true
+        },
+        "step_metrics.csv": {
+          "sha256_orig": "fb565976418bef3afac0e4aab8f2f7807e8515eaf6e918c0a0c74506a36122cb",
+          "sha256_traced": "3812bdcca9505ba95f4552eb847095ef4588ded92fd8612aafe81d02ecb29007",
+          "exact": false
+        },
+        "urllc_delayed_updates.jsonl": {
+          "sha256_orig": "a9a831101b039130aa1ba2508d69e205fbe027a80ef41e521299368761e186bc",
+          "sha256_traced": "a9a831101b039130aa1ba2508d69e205fbe027a80ef41e521299368761e186bc",
+          "exact": true
+        },
+        "sqr_kpm_history.csv": {
+          "sha256_orig": "4fa1e3e712424feb99b8d587e515c57e17f6f89a2a17610efba5a64722a625f3",
+          "sha256_traced": "4fa1e3e712424feb99b8d587e515c57e17f6f89a2a17610efba5a64722a625f3",
+          "exact": true
+        },
+        "sqr_prb_windows.csv": {
+          "sha256_orig": "df0f5266c8021c2ea0813e686c4ffdb7e2fbfb2935bf439208cabe038a965e90",
+          "sha256_traced": "df0f5266c8021c2ea0813e686c4ffdb7e2fbfb2935bf439208cabe038a965e90",
+          "exact": true
+        },
+        "sqr_packet_delays.csv": {
+          "sha256_orig": "9276f19ecd301ecf2cfd2b0f44df77b374e0210f1f9db1f4346433f877d5abbe",
+          "sha256_traced": "9276f19ecd301ecf2cfd2b0f44df77b374e0210f1f9db1f4346433f877d5abbe",
+          "exact": true
+        },
+        "sqr_summary.csv": {
+          "sha256_orig": "aef7bc370f8b614b968a3ec80be8faba9f227b75e87886119eb4eee9314bdb35",
+          "sha256_traced": "aef7bc370f8b614b968a3ec80be8faba9f227b75e87886119eb4eee9314bdb35",
+          "exact": true
+        }
+      },
+      "checkpoint_payload_sha256_orig": "691feb672ca80479280e2404f321829ceff2620dcd78ec04109f3dc9b1c63aa5",
+      "checkpoint_payload_sha256_traced": "691feb672ca80479280e2404f321829ceff2620dcd78ec04109f3dc9b1c63aa5",
+      "checkpoint_payload_match_full_ep": true,
+      "checkpoint_self_hash_valid": true,
+      "config_sha256_match": true,
+      "checkpoint_horizon": {
+        "max_step_index": 2995,
+        "max_window_index": 2994,
+        "max_sim_time_ms": 299500
+      },
+      "trace_header_ok": true,
+      "trace_windows": 565,
+      "het_decisions": 565,
+      "causal_invariants_ok": true,
+      "future_ckpt_blocked_count": 564,
+      "max_f_candidate_err": 0.0,
+      "seq_mismatch_excluding_lag": 0,
+      "ipc_lag_or_end_excluded": 1
+    },
+    {
+      "tag": "het_lam5_s2102",
+      "lam": 5,
+      "seed": 2102,
+      "orig_first_ipc_lag_step": null,
+      "traced_first_ipc_lag_step": 2836,
+      "clean_cut_step": 2836,
+      "pre_timeout_parity_ok": true,
+      "pre_checks": {
+        "dec": true,
+        "kpm": true,
+        "prb": true,
+        "del_delivered": true,
+        "step_excl_dt": true
+      },
+      "file_checks": {
+        "decisions.jsonl": {
+          "sha256_orig": "d3dcdb29ca98f58166dbb311e51764cedcf273435f66fa7b13f7e132412dafa8",
+          "sha256_traced": "a47de173561354c93b2b0bde8d8adc64531177b12482ed5bdf00754449bb1e55",
+          "exact": false
+        },
+        "step_metrics.csv": {
+          "sha256_orig": "c93621d6cb751f0aafec4b028626a746cee5c78fdff7289b5ba9002dc7654e25",
+          "sha256_traced": "25dcf8cecfa3f7d14f013cf064894ec24b47dfd158eaced3d61bad994f267e4a",
+          "exact": false
+        },
+        "urllc_delayed_updates.jsonl": {
+          "sha256_orig": "62816bc7efd646c70aa0242f89f4fb731ac388f328944b3b158f830382054233",
+          "sha256_traced": "456f0ffaa3e4b454c65ed18c22c08bcb91069c8b5c73ca65d7c39068608c6894",
+          "exact": false
+        },
+        "sqr_kpm_history.csv": {
+          "sha256_orig": "a704fed6bb05321c1acf4cfab5062b5d229bd61c27533c8dd7f08452c5afc609",
+          "sha256_traced": "785b8d22311df2e7306ffe455210da3d661ac5d06ea4c424d91a659e57b23ee7",
+          "exact": false
+        },
+        "sqr_prb_windows.csv": {
+          "sha256_orig": "f43aa9b53d50c81fa211b5bc7c4ae86a1bfcd08a97959ff4441be1ebd8a9ca14",
+          "sha256_traced": "905265540ce9c93e8283622309ea966656505c59b85841181af7e52036eaaf33",
+          "exact": false
+        },
+        "sqr_packet_delays.csv": {
+          "sha256_orig": "e8a8bf1dc90f150d3b6a6aaf7430633726e6ca79892f630da81477504027fb2a",
+          "sha256_traced": "48196ee18551ba5e329ef38d8ea3bf509c636a813654a1036d883c5391f74a05",
+          "exact": false
+        },
+        "sqr_summary.csv": {
+          "sha256_orig": "f55545e3f3315456a538284ed2082f825d8b90cefbf2426422b9e15333e47461",
+          "sha256_traced": "37e122f67131e0a290531007c10fe2ddaabcd26bc3685a409e9fdacbf70fe998",
+          "exact": false
+        }
+      },
+      "checkpoint_payload_sha256_orig": "316ea40e986f4e11d7d52d62890e3f67c3d33eda265517c58a49339891059dad",
+      "checkpoint_payload_sha256_traced": "2008f071a7102f95fe361431ba57e932386a4a57482de94460d6a74821541e1c",
+      "checkpoint_payload_match_full_ep": false,
+      "checkpoint_self_hash_valid": true,
+      "config_sha256_match": true,
+      "checkpoint_horizon": {
+        "max_step_index": 2995,
+        "max_window_index": 2994,
+        "max_sim_time_ms": 299500
+      },
+      "trace_header_ok": true,
+      "trace_windows": 1995,
+      "het_decisions": 1995,
+      "causal_invariants_ok": true,
+      "future_ckpt_blocked_count": 1994,
+      "max_f_candidate_err": 0.0,
+      "seq_mismatch_excluding_lag": 0,
+      "ipc_lag_or_end_excluded": 160
+    },
+    {
+      "tag": "het_lam5_s2103",
+      "lam": 5,
+      "seed": 2103,
+      "orig_first_ipc_lag_step": 1692,
+      "traced_first_ipc_lag_step": 2219,
+      "clean_cut_step": 1692,
+      "pre_timeout_parity_ok": true,
+      "pre_checks": {
+        "dec": true,
+        "kpm": true,
+        "prb": true,
+        "del_delivered": true,
+        "step_excl_dt": true
+      },
+      "file_checks": {
+        "decisions.jsonl": {
+          "sha256_orig": "108d1ff256962e40ecf2bde116b443f1f886a2b19388263720b83a4b2eae4232",
+          "sha256_traced": "c75c02aede5b913c1d58ac1f6c3e8e399b8b2709168a7b19ec7a1d02c666638b",
+          "exact": false
+        },
+        "step_metrics.csv": {
+          "sha256_orig": "fb36f44ad903607c89f86f11d73247e3135a828e51e08759c1f18deec2708455",
+          "sha256_traced": "961aa50fd94a35876df178a4c984b5a5efee9bb182ccd7c3fe6cc22ca01694a8",
+          "exact": false
+        },
+        "urllc_delayed_updates.jsonl": {
+          "sha256_orig": "bd0794178937eab30e80d88c3490a1bba69200711e58419488714cea591b475b",
+          "sha256_traced": "5afd678d0e8396868747b4a8401a0025de635da972c3e0265becef0cfd78177f",
+          "exact": false
+        },
+        "sqr_kpm_history.csv": {
+          "sha256_orig": "25ca47abbbdcd63d8fcbb0f2d282303e2beff5535c89a32af4e79157a49c616e",
+          "sha256_traced": "4751069f25a54efc6abc1624c519366c66ae109f78df9954893c145b97c072fa",
+          "exact": false
+        },
+        "sqr_prb_windows.csv": {
+          "sha256_orig": "01669296141417ec9310ced4987c98ac20d8d0fae63b2d406364ac16b258732a",
+          "sha256_traced": "32f6dd729585bf2534ee6498b627a485c14cb3b25892fdaac2a3090fd0feaca7",
+          "exact": false
+        },
+        "sqr_packet_delays.csv": {
+          "sha256_orig": "0a3f8138b6c6b7c5caea5c185dd9b280cf910fdc0005232393226c6a0c453218",
+          "sha256_traced": "a1ef887c7cd4e3de559a536555d1577dc84859762e3b4eb408dcbfd951ce54fa",
+          "exact": false
+        },
+        "sqr_summary.csv": {
+          "sha256_orig": "0b06bf528d6a2e0dfb602badb3ce63f0e4546201a8c8cdc178b3b045d4088ff8",
+          "sha256_traced": "297ab1628e0f1cadcfce92339d4efaa7cf2396fbf690693aa97e93ca3fbaa619",
+          "exact": false
+        }
+      },
+      "checkpoint_payload_sha256_orig": "f130f41884fddc905b89a96fe18a5dd8e789f289bd7b67a4212d2d85197d46e1",
+      "checkpoint_payload_sha256_traced": "bb1c77ccd143bc78b1301b27af7f6299cbc0eb9b697e78b8e52e0168fcaa1d28",
+      "checkpoint_payload_match_full_ep": false,
+      "checkpoint_self_hash_valid": true,
+      "config_sha256_match": true,
+      "checkpoint_horizon": {
+        "max_step_index": 2995,
+        "max_window_index": 2994,
+        "max_sim_time_ms": 299500
+      },
+      "trace_header_ok": true,
+      "trace_windows": 1948,
+      "het_decisions": 1948,
+      "causal_invariants_ok": true,
+      "future_ckpt_blocked_count": 1947,
+      "max_f_candidate_err": 0.0,
+      "seq_mismatch_excluding_lag": 0,
+      "ipc_lag_or_end_excluded": 1304
+    },
+    {
+      "tag": "het_lam6_s2102",
+      "lam": 6,
+      "seed": 2102,
+      "orig_first_ipc_lag_step": 2891,
+      "traced_first_ipc_lag_step": 2416,
+      "clean_cut_step": 2416,
+      "pre_timeout_parity_ok": true,
+      "pre_checks": {
+        "dec": true,
+        "kpm": true,
+        "prb": true,
+        "del_delivered": true,
+        "step_excl_dt": true
+      },
+      "file_checks": {
+        "decisions.jsonl": {
+          "sha256_orig": "3bde1a42a729f604c6603da47c7ca0dfcec572fdac0fc0b50819b15f6af7ca3c",
+          "sha256_traced": "3945ba7fd5cea0b26a73ec0b08b9dd22cb8540f34b8f6e6e5a7a47b0527c4a59",
+          "exact": false
+        },
+        "step_metrics.csv": {
+          "sha256_orig": "aaca3fbae468c0e07ca6e96bc742f205de01e7066821fc2830c11874ef3b81b0",
+          "sha256_traced": "431a0eb0942b50b92c446cd668df33f28d86cd8656df973528cc8e36a8be4127",
+          "exact": false
+        },
+        "urllc_delayed_updates.jsonl": {
+          "sha256_orig": "bd1f08293ae738d16c6afd70065bc0840e5eb75bc473f6abaa0866974dbb3cbf",
+          "sha256_traced": "02d3d78318e778680f398619e35dfc807712ffcab52526198d7e31c3d3974957",
+          "exact": false
+        },
+        "sqr_kpm_history.csv": {
+          "sha256_orig": "2c70d8253768326b2dc377651a77d69527903ce1f908e4ada1befe899960fcff",
+          "sha256_traced": "bd8e66189c0bce4ff760f99d8001e62eb70e85d62aa727a450dff95d51022c73",
+          "exact": false
+        },
+        "sqr_prb_windows.csv": {
+          "sha256_orig": "cf68bfdeb973e4e93349a4558386f81e36b93454edc016ad84f4276a07e8431d",
+          "sha256_traced": "8cc8bd838667aa9dbaef0fb6024d2d965589fc5ef426f38b1bd945e500360ab2",
+          "exact": false
+        },
+        "sqr_packet_delays.csv": {
+          "sha256_orig": "f295c4c3a37bc2c8d8e44e8254a290980a47ba0222e4506cf6e7b4b5f18964fe",
+          "sha256_traced": "6d2b96b35085aca22ce07177e2e5e6c7146db1526a23da8363e1dc7e8a6c3655",
+          "exact": false
+        },
+        "sqr_summary.csv": {
+          "sha256_orig": "4ea64908e662d39df6e0581cec4f3460896ac8e62dcd7f7566ed051e9b76acaf",
+          "sha256_traced": "dfb820344f585819421aa3acd1a95ef964b736afbf7832539ffbc3830d7ddf12",
+          "exact": false
+        }
+      },
+      "checkpoint_payload_sha256_orig": "abe4bcf466e4fe04bf85f91b85df9213f023cf838ee5d28aefbf2e35f5b16175",
+      "checkpoint_payload_sha256_traced": "fea1676a071aab6f9837b70c9707cb28e29ca6b5e4bb847dd29b16bc20aed25a",
+      "checkpoint_payload_match_full_ep": false,
+      "checkpoint_self_hash_valid": true,
+      "config_sha256_match": true,
+      "checkpoint_horizon": {
+        "max_step_index": 2995,
+        "max_window_index": 2994,
+        "max_sim_time_ms": 299500
+      },
+      "trace_header_ok": true,
+      "trace_windows": 1995,
+      "het_decisions": 1995,
+      "causal_invariants_ok": true,
+      "future_ckpt_blocked_count": 1994,
+      "max_f_candidate_err": 0.0,
+      "seq_mismatch_excluding_lag": 0,
+      "ipc_lag_or_end_excluded": 580
+    },
+    {
+      "tag": "het_lam6_s2103",
+      "lam": 6,
+      "seed": 2103,
+      "orig_first_ipc_lag_step": 1473,
+      "traced_first_ipc_lag_step": 1788,
+      "clean_cut_step": 1473,
+      "pre_timeout_parity_ok": true,
+      "pre_checks": {
+        "dec": true,
+        "kpm": true,
+        "prb": true,
+        "del_delivered": true,
+        "step_excl_dt": true
+      },
+      "file_checks": {
+        "decisions.jsonl": {
+          "sha256_orig": "a7712f767431fbfedceb75e201f8a9ab85f1856ea33779561a1280b0f1bd8752",
+          "sha256_traced": "25e144a527012fd2f9040d70f7d9163c7cf58793e3ff8205dcdedfc8d485e089",
+          "exact": false
+        },
+        "step_metrics.csv": {
+          "sha256_orig": "3bdffdd5e1c8157a271b5683d0e0b369ff93e363da25809d332455f45fe846b1",
+          "sha256_traced": "4a645539cf979f0508a42dbb1c4e513868e32f1ebe5110bd61e38debed8a44ee",
+          "exact": false
+        },
+        "urllc_delayed_updates.jsonl": {
+          "sha256_orig": "858948a0131071f704451213cf5edc525fee89efae58225f9a1bade506e7008d",
+          "sha256_traced": "73cc86e22a279de8479c2ab0644b4efa53ba88a885de8b2c1a72931230d19591",
+          "exact": false
+        },
+        "sqr_kpm_history.csv": {
+          "sha256_orig": "e67853d275e526e8c841051080b5577ca5d78f3cc1a6e2d6849111341fbfda57",
+          "sha256_traced": "50821fee2483c23c0d1922e63c568a0a847ebc941c257dea491690691554d760",
+          "exact": false
+        },
+        "sqr_prb_windows.csv": {
+          "sha256_orig": "94fe6a10ef5a09987c3a67c562d1a3dd4904503dd98470c83298f466ebd9315e",
+          "sha256_traced": "138fb174a689044d84a8d111d9292b0064ff7acc4a424b8eba46e6049f741365",
+          "exact": false
+        },
+        "sqr_packet_delays.csv": {
+          "sha256_orig": "84b7555f3dc6f2b9204ad0a41bae9c48213a2dfd435e7149a8e3ae9e72270e46",
+          "sha256_traced": "e4f58086803373cd9ff79589e15b6f9182788f73bd9a429de6f6ce02093255c8",
+          "exact": false
+        },
+        "sqr_summary.csv": {
+          "sha256_orig": "51cd1619ef9c4484c66b7fccde203a841566b8a3491432cc966fb7aab9e027d5",
+          "sha256_traced": "b2e94376adb329b096677bae2a3e224d5e66616c0fbe122e71e46998cd93d754",
+          "exact": false
+        }
+      },
+      "checkpoint_payload_sha256_orig": "44888aa7426fd031047a8a2adfc001daf8feacc030ca9b2aa53d270435c68ba6",
+      "checkpoint_payload_sha256_traced": "09c6a1cf9d1fdc2032627087a8e20ddd6dc1dd031d2dbbe1ac415f475824fb2f",
+      "checkpoint_payload_match_full_ep": false,
+      "checkpoint_self_hash_valid": true,
+      "config_sha256_match": true,
+      "checkpoint_horizon": {
+        "max_step_index": 2995,
+        "max_window_index": 2994,
+        "max_sim_time_ms": 299500
+      },
+      "trace_header_ok": true,
+      "trace_windows": 1995,
+      "het_decisions": 1995,
+      "causal_invariants_ok": true,
+      "future_ckpt_blocked_count": 1994,
+      "max_f_candidate_err": 0.0,
+      "seq_mismatch_excluding_lag": 0,
+      "ipc_lag_or_end_excluded": 1523
+    }
+  ]
+}
