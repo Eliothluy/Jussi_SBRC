@@ -1,0 +1,44 @@
+category,parameter,value,unit_or_rule,source
+SLA,sla_manifest_version,'1.1-g4b',versão congelada,sla_manifest.yaml
+SLA_eMBB,threshold_mbps,3.5,Mbps; m_e = (T_e - 3.5) / 3.5; median across UE-windows with demand (dTxBytes > 0),sla_manifest.yaml
+SLA_URLLC,threshold_p95_ms,10.0,ms; m_u = (10 - p95_ms) / 10; chegada floor(txSec*10),sla_manifest.yaml
+SLA_URLLC_sec,secondary_miss_pct,5.0,%; REPORT_ONLY (nunca gate),sla_manifest.yaml
+SLA_mMTC,threshold_pdr,0.95,fração rolling 1s (10 janelas); m_m = (PDR - 0.95) / 0.95,sla_manifest.yaml
+SLA_Lambda,normalized_margin_boundary,0.0,m_i >= 0.0 satisfeito; m_i < 0.0 violado,sla_margin.py
+Emenda_4,urllc_pool_closure_rule,delivered(W)==tx_kpm(W) and tx_kpm(W)>0,CLOSED => 1 update só-URLLC; tx==0 => NO_ACTIVE_DEMAND; nunca fecha => expira em MAX_AGE=30 janelas (3.0 s) como expired_vacuous_R19,PROTOCOL_FROZEN_AMENDMENT_4 & sqr_run.py:664
+G4B_Note,g4b_yaml_block_status,"STOP_FINAL   # 04/11: FFR 11,1% > 10% (marginal; FIR 9,5% ✓, ordenação ✓);",urllc_agg_win=1000 ms (nota histórica no YAML; Gate 1 usa janela de 100 ms por coorte de chegada),sla_manifest.yaml
+B0_Ident,frozen_baseline_id,B0-rest,arm=A1+A2a+A_scaler config_sha256=a2b40861ace7ba87ce2d321ccc62f42f22e6b3798c4432171875ae55d7040d7c,B0_FROZEN_MANIFEST.json
+Kernel,type_nu_length_scale,"Matérn nu=1.5, length_scale=1.0 isotrópico em R^7","x=[z_i(6), a_i/C]",sqr_controller.py:214 & kernel.py
+Regressor,memory_size_B,2000,vetores de suporte/slice,quantile_regressor.py:111
+Regressor,eta,0.1,passo pinball,quantile_regressor.py:113
+Regressor,p_penalty,2.0,multiplicador falha crítica (f>=0 e y<0),quantile_regressor.py:114
+Regressor,pruning_rule_R10,"argmin_j |alpha_j| * k(x_new, x_j)",desempate pelo menor índice (mais antigo),quantile_regressor.py:206-214
+Policy_SQR,gamma,1.0,termo de custo -gamma*a/C em A_safe,B0_FROZEN_MANIFEST.json
+Policy_SQR,tau_init_min_max_step,"tau0=0.05, [0.01, 0.05], step=0.005",adapta a cada bloco W=100 passos (delta=0.01; recupera após 2 blocos limpos),B0_FROZEN_MANIFEST.json & sqr_controller.py:75-85
+Policy_SQR,M0_and_M_bounds,"M0=10.0, bounds=[2.0, 50.0]","M <- min(50, 2M) se v_W>0.01; M/2 após 2 blocos limpos",B0_FROZEN_MANIFEST.json & sqr_controller.py:82-83
+Policy_SQR,epsilon_T_knn_k_succ_mem,"eps=0.1, T=1.0, knn_k=10, success_mem=2000",exploração incerta,sqr_controller.py:73-90
+B0_Delta,virtual_alpha_R12,0.0,DESATIVADO (vs 0.05 no SQR/D1-v9),B0_FROZEN_MANIFEST.json
+B0_Delta,empty_slice_guard_A2a,True,zera proposta em slice comprovadamente vazia pré-decisão,B0_FROZEN_MANIFEST.json
+B0_Delta,mean_field_A4,False,"z_i dims [4..5] = [prev_a_i/C, viol_i] (sem z4/z5 globais)",B0_FROZEN_MANIFEST.json & sqr_het.py:144-145
+B0_Delta,fix_scaler_index_Ascaler,True,indexação 'eum' em slice_state() [antes bug 'emu'],B0_FROZEN_MANIFEST.json & sqr_het.py:124
+B0_Delta,urllc_delayed_update,True,Emenda 4 ativa,B0_FROZEN_MANIFEST.json
+B0_Scenario,c_prbs_cli_vs_mac,cli=52 -> MAC C=53,NumRbPerRbg=1 => 53 RBGs = 53 PRBs/slot DL,B0_FROZEN_MANIFEST.json
+B0_Scenario,warmup_s_and_policy,100.0 s (1000 janelas),SQR_HET_BOOTSTRAP_PROP (PropDemandController); modelo observa outcomes,sqr_run.py:791-867
+FeatureScaler,n_e_p1_p99,"[0.0, 4.0]",rule=cal_p1p99; n_cal=23720,feature_scaler_manifest.yaml
+FeatureScaler,n_u_p1_p99,"[0.0, 3.0]",rule=cal_p1p99; n_cal=23720,feature_scaler_manifest.yaml
+FeatureScaler,n_m_p1_p99,"[0.0, 2.0]",rule=cal_p1p99; n_cal=23720,feature_scaler_manifest.yaml
+FeatureScaler,queue_e_p1_p99,"[0.0, 9844456.460000005]",rule=cal_p1p99; n_cal=23720,feature_scaler_manifest.yaml
+FeatureScaler,queue_u_p1_p99,"[0.0, 709.0]",rule=cal_p1p99; n_cal=23720,feature_scaler_manifest.yaml
+FeatureScaler,queue_m_p1_p99,"[0.0, 1422.0]",rule=cal_p1p99; n_cal=23720,feature_scaler_manifest.yaml
+FeatureScaler,offered_e_p1_p99,"[0.0, 16.5024]",rule=cal_p1p99; n_cal=23720,feature_scaler_manifest.yaml
+FeatureScaler,offered_u_p1_p99,"[0.0, 1.4256]",rule=cal_p1p99; n_cal=23720,feature_scaler_manifest.yaml
+FeatureScaler,offered_m_p1_p99,"[0.0, 0.0182]",rule=cal_p1p99; n_cal=23720,feature_scaler_manifest.yaml
+FeatureScaler,rule_kpi_e,kpi_div_sla,escala física fixa,feature_scaler_manifest.yaml
+FeatureScaler,rule_kpi_u,kpi_div_deadline,escala física fixa,feature_scaler_manifest.yaml
+FeatureScaler,rule_kpi_m,unit01,escala física fixa,feature_scaler_manifest.yaml
+FeatureScaler,rule_snr_e,snr_r09,escala física fixa,feature_scaler_manifest.yaml
+FeatureScaler,rule_snr_u,snr_r09,escala física fixa,feature_scaler_manifest.yaml
+FeatureScaler,rule_snr_m,snr_r09,escala física fixa,feature_scaler_manifest.yaml
+FeatureScaler,rule_prev_a_e,alloc_div_c,escala física fixa,feature_scaler_manifest.yaml
+FeatureScaler,rule_prev_a_u,alloc_div_c,escala física fixa,feature_scaler_manifest.yaml
+FeatureScaler,rule_prev_a_m,alloc_div_c,escala física fixa,feature_scaler_manifest.yaml

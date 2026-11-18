@@ -1,0 +1,10 @@
+run_tag,lam,seed,n_decisions,n_mismatches_ow_ge_1,onset_outcome_window,onset_decision_index,n_decision_ms_gt_50,first_over50_step,max_decision_time_ms,clean
+het_lam2_s2101,2,2101,2627,0,,,0,,26.8744,True
+het_lam2_s2102,2,2102,848,0,,,0,,5.7004,True
+het_lam2_s2103,2,2103,1703,0,,,0,,16.1769,True
+het_lam5_s2101,5,2101,2923,191,2734.0,2734.0,0,,33.6549,False
+het_lam5_s2102,5,2102,2298,113,2844.0,2844.0,0,,36.768,False
+het_lam5_s2103,5,2103,2923,584,2313.0,2313.0,2,2737.0,51.6062,False
+het_lam6_s2101,6,2101,2935,298,2654.0,2654.0,0,,34.9342,False
+het_lam6_s2102,6,2102,2455,455,2500.0,2500.0,0,,35.4972,False
+het_lam6_s2103,6,2103,2974,849,1902.0,1902.0,0,,43.2449,False
