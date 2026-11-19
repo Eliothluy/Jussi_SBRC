@@ -1,7 +1,0 @@
-block_bootstrap:
-  block_len_windows: 50
-  criterion: |coverage - target| <= 0.1 e alvo no CI 95%
-  resamples: 1000
-chosen_percentile: null
-grid: [50, 60, 70, 80, 90, 95]
-sigma_support: null

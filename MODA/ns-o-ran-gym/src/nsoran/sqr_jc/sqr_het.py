@@ -51,6 +51,7 @@ from nsoran.sqr.coordinator import (
     project_prbs,
 )
 from nsoran.sqr.sqr_controller import SqrDecision, SqrSliceController
+from nsoran.sqr.sqr_env import N_MAX_CELL, clip_norm
 from nsoran.sqr_jc.feature_scaler import FeatureScaler
 from nsoran.sqr_jc.joint_state import JointState
 from nsoran.sqr_jc.sla_margin import SliceOutcome
@@ -85,6 +86,8 @@ class SqrHetController:
         c: int,
         virtual_alpha: float = DEFAULT_VIRTUAL_ALPHA,
         empty_slice_guard: bool = False,
+        mean_field: bool = False,
+        fix_scaler_index: bool = False,
     ) -> None:
         if len(controllers) != 3:
             raise ValueError(f"need exactly 3 SqrSliceController, got {len(controllers)}")
@@ -108,28 +111,45 @@ class SqrHetController:
         self.c = int(c)
         self.virtual_alpha = float(virtual_alpha)
         self.empty_slice_guard = bool(empty_slice_guard)
+        self.mean_field = bool(mean_field)
+        self.fix_scaler_index = bool(fix_scaler_index)
         self.prev_action: tuple[int, int, int] = (0, 0, 0)
 
     # ------------------------------------------------------------------
-    # Per-slice local state z_i (6 dims; NO joint features)
+    # Per-slice local state z_i (6 dims)
     # ------------------------------------------------------------------
 
     def slice_state(self, state: JointState, slice_id: int) -> np.ndarray:
-        """z_i = [n_i, queue_i, prev_KPI_i, snr_i, prev_a_i/C, viol_i]."""
-        letter = "emu"[slice_id]
+        """Build 6-dim z_i for slice_id (A0: [prev_a_i/C, viol_i]; A4: mean-field)."""
+        letter = ("eum" if self.fix_scaler_index else "emu")[slice_id]
         n = (state.n_e, state.n_u, state.n_m)[slice_id]
         queue = (state.queue_e, state.queue_u, state.queue_m)[slice_id]
         kpi = (state.kpi_e_raw, state.kpi_u_raw, state.kpi_m_raw)[slice_id]
         snr = (state.snr_e, state.snr_u, state.snr_m)[slice_id]
         viol = (state.viol_e, state.viol_u, state.viol_m)[slice_id]
         prev_a = (state.prev_a_e, state.prev_a_u, state.prev_a_m)[slice_id]
+        if self.mean_field:
+            # A4: causal global mean-field features from pre-decision state
+            # (prb_others_norm from previous step actions; total_ues_norm from
+            # the just-closed window W, R09/R20).
+            dim4 = clip_norm(
+                float(state.prev_a_e + state.prev_a_u + state.prev_a_m - prev_a),
+                float(self.c),
+            )
+            dim5 = clip_norm(
+                float(state.n_e + state.n_u + state.n_m),
+                float(N_MAX_CELL),
+            )
+        else:
+            dim4 = float(prev_a) / float(self.c)
+            dim5 = float(viol)
         return np.array([
             float(self.scaler.transform_feature(f"n_{letter}", float(n))),
             float(self.scaler.transform_feature(f"queue_{letter}", float(queue))),
             float(self.scaler.transform_feature(_KPI_FEATURE[slice_id], float(kpi or 0.0))),
             float(self.scaler.transform_feature(f"snr_{letter}", float(snr))),
-            float(prev_a) / float(self.c),
-            float(viol),
+            dim4,
+            dim5,
         ], dtype=np.float64)
 
     # ------------------------------------------------------------------

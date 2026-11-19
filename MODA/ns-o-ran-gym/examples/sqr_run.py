@@ -97,6 +97,13 @@ from nsoran.sqr.sqr_controller import (
     SqrSliceController,
 )
 from nsoran.sqr.sqr_env import SqrEnv
+from nsoran.sqr_jc.freeze_contract import (
+    CausalTraceWriter,
+    build_b0_config_descriptor,
+    build_version_manifest,
+    checkpoint_payload_sha256,
+    verify_resume_contract,
+)
 
 #: Controller choices of --controller (Fase 3): the model-based SQR agent
 #: or the KBRL baseline (Alcaraz et al., IEEE TWC 2022) ported as a
@@ -551,6 +558,23 @@ class Ns3PrbWindowTelemetry:
         return self._last
 
 
+def _save_checkpoint_with_hash(
+    path: str,
+    controllers: dict[int, SqrSliceController],
+    meta: dict | None,
+    *,
+    horizon: dict | None = None,
+) -> None:
+    """Build checkpoint payload, inject payload_sha256 in meta, and persist."""
+    meta_copy = dict(meta) if meta is not None else {}
+    if horizon is not None:
+        meta_copy["checkpoint_horizon"] = dict(horizon)
+    payload = build_checkpoint(controllers, meta=meta_copy if (meta is not None or horizon is not None) else None)
+    if payload.get("meta") is not None:
+        payload["meta"]["payload_sha256"] = checkpoint_payload_sha256(payload)
+    save_checkpoint(path, payload)
+
+
 def run_episode(
     env,
     controllers: dict[int, SqrSliceController],
@@ -574,6 +598,8 @@ def run_episode(
     het_meta: dict | None = None,
     het_bootstrap=None,
     urllc_delayed_update: bool = False,
+    causal_trace_path: str | None = None,
+    causal_trace_meta: dict | None = None,
 ) -> dict:
     """One closed-loop episode: decide -> act -> learn (paper cadence).
 
@@ -607,6 +633,13 @@ def run_episode(
     # -- D1 SQR-HET joint-path state (protocolo v2 §7.1) ------------------
     _het_jsonl = (open(decision_jsonl, "a", encoding="utf-8")
                   if (het is not None and decision_jsonl) else None)
+    _trace_meta = causal_trace_meta if causal_trace_meta is not None else het_meta
+    _causal_writer = (
+        CausalTraceWriter(causal_trace_path, metadata=_trace_meta)
+        if (het is not None and causal_trace_path)
+        else None
+    )
+    _deferred_trace_kwargs = None
 
     class _HoldDecision:
         """step-row placeholder while no KPM window exists yet."""
@@ -639,6 +672,8 @@ def run_episode(
     _het_prev_decisions = None
 
     step = 0
+    last_window_index = -1
+    last_sim_time_ms = -1
     while True:
         states = [np.asarray(obs[i], dtype=np.float64) for i in range(num_slices)]
 
@@ -670,17 +705,18 @@ def run_episode(
                     het.observe_outcome(_het_pending["state"],
                                         _het_pending["action"], outcome)
                 margins = outcome.margins
-                row = {k: v for k, v in _het_pending.items() if k != "state"}
-                row["sla_evidence"] = het_runtime.evidence(
-                    _het_pending["state"].window_index + 1)
-                row["sla_outcome_margins"] = [
-                    None if m is None else float(m) for m in margins]
-                row["sla_ok"] = [bool(b) for b in outcome.sla_ok]
-                row["joint_frozen_ok"] = bool(all(outcome.sla_ok))
-                row["outcome_window_index"] = _gov
-                row["outcome_kpm_stamp_ms"] = (_gov + 1) * 100
-                _het_jsonl.write(json.dumps(row, default=float) + "\n")
-                _het_jsonl.flush()
+                if _het_jsonl is not None:
+                    row = {k: v for k, v in _het_pending.items() if k != "state"}
+                    row["sla_evidence"] = het_runtime.evidence(
+                        _het_pending["state"].window_index + 1)
+                    row["sla_outcome_margins"] = [
+                        None if m is None else float(m) for m in margins]
+                    row["sla_ok"] = [bool(b) for b in outcome.sla_ok]
+                    row["joint_frozen_ok"] = bool(all(outcome.sla_ok))
+                    row["outcome_window_index"] = _gov
+                    row["outcome_kpm_stamp_ms"] = (_gov + 1) * 100
+                    _het_jsonl.write(json.dumps(row, default=float) + "\n")
+                    _het_jsonl.flush()
                 if (_urllc_delayed is not None
                         and margins[1] is None
                         and _gov not in _urllc_updated_wins):
@@ -815,6 +851,16 @@ def run_episode(
                     "f_at_amax": f_amax,
                     "slice_n_ues": [st.n_e, st.n_u, st.n_m],
                     "slice_backlog": [st.queue_e, st.queue_u, st.queue_m],
+                    "mean_field": bool(het.mean_field),
+                    "fix_scaler_index": bool(het.fix_scaler_index),
+                    "z_dim0_dim1_per_slice": [
+                        [round(float(z[0]), 6), round(float(z[1]), 6)]
+                        for z in zs
+                    ],
+                    "z_dim4_dim5_per_slice": [
+                        [round(float(z[4]), 6), round(float(z[5]), 6)]
+                        for z in zs
+                    ],
                     "state": st,
                 }
                 _het_prev_action = tuple(int(v) for v in proposals)
@@ -838,13 +884,42 @@ def run_episode(
                 zs = [het.slice_state(st, sid) for sid in range(num_slices)]
                 preds_b, preds_a = [], []
                 f_a0, f_a37, f_amax = [], [], []
+                _sc_cache = []
                 for sid in range(num_slices):
                     sc = controllers[sid].score_candidates(zs[sid])
+                    if _causal_writer is not None:
+                        _sc_cache.append(sc)
                     preds_b.append(float(sc["f"][int(het_dec.proposals[sid])]))
                     preds_a.append(float(sc["f"][int(het_dec.action[sid])]))
                     f_a0.append(float(sc["f"][0]))
                     f_a37.append(float(sc["f"][min(37, len(sc["f"]) - 1)]))
                     f_amax.append(float(sc["f"][-1]))
+                _deferred_trace_kwargs = None
+                if _causal_writer is not None:
+                    _trace_kwargs = {
+                        "step_index": step + 1,
+                        "sim_time_ms": int(win.timestamp),
+                        "policy": "SQR_HET",
+                        "state": st,
+                        "zs": zs,
+                        "controllers": controllers,
+                        "capacity_c": int(total_prbs),
+                        "a_raw_per_slice": [int(d.raw_action) for d in decisions],
+                        "a_prop_per_slice": list(het_dec.proposals),
+                        "a_exec_per_slice": list(het_dec.action),
+                        "cut_per_slice": list(het_dec.cut),
+                        "modes_per_slice": [d.mode for d in decisions],
+                        "precomputed_scores": _sc_cache,
+                    }
+                    _will_apply_virt = (not freeze) and any(het_dec.cut) and (
+                        float(getattr(het, "virtual_alpha", 0.0)) != 0.0
+                    )
+                    if _will_apply_virt:
+                        _causal_writer.record_decision(**_trace_kwargs)
+                    else:
+                        # Defer serialization/flush until right AFTER controlSemaphore.release()
+                        # while ns-3 simulates the next window (zero overhead inside the 50 ms IPC timeout).
+                        _deferred_trace_kwargs = _trace_kwargs
                 if (not freeze) and any(het_dec.cut):
                     het.apply_virtual_updates(st, het_dec.proposals,
                                               het_dec.action)
@@ -881,6 +956,16 @@ def run_episode(
                     "mode_per_slice": [str(d.mode) for d in decisions],
                     "slice_n_ues": [st.n_e, st.n_u, st.n_m],
                     "slice_backlog": [st.queue_e, st.queue_u, st.queue_m],
+                    "mean_field": bool(het.mean_field),
+                    "fix_scaler_index": bool(het.fix_scaler_index),
+                    "z_dim0_dim1_per_slice": [
+                        [round(float(z[0]), 6), round(float(z[1]), 6)]
+                        for z in zs
+                    ],
+                    "z_dim4_dim5_per_slice": [
+                        [round(float(z[4]), 6), round(float(z[5]), 6)]
+                        for z in zs
+                    ],
                     "state": st,
                 }
                 _het_prev_action = tuple(int(v) for v in proposals)
@@ -894,7 +979,25 @@ def run_episode(
             proposals = [d.action for d in decisions]
 
         # -- act (projection + CSV happen inside the env) ------------------
-        obs, reward, terminated, truncated, info = env.step(np.array(proposals, dtype=np.int64))
+        _trace_payload = locals().get("_deferred_trace_kwargs")
+        _orig_wait = getattr(env, "_wait_data_availability", None)
+        _trace_flushed = [False]
+        if _trace_payload is not None and _causal_writer is not None and callable(_orig_wait):
+            def _post_release_wait():
+                if not _trace_flushed[0]:
+                    _trace_flushed[0] = True
+                    _causal_writer.record_decision(**_trace_payload)
+                return _orig_wait()
+            env._wait_data_availability = _post_release_wait
+        try:
+            obs, reward, terminated, truncated, info = env.step(np.array(proposals, dtype=np.int64))
+        finally:
+            if _orig_wait is not None and getattr(env, "_wait_data_availability", None) is not _orig_wait:
+                env._wait_data_availability = _orig_wait
+            if _trace_payload is not None and _causal_writer is not None and not _trace_flushed[0]:
+                _trace_flushed[0] = True
+                _causal_writer.record_decision(**_trace_payload)
+            _deferred_trace_kwargs = None
 
         # Dynamic C (register R01 as amended): the env adopts the effective
         # cell capacity read from the ns-3 telemetry; sync the controllers
@@ -968,6 +1071,17 @@ def run_episode(
 
         # -- log ------------------------------------------------------------
         now_ms = info.get("kpm_timestamp", "")
+        if het is not None and _het_pending is not None:
+            last_window_index = max(
+                last_window_index, int(_het_pending["state"].window_index)
+            )
+            last_sim_time_ms = max(
+                last_sim_time_ms, int(_het_pending["sim_time_ms"])
+            )
+        else:
+            last_window_index = max(last_window_index, int(step))
+            if isinstance(now_ms, (int, float)) and not isinstance(now_ms, bool):
+                last_sim_time_ms = max(last_sim_time_ms, int(now_ms))
         kpi = lambda sid: info.get(f"slice_{sid}", {})
         # MAC-side prb_scheduled (contract §3.5): info first (if the env
         # transports it), otherwise the ns-3 telemetry reader; "" in mocks.
@@ -1023,9 +1137,15 @@ def run_episode(
 
         step += 1
         if checkpoint_path and checkpoint_interval and step % checkpoint_interval == 0:
-            save_checkpoint(
+            _save_checkpoint_with_hash(
                 checkpoint_path,
-                build_checkpoint(controllers, meta=checkpoint_meta),
+                controllers,
+                checkpoint_meta,
+                horizon={
+                    "max_step_index": int(step),
+                    "max_window_index": int(last_window_index),
+                    "max_sim_time_ms": int(last_sim_time_ms),
+                },
             )
         done = terminated or truncated or (max_steps is not None and step >= max_steps)
         if done:
@@ -1037,10 +1157,19 @@ def run_episode(
             row["missing_reason"] = "end_of_run"
             _het_jsonl.write(json.dumps(row, default=float) + "\n")
         _het_jsonl.close()
+    if _causal_writer is not None:
+        _causal_writer.close()
 
     if checkpoint_path:
-        save_checkpoint(
-            checkpoint_path, build_checkpoint(controllers, meta=checkpoint_meta)
+        _save_checkpoint_with_hash(
+            checkpoint_path,
+            controllers,
+            checkpoint_meta,
+            horizon={
+                "max_step_index": int(step),
+                "max_window_index": int(last_window_index),
+                "max_sim_time_ms": int(last_sim_time_ms),
+            },
         )
 
     return {
@@ -1170,6 +1299,15 @@ def parse_args(argv=None):
                         default=f"{MARGIN_BOUNDS[0]},{MARGIN_BOUNDS[1]}",
                         help="R11 uncertainty margin bounds 'M_min,M_max' "
                              "(default: '2.0,50.0'; A3a: '1.0,10.0')")
+    parser.add_argument("--mean_field", action="store_true",
+                        help="A4 ablation (SQR-HET): restore original paper's "
+                             "causal global mean-field features [prb_others_norm, "
+                             "total_ues_norm] in dims 4..5 of z_i")
+    parser.add_argument("--fix_scaler_index", action="store_true",
+                        help="A_scaler isolated variant (SQR-HET): fix "
+                             "slice_state() scaler lookup from 'emu'[slice_id] "
+                             "to 'eum'[slice_id] so eMBB/URLLC/mMTC use their "
+                             "own n_{e,u,m} and queue_{e,u,m} scalers")
     parser.add_argument("--freeze", action="store_true",
                         help="evaluation mode: no regressor/memory updates")
     parser.add_argument("--warmup_s", type=float, default=100.0,
@@ -1210,6 +1348,10 @@ def parse_args(argv=None):
                              "URLLC com margem completa (R19). Sem dados "
                              "futuros; 1 update por janela; eMBB/mMTC "
                              "intactos.")
+    parser.add_argument("--causal_trace_path", type=str, default=None,
+                        help="opt-in JSONL(.gz) causal trace per decision "
+                             "window for D3-v2/A5 replay (pure read-only, "
+                             "zero RNG/state side effects)")
     return parser.parse_args(argv)
 
 
@@ -1266,20 +1408,27 @@ def main(argv=None):
     for key in ("scenario", "appStart", "ues"):
         env.scenario_configuration.pop(key, None)
     controllers = build_controllers(args, env)
-    checkpoint_path = args.checkpoint_path or os.path.join(
-        args.output, "sqr_checkpoint.pkl"
+    margin_bounds = list(parse_margin_bounds(args.margin_bounds))
+    scaler_manifest_path = (
+        args.het_scaler_manifest if args.controller == "sqr_het" else None
     )
-    if args.resume:
-        if not os.path.exists(checkpoint_path):
-            raise FileNotFoundError(
-                f"--resume: checkpoint not found at {checkpoint_path}"
-            )
-        restored_meta = restore_controllers(
-            load_checkpoint(checkpoint_path), controllers
-        )
-        print(f"[sqr_run] resumed controllers from {checkpoint_path} (meta={restored_meta})")
-
-    step_logger = StepMetricsLogger(os.path.join(args.output, args.step_log_file))
+    version_manifest = build_version_manifest(
+        scaler_manifest_path=scaler_manifest_path,
+    )
+    b0_descriptor, b0_config_sha256 = build_b0_config_descriptor(
+        controller=args.controller,
+        gamma=float(args.gamma),
+        c_prbs=int(args.c_prbs),
+        virtual_alpha=float(args.virtual_alpha),
+        empty_slice_guard=bool(args.empty_slice_guard),
+        fix_scaler_index=bool(args.fix_scaler_index),
+        mean_field=bool(args.mean_field),
+        margin_init=float(args.margin_init),
+        margin_bounds=margin_bounds,
+        urllc_delayed_update=bool(getattr(args, "urllc_delayed_update", False)),
+        warmup_s=float(args.warmup_s),
+        scaler_manifest_path=scaler_manifest_path,
+    )
     meta = {
         "controller": args.controller,
         "gamma": args.gamma,
@@ -1289,10 +1438,33 @@ def main(argv=None):
         "virtual_alpha": args.virtual_alpha,
         "empty_slice_guard": bool(args.empty_slice_guard),
         "margin_init": float(args.margin_init),
-        "margin_bounds": list(parse_margin_bounds(args.margin_bounds)),
+        "margin_bounds": margin_bounds,
+        "mean_field": bool(args.mean_field),
+        "fix_scaler_index": bool(args.fix_scaler_index),
+        "urllc_delayed_update": bool(getattr(args, "urllc_delayed_update", False)),
+        "warmup_s": float(args.warmup_s),
         "freeze": bool(args.freeze),
+        "versions": version_manifest,
+        "sla_manifest_sha256": version_manifest["sla_manifest_sha256"],
+        "scaler_manifest_sha256": version_manifest["scaler_manifest_sha256"],
+        "config_descriptor": b0_descriptor,
+        "config_sha256": b0_config_sha256,
         "saved_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
+    checkpoint_path = args.checkpoint_path or os.path.join(
+        args.output, "sqr_checkpoint.pkl"
+    )
+    if args.resume:
+        if not os.path.exists(checkpoint_path):
+            raise FileNotFoundError(
+                f"--resume: checkpoint not found at {checkpoint_path}"
+            )
+        ckpt_payload = load_checkpoint(checkpoint_path)
+        restored_meta = verify_resume_contract(ckpt_payload, meta, controllers)
+        restore_controllers(ckpt_payload, controllers)
+        print(f"[sqr_run] resumed controllers from {checkpoint_path} (meta={restored_meta})")
+
+    step_logger = StepMetricsLogger(os.path.join(args.output, args.step_log_file))
     if args.controller == "replay":
         # Replay provenance (Etapa 2.4): the override plan row this run
         # executes (grupo/plan coordinates land in the analysis join).
@@ -1323,6 +1495,8 @@ def main(argv=None):
             args.c_prbs,
             virtual_alpha=args.virtual_alpha,
             empty_slice_guard=bool(args.empty_slice_guard),
+            mean_field=bool(args.mean_field),
+            fix_scaler_index=bool(args.fix_scaler_index),
         )
         # HetRuntime construído LAZY dentro de run_episode (após env.reset,
         # quando env.sim_path existe). Incidente 11/11: construído aqui com
@@ -1342,7 +1516,21 @@ def main(argv=None):
                 window_provider=window_provider)
             for sid in range(args.num_slices)}
 
+    ep_checkpoint_path = (
+        None if (args.freeze and args.resume) else checkpoint_path
+    )
     total_kpm_missing = 0
+    _lambda_total_meta = (
+        float(sum(
+            float(v) for v in
+            (getattr(args, "sliceLambdas", None)
+             or getattr(args, "slice_lambdas", None)
+             or "").split(",")))
+        if (getattr(args, "sliceLambdas", None)
+            or getattr(args, "slice_lambdas", None))
+        else None
+    )
+    _run_id_meta = os.path.basename(os.path.normpath(args.output))
     for episode in range(1, args.episodes + 1):
         summary = run_episode(
             env,
@@ -1351,16 +1539,8 @@ def main(argv=None):
             het_runtime=het_runtime,
             het_bootstrap=het_bootstrap,
             decision_jsonl=os.path.join(args.output, "decisions.jsonl"),
-            het_meta={"run_id": os.path.basename(
-                          os.path.normpath(args.output)),
-                      "lambda_total": (float(sum(
-                          float(v) for v in
-                          (getattr(args, "sliceLambdas", None)
-                           or getattr(args, "slice_lambdas", None)
-                           or "").split(",")))
-                          if (getattr(args, "sliceLambdas", None)
-                              or getattr(args, "slice_lambdas", None))
-                          else None)},
+            het_meta={"run_id": _run_id_meta,
+                      "lambda_total": _lambda_total_meta},
             gamma=float(args.gamma),
             virtual_alpha=args.virtual_alpha,
             freeze=args.freeze,
@@ -1369,11 +1549,21 @@ def main(argv=None):
             episode=episode,
             step_logger=step_logger,
             decision_timer=accounting.decision_timer,
-            checkpoint_path=checkpoint_path,
+            checkpoint_path=ep_checkpoint_path,
             checkpoint_interval=args.checkpoint_interval,
             checkpoint_meta=meta,
             urllc_delayed_update=bool(getattr(args, "urllc_delayed_update",
                                               False)),
+            causal_trace_path=getattr(args, "causal_trace_path", None),
+            causal_trace_meta={
+                "run_id": _run_id_meta,
+                "lambda_total": _lambda_total_meta,
+                "seed": int(args.seed),
+                "c_prbs": int(args.c_prbs),
+                "versions": version_manifest,
+                "config_descriptor": b0_descriptor,
+                "config_sha256": b0_config_sha256,
+            },
         )
         total_kpm_missing += summary["kpm_missing_steps"]
         print(

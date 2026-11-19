@@ -56,5 +56,9 @@ results/sqr_jc_final/02_radio_sanity/*.log
 # literatura: PDFs raw re-obtinníveis fora; notas/figuras ficam
 docs/literature/tools/raw/
 # logs temporários de agentes
-avaliacao4.txt
+avaliacao*.txt
 MODA/ns-o-ran-gym/results/sqr_jc_decision/d1_delayed_feedback_test/*/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/a4_runs*/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/b0_robustness*/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/b0_traced*/
+MODA/ns-o-ran-gym/results/sqr_jc_decision/a5_gate1_replays*/
