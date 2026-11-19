@@ -10,4 +10,4 @@ PYTHON="${SQR_PYTHON:-${GYM_ROOT}/.venv/bin/python}"
 [[ -x "${PYTHON}" ]] || { echo "[run_sqr_v2_tests] ERRO: ${PYTHON} ausente" >&2; exit 2; }
 
 echo "[run_sqr_v2_tests] interpretador: ${PYTHON}"
-exec "${PYTHON}" -m pytest tests/test_sqr_v2_ipc_and_metrics.py "$@"
+exec "${PYTHON}" -m pytest tests/test_sqr_v2_ipc_and_metrics.py tests/test_sqr_v2_cer.py tests/test_sqr_v2_etapa3_fixes.py "$@"

@@ -1,0 +1,47 @@
+c: 53
+format: sqrjc_feature_scaler_manifest-1
+frozen: true
+n_cal_samples: 5388
+n_e_p1: 0.0
+n_e_p99: 3.0
+n_m_p1: 0.0
+n_m_p99: 3.0
+n_u_p1: 0.0
+n_u_p99: 8.0
+offered_e_p1: 0.0
+offered_e_p99: 22.7366
+offered_m_p1: 0.0
+offered_m_p99: 0.0182
+offered_u_p1: 0.0
+offered_u_p99: 3.811824000000001
+queue_e_p1: 0.0
+queue_e_p99: 7305094.620000003
+queue_m_p1: 0.0
+queue_m_p99: 711.0
+queue_u_p1: 0.0
+queue_u_p99: 6405.0
+rules:
+  kpi_e: kpi_div_sla
+  kpi_m: unit01
+  kpi_u: kpi_div_deadline
+  n_e: cal_p1p99
+  n_m: cal_p1p99
+  n_u: cal_p1p99
+  offered_e: cal_p1p99
+  offered_m: cal_p1p99
+  offered_u: cal_p1p99
+  prev_a_e: alloc_div_c
+  prev_a_m: alloc_div_c
+  prev_a_u: alloc_div_c
+  queue_e: cal_p1p99
+  queue_m: cal_p1p99
+  queue_u: cal_p1p99
+  snr_e: snr_r09
+  snr_m: snr_r09
+  snr_u: snr_r09
+  urllc_miss: unit01
+  urllc_p99: kpi_div_deadline
+  viol_e: unit01
+  viol_m: unit01
+  viol_u: unit01
+source: DEV_ETAPA3A_3B_TDD5MS

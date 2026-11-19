@@ -1,0 +1,12 @@
+{
+  "beta_v": 0.85,
+  "beta_o": 0.15,
+  "beta_c": 0.15,
+  "dl_slots_per_win": 80,
+  "a_min_m": 4,
+  "theta_u_def_e": 0.274,
+  "theta_u_def_u": 0.38,
+  "theta_u_don_e": 0.15,
+  "theta_u_don_u": 0.2,
+  "theta_u_don_m": 0.15
+}

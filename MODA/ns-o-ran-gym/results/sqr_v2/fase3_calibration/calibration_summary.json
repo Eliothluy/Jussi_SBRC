@@ -1,0 +1,31 @@
+{
+  "schema": "fase3_calibration_summary_1.0",
+  "seeds": [
+    101,
+    102,
+    103
+  ],
+  "sim_time_s": 90.0,
+  "slice_lambdas": "3,3,3",
+  "n_rollouts": 6,
+  "n_cal_samples": 5388,
+  "scaler_manifest_path": "/home/eliothluy/Documentos/Jussi_SBRC/MODA/ns-o-ran-gym/results/sqr_v2/fase3_calibration/scaler_manifest_v2_tdd5ms.yaml",
+  "selected_action_length_scales": [
+    0.35,
+    0.2,
+    0.1
+  ],
+  "cer_config_calibrated": {
+    "beta_v": 0.85,
+    "beta_o": 0.15,
+    "beta_c": 0.15,
+    "dl_slots_per_win": 80,
+    "a_min_m": 4,
+    "theta_u_def_e": 0.274,
+    "theta_u_def_u": 0.38,
+    "theta_u_don_e": 0.15,
+    "theta_u_don_u": 0.2,
+    "theta_u_don_m": 0.15
+  },
+  "cer_config_path": "/home/eliothluy/Documentos/Jussi_SBRC/MODA/ns-o-ran-gym/results/sqr_v2/fase3_calibration/cer_config_v2_calibrated.json"
+}

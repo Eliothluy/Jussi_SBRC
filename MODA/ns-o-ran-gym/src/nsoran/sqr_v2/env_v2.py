@@ -27,6 +27,14 @@ from nsoran.sqr.sqr_env import (
     SQR_LOG_FILENAME,
     SqrObservationBuilder,
 )
+from nsoran.sqr.sqr_kpis import (
+    CQI_SENTINEL,
+    IMP_CARRIED,
+    IMP_CELL_MEDIAN,
+    SNR_SENTINEL,
+    SqrKpmParser,
+    UeKpmRow,
+)
 from nsoran.sqr_v2.ipc_v2 import (
     IPC_V2_INDICATION_FILENAME,
     IpcIndicationV2,
@@ -47,6 +55,100 @@ def compute_expected_callbacks(sim_time_s: float, period_ms: int) -> int:
     total_ms = int(round(float(sim_time_s) * 1000.0))
     n = (total_ms - 1) // int(period_ms)
     return max(n, 1)
+
+
+IMP_OUT_OF_RANGE_FLOOR = "out_of_range_floor"
+
+
+class SqrV2KpmParser(SqrKpmParser):
+    """v2 KPM parser separating ``wbCqi=0`` outage from missing CQI without ``-999``/``15 dB`` distortion."""
+
+    def _parse_row(self, row: dict, legacy_one_based: bool) -> UeKpmRow | None:
+        try:
+            ts = int(row["timestamp"])
+            ue_imsi = int(row["ueImsi"])
+            raw_sid = int(row.get("sliceId", -1))
+        except (KeyError, TypeError, ValueError):
+            return None
+        sid = raw_sid - 1 if legacy_one_based else raw_sid
+        if sid not in range(self.num_slices):
+            return None
+
+        def _f(name: str, default: float = 0.0) -> float:
+            try:
+                v = float(row.get(name, default))
+            except (TypeError, ValueError):
+                return default
+            return v if np.isfinite(v) else default
+
+        raw_cqi = row.get("cqiWideband")
+        try:
+            cqi_val = float(raw_cqi)
+            if not np.isfinite(cqi_val):
+                cqi_val = float(CQI_SENTINEL)
+        except (TypeError, ValueError):
+            cqi_val = float(CQI_SENTINEL)
+
+        snr_db, snr_valid, imp_label = self._impute_snr_v2(ue_imsi, row.get("snrDb"), cqi_val)
+        return UeKpmRow(
+            timestamp=ts,
+            ue_imsi=ue_imsi,
+            slice_id=sid,
+            d_tx_bytes=_f("dTxBytes"),
+            d_rx_bytes=_f("dRxBytes"),
+            plr=_f("plr"),
+            resource_share_pct=_f("resourceSharePct"),
+            d_lost_packets=_f("dLostPackets"),
+            throughput_mbps=_f("throughputMbps"),
+            buffer_bytes=_f("bufferBytes"),
+            window_throughput_mbps=_f("windowThroughputMbps"),
+            snr_db=snr_db,
+            snr_was_imputed=not snr_valid,
+            snr_imputation=imp_label,
+            queue_bytes=_f("queueBytes"),
+            d_tx_packets=_f("dTxPackets"),
+            d_rx_packets=_f("dRxPackets"),
+            d_delay_sum_sec=_f("dDelaySumSec"),
+            cqi_wideband=cqi_val,
+        )
+
+    def _impute_snr_v2(
+        self, ue_imsi: int, wire_value: Any, cqi_val: float
+    ) -> tuple[float, bool, str | None]:
+        try:
+            v = float(wire_value)
+        except (TypeError, ValueError):
+            v = float("nan")
+        if np.isfinite(v) and v != SNR_SENTINEL:
+            self._last_valid_snr[ue_imsi] = v
+            self._last_method = None
+            return v, True, None
+
+        # Explicit out-of-range / outage from MAC (wbCqi == 0): deterministic 0.0 dB floor
+        if np.isfinite(cqi_val) and int(round(cqi_val)) == 0:
+            self._last_valid_snr[ue_imsi] = 0.0
+            self._last_method = None
+            return 0.0, True, None
+
+        carried = self._last_valid_snr.get(ue_imsi)
+        if carried is not None:
+            self._last_method = IMP_CARRIED
+            return float(carried), False, IMP_CARRIED
+        if self._previous_cell_median is not None:
+            self._last_method = IMP_CELL_MEDIAN
+            return float(self._previous_cell_median), False, IMP_CELL_MEDIAN
+        self._last_method = IMP_OUT_OF_RANGE_FLOOR
+        return 0.0, False, IMP_OUT_OF_RANGE_FLOOR
+
+
+class SqrV2ObservationBuilder(SqrObservationBuilder):
+    """Observation builder backed by :class:`SqrV2KpmParser` (BUG-06 fix)."""
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.parser = SqrV2KpmParser(
+            num_slices=self.num_slices, sla_thresholds=self.sla_thresholds
+        )
 
 
 class Ns3PrbWindowTelemetryV2:
@@ -246,7 +348,7 @@ class SqrV2Env(NsOranEnv):
         self.action_space = spaces.MultiDiscrete(
             np.full(self.num_slices, self.total_prbs + 1, dtype=np.int64)
         )
-        self.builder = SqrObservationBuilder(
+        self.builder = SqrV2ObservationBuilder(
             num_slices=self.num_slices,
             total_prbs=self.total_prbs,
             sla_thresholds=self.sla_thresholds,
